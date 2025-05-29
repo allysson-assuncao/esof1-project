@@ -2,6 +2,7 @@ package org.example.backend.model;
 
 import lombok.*;
 import jakarta.persistence.*;
+import org.example.backend.model.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

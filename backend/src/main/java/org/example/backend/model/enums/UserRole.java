@@ -1,4 +1,4 @@
-package org.example.backend.model;
+package org.example.backend.model.enums;
 
 import lombok.Getter;
 
@@ -7,6 +7,7 @@ public enum UserRole {
 
     ADMIN("admin"),
     CASHIER("caixa"),
+    COOK("cozinheiroz"),
     WAITER("garçom");
 
     private String role;
