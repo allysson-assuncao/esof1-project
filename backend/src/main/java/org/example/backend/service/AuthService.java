@@ -34,6 +34,7 @@ public class AuthService {
     }
 
     public boolean test(String message) {
+        System.out.println(message);
         return message.contains("teste");
     }
 

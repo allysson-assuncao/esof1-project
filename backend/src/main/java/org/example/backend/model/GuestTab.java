@@ -32,6 +32,6 @@ public class GuestTab {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_table_id")
-    private LocalTable user;
+    private LocalTable localTable;
 
 }

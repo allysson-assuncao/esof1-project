@@ -28,7 +28,7 @@ public class LocalTable {
     @Column(name = "status", nullable = false)
     private LocalTableStatus status;
 
-    @OneToMany(mappedBy = "local_table", cascade = CascadeType.DETACH)
+    @OneToMany(mappedBy = "localTable", cascade = CascadeType.DETACH)
     @JsonIgnore
     private List<GuestTab> guestTabs;
 

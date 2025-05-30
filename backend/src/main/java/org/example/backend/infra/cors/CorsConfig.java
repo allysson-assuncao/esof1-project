@@ -4,11 +4,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 public class CorsConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("https://localhost:3000", "http://localhost:3000")
+                .allowedMethods("GET", "POST", "DELETE", "PUT")
+                .allowedHeaders("Authorization", "Content-Type")
+                .exposedHeaders("Content-Disposition", "Allow-Origin")
+                .allowedOriginPatterns("https://localhost:3000", "http://localhost:3000")
+                .allowCredentials(true);
+    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -16,7 +28,7 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(List.of("https://localhost:3000", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setExposedHeaders(List.of("Content-Disposition"));
+        configuration.setExposedHeaders(List.of("Content-Disposition", "Allow-Origin"));
         configuration.setAllowedOriginPatterns(List.of("https://localhost:3000", "http://localhost:3000"));
         configuration.setAllowCredentials(true);
 
