@@ -23,12 +23,12 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
-    private Set<Category> subCategories;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+    private Set<Category> subCategories;
 
     @ManyToMany(mappedBy = "categoryList", fetch = FetchType.LAZY)
     @JsonIgnore

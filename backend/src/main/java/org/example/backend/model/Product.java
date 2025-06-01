@@ -30,7 +30,12 @@ public class Product {
     @Column(name = "price", nullable = false)
     private double price;
 
-    @Column(name = "additional_list", nullable = false)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "product_additional_categories",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private Set<Category> additionalList;
 
     @Column(name = "active", nullable = false)
