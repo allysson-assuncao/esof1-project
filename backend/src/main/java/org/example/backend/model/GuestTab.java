@@ -7,7 +7,6 @@ import org.example.backend.model.enums.GuestTabStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Table(name = "guest_tabs")
@@ -39,15 +38,6 @@ public class GuestTab {
 
     @OneToMany(mappedBy = "guestTab", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<GuestTab> guestTabs;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "guest_tab_products",
-        joinColumns = @JoinColumn(name = "guest_tab_id"),
-        inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    @JsonIgnore
-    private Set<Category> categoryList;
+    private List<Order> orders;
 
 }

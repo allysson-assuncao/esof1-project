@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "waiter", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
 

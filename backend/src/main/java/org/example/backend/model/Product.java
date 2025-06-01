@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,6 +20,9 @@ public class Product {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -36,13 +40,13 @@ public class Product {
     @JoinTable(
         name = "product_categories",
         joinColumns = @JoinColumn(name = "product_id"),
-        inverseJoinColumns = @JoinColumn(name = "categories_id")
+        inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     @JsonIgnore
     private Set<Category> categoryList;
 
-    @ManyToMany(mappedBy = "guest_tabs", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<GuestTab> guestTabs;
+    private List<Order> orders;
 
 }
