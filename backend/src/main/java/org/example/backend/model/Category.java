@@ -23,6 +23,9 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "sub_categories", nullable = false)
+    private Set<Category> subCategories;
+
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Product> products;

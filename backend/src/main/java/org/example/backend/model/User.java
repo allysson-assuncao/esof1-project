@@ -1,5 +1,6 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
 import org.example.backend.model.enums.UserRole;
@@ -25,6 +26,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -37,6 +41,10 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> orders;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(this.role == UserRole.ADMIN)
@@ -44,7 +52,7 @@ public class User implements UserDetails {
                     new SimpleGrantedAuthority("ROLE_CASHIER"),
                     new SimpleGrantedAuthority("ROLE_WAITER"));
         else if (this.role == UserRole.CASHIER)
-            return List.of(new SimpleGrantedAuthority("ROLE_PROFESSOR"),
+            return List.of(new SimpleGrantedAuthority("ROLE_CASHIER"),
                     new SimpleGrantedAuthority("ROLE_WAITER"));
         else
             return List.of(new SimpleGrantedAuthority("ROLE_WAITER"));
