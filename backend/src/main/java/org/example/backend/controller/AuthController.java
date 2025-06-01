@@ -38,8 +38,8 @@ public class AuthController {
     @PostMapping("/test")
     public ResponseEntity<?> test(@RequestBody String message) {
         return this.authService.test(message) ?
-                ResponseEntity.status(HttpStatus.OK).body("Mensagem de teste recebida com sucesso") :
-                ResponseEntity.badRequest().body("Mensagem nao continha teste");
+                ResponseEntity.status(HttpStatus.OK).body(Map.of("message","Mensagem de teste recebida com sucesso")) :
+                ResponseEntity.badRequest().body(Map.of("message","Mensagem nao continha teste"));
     }
 
 }

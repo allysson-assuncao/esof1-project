@@ -24,14 +24,20 @@ const TestForm = () => {
     const mutation = useMutation(test, {
         onSuccess: (data) => {
             toast.success("Teste realizado com sucesso!", {
-                description: `Bem-vindo, ${data.username}!`,
+                description: `${data.message}!`,
             })
         },
         onError: (error: unknown) => {
             if (error instanceof AxiosError) {
-                toast.error("Erro ao realizar o teste!", {
-                    description: error.response?.data?.message || 'Ocorreu um erro inesperado.',
-                })
+                if (error.response?.status === 400) {
+                    toast.error("Erro ao realizar o teste!", {
+                        description: error.response?.data?.message || 'Ocorreu um erro inesperado.',
+                    })
+                } else {
+                    toast.error("Erro ao realizar o teste!", {
+                        description: error.response?.data?.message || 'Ocorreu um erro inesperado.',
+                    })
+                }
             } else {
                 toast.error("Erro ao realizar o teste!", {
                     description: 'Ocorreu um erro inesperado.',
