@@ -6,7 +6,6 @@ import org.example.backend.model.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.UUID;
 
 @Table(name = "orders")
 @Entity

@@ -23,7 +23,7 @@ public class LocalTable {
     private UUID id;
 
     @Column(name = "number", nullable = false)
-    private String number;
+    private int number;
 
     @Column(name = "status", nullable = false)
     private LocalTableStatus status;

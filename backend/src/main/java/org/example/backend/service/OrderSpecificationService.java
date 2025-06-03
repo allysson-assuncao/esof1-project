@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderSpecificationService {
@@ -63,7 +62,6 @@ public class OrderSpecificationService {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("orderedTime"), filterDto.endTime()));
             }
 
-            // Filtro de preço (exemplo para preço unitário do produto)
             if (filterDto.minPrice() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(productJoin.get("price"), filterDto.minPrice()));
             }
