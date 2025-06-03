@@ -7,7 +7,6 @@ import org.example.backend.model.enums.GuestTabStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Table(name = "guest_tabs")
 @Entity
@@ -20,8 +19,8 @@ public class GuestTab {
 
     @Id
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "status", nullable = false)
     private GuestTabStatus status;

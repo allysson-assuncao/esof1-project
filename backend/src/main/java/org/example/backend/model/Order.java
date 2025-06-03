@@ -18,8 +18,8 @@ import java.util.UUID;
 public class Order {
     @Id
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "amount", nullable = false)
     private int amount;
