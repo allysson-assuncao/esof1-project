@@ -6,6 +6,7 @@ import {Provider} from "react-redux";
 import {ThemeProvider} from "next-themes";
 import {Toaster} from "@/components/ui/sonner";
 import store from "@/store";
+import React from "react";
 
 const queryClient = new QueryClient();
 

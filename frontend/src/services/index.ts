@@ -7,3 +7,7 @@ export const auth = axios.create({
 export const testURL = axios.create({
     baseURL: 'http://localhost:8080/app/auth',
 });
+
+export const orders = axios.create({
+    baseURL: 'http://localhost:8080/app/orders',
+});

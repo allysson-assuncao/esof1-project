@@ -35,8 +35,8 @@ export interface OrderFilters {
     tableId?: string;
     guestTabIds?: number[];
     orderIds?: number[];
-    orderStatuses?: OrderStatus;
-    guestTabStatuses?: GuestTabStatus;
+    orderStatuses?: string[];
+    guestTabStatuses?: string[];
     minPrice?: number;
     maxPrice?: number;
     startTime?: Date | undefined;
@@ -53,21 +53,21 @@ export interface FetchOrdersParams {
     direction?: 'ASC' | 'DESC';
 }
 
-interface Order {
+export interface Order {
   id: string;
   productName: string;
   amount: number;
   unitPrice: number;
   totalItemPrice: number;
-  status: OrderStatus;
+  orderStatus: OrderStatus;
   observation: string;
   orderedTime: string;
   waiterName: string;
 }
 
-interface GuestTab {
+export interface GuestTab {
   id: string;
-  status: GuestTabStatus;
+  guestTabStatus: GuestTabStatus;
   timeOpened: Date | undefined;
   totalGuestTabPrice: number;
   waiterName?: string;
