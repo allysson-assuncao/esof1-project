@@ -1,6 +1,6 @@
 "use client";
 
-import TestForm from "@/components/form/TestPage";
+import TestForm from "@/components/form/TestForm";
 
 const TestPage = () => {
     return (
