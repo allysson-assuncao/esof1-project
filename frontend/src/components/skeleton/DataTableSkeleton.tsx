@@ -8,12 +8,12 @@ export function DataTableSkeleton() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Id do Processo</TableHead>
-                            <TableHead>Inicio</TableHead>
-                            <TableHead>Fim</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Usuário</TableHead>
-                            <TableHead>Saída</TableHead>
+                            <TableHead>Coluna 1</TableHead>
+                            <TableHead>Coluna 2</TableHead>
+                            <TableHead>Coluna 3</TableHead>
+                            <TableHead>Coluna 4</TableHead>
+                            <TableHead>Coluna 5</TableHead>
+                            <TableHead>Coluna 6</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
