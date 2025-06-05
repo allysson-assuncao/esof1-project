@@ -38,6 +38,7 @@ public class OrderController {
             @RequestParam(defaultValue = "DESC") Sort.Direction direction
     ) {
         System.out.println(filterDto.toString());
+        System.out.println("Received");
         Page<OrderDTO> ordersPage = this.orderService.getOrdersByFilters(filterDto, page, size, orderBy, direction);
         return ResponseEntity.ok(new FilteredPageDTO<>(ordersPage.getContent(), ordersPage.getTotalPages()));
     }

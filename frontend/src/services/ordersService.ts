@@ -3,9 +3,9 @@ import {FetchOrdersParams} from "@/model/Interfaces";
 
 export const fetchFilteredProcesses = async (params: FetchOrdersParams) => {
     const response = await orders.post(`/filter`, params.filter, {
-        headers: {
+        /*headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        },*/
         params: {
             page: params.page || 0,
             size: params.size || 350,
@@ -13,6 +13,7 @@ export const fetchFilteredProcesses = async (params: FetchOrdersParams) => {
             direction: params.direction || 'ASC',
         },
     });
-    console.log(params.filter)
+    console.log(params)
+    console.log(response.data)
     return response.data;
 };

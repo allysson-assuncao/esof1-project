@@ -17,10 +17,10 @@ public class OrderSpecificationService {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            Join<Order, User> userJoin = root.join("user");
+            Join<Order, User> userJoin = root.join("waiter");
             Join<Order, Product> productJoin = root.join("product");
             Join<Order, GuestTab> guestTabJoin = root.join("guestTab");
-            Join<GuestTab, LocalTable> localTableJoin = root.join("localTable");
+            Join<GuestTab, LocalTable> localTableJoin = guestTabJoin.join("localTable");
 
             if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));

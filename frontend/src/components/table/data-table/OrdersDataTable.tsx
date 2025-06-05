@@ -11,6 +11,8 @@ import {
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import {OrderFilters} from "@/model/Interfaces";
+import {Input} from "@/components/ui/input";
+import {DatePicker} from "@/components/ui/date-picker";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -59,7 +61,32 @@ export function OrdersDataTable<TData, TValue>({
         <div>
             {/* Filters */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
-
+                <Input
+                    placeholder="Nome do Produto: "
+                    value={selectedFilters.productName}
+                    onChange={(event) => setSelectedFilters({ ...selectedFilters, productName: event.target.value })}
+                    className="max-w-sm"
+                />
+                <Input
+                    type="number"
+                    placeholder="Preço min: "
+                    value={selectedFilters.minPrice}
+                    onChange={(event) => setSelectedFilters({ ...selectedFilters, minPrice: event.target.valueAsNumber })}
+                    className="max-w-sm"
+                />
+                <Input
+                    type="number"
+                    placeholder="Preço max: "
+                    value={selectedFilters.maxPrice}
+                    onChange={(event) => setSelectedFilters({ ...selectedFilters, maxPrice: event.target.valueAsNumber })}
+                    className="max-w-sm"
+                />
+                <DatePicker
+                    onDateSelected={(startTime) => setSelectedFilters({ ...selectedFilters, startTime })}
+                />
+                <DatePicker
+                    onDateSelected={(endTime) => setSelectedFilters({ ...selectedFilters, endTime })}
+                />
             </div>
 
             {/* Table */}
