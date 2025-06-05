@@ -1,0 +1,63 @@
+-- ========== USUÁRIOS (GARÇONS) ==========
+INSERT INTO users (id, name, email, username, password, role) VALUES
+('8c1a8608-0949-4743-98f7-7b8219f36199', 'João Carlos Silva', 'a', 'joao.waiter', '$2a$10$placeholderhashedpassword1', 3), -- Lembre-se de usar senhas com hash real!
+('5a9d803f-6139-4edf-96c3-47135f63354c', 'Maria Antônia Oliveira', 'b', 'maria.waiter', '$2a$10$placeholderhashedpassword2', 3),
+('f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', 'Ana Beatriz Lima', 'c', 'ana.waiter', '$2a$10$placeholderhashedpassword3', 3);
+
+-- ========== PRODUTOS ==========
+INSERT INTO products (id, name, description, price, active) VALUES
+('1e60c9e8-9a9b-4a9c-9b87-0452ef5ddc7a', 'Pizza Margherita', 'Molho de tomate fresco, mussarela de búfala e manjericão.', 45.50, TRUE),
+('b2e8f0b5-7205-4b75-a629-e0c8c4c81515', 'Coca-Cola Zero (Lata 350ml)', 'Refrigerante sem açúcar.', 6.00, TRUE),
+('d8f0a2c1-30e6-4f50-9f89-7219e92b7a26', 'Suco de Laranja Natural (500ml)', 'Feito com laranjas frescas espremidas na hora.', 12.00, TRUE),
+('c1b3e8d2-5a6f-4c7e-8d9f-0a1b2c3d4e5f', 'Hambúrguer Gourmet da Casa', 'Pão brioche, blend de carnes nobres 180g, queijo cheddar, bacon crocante e maionese caseira.', 38.90, TRUE),
+('9f8e7d6c-5b4a-3c2b-1a0f-e9d8c7b6a543', 'Água Mineral com Gás (500ml)', 'Água mineral natural gaseificada.', 4.00, TRUE),
+('a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'Batata Frita Especial', 'Batatas fritas crocantes com alecrim e páprica.', 22.00, TRUE);
+
+
+-- ========== MESAS (local_tables) ==========
+INSERT INTO tables (id, "number", status) VALUES
+('a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d', 1, 1),
+('b1c2d3e4-f5a6-4b5c-9d0e-1f2a3b4c5d6e', 2, 1),
+('c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f', 3, 2),
+('d3e4f5a6-b7c8-4d5e-1f2a-3b4c5d6e7f80', 4, 2);
+
+
+-- ========== COMANDAS (guest_tabs) ==========
+INSERT INTO guest_tabs (id, status, time_opened, time_closed, local_table_id) VALUES
+(1, 0, CURRENT_TIMESTAMP - INTERVAL '2 hours 30 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01
+(2, 0, CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01 (outra comanda)
+(3, 0, CURRENT_TIMESTAMP - INTERVAL '5 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours', 'b1c2d3e4-f5a6-4b5c-9d0e-1f2a3b4c5d6e'), -- Mesa M02 (comanda antiga, fechada)
+(4, 0, CURRENT_TIMESTAMP - INTERVAL '45 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f'), -- Mesa M03
+(5, 2, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days' + INTERVAL '10 minutes', 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01 (comanda cancelada)
+(6, 1, CURRENT_TIMESTAMP - INTERVAL '10 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f'); -- Mesa M03
+
+
+-- ========== PEDIDOS (orders) ==========
+-- ATENÇÃO: IDs especificados manualmente. Mesma observação da tabela guest_tabs.
+-- Assegure-se que guest_tab_id, product_id e user_id (garçom) existam nas tabelas referenciadas.
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(1, 1, 'Sem cebola, por favor.', 0, CURRENT_TIMESTAMP - INTERVAL '2 hours 25 minutes', 1, 'c1b3e8d2-5a6f-4c7e-8d9f-0a1b2c3d4e5f', '8c1a8608-0949-4743-98f7-7b8219f36199', NULL),
+(2, 2, 'Uma bem gelada.', 1, CURRENT_TIMESTAMP - INTERVAL '2 hours 20 minutes', 1, 'b2e8f0b5-7205-4b75-a629-e0c8c4c81515', '8c1a8608-0949-4743-98f7-7b8219f36199', NULL),
+(3, 1, '', 0, CURRENT_TIMESTAMP - INTERVAL '1 hour', 1, '1e60c9e8-9a9b-4a9c-9b87-0452ef5ddc7a', '5a9d803f-6139-4edf-96c3-47135f63354c', NULL);
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(4, 1, 'Com gelo e limão.', 1, CURRENT_TIMESTAMP - INTERVAL '1 hour 10 minutes', 2, 'd8f0a2c1-30e6-4f50-9f89-7219e92b7a26', '5a9d803f-6139-4edf-96c3-47135f63354c', NULL),
+(5, 1, 'Extra bacon.', 0, CURRENT_TIMESTAMP - INTERVAL '1 hour', 2, 'c1b3e8d2-5a6f-4c7e-8d9f-0a1b2c3d4e5f', '5a9d803f-6139-4edf-96c3-47135f63354c', NULL);
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(6, 2, 'Caprichar na mussarela!', 0, CURRENT_TIMESTAMP - INTERVAL '4 hours 50 minutes', 3, '1e60c9e8-9a9b-4a9c-9b87-0452ef5ddc7a', 'f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', NULL),
+(7, 4, '', 2, CURRENT_TIMESTAMP - INTERVAL '4 hours 40 minutes', 3, '9f8e7d6c-5b4a-3c2b-1a0f-e9d8c7b6a543', 'f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', NULL);
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(8, 1, 'Ponto da casa.', 0, CURRENT_TIMESTAMP - INTERVAL '40 minutes', 4, 'c1b3e8d2-5a6f-4c7e-8d9f-0a1b2c3d4e5f', '8c1a8608-0949-4743-98f7-7b8219f36199', NULL),
+(9, 1, 'Pouco gelo.', 1, CURRENT_TIMESTAMP - INTERVAL '35 minutes', 4, 'd8f0a2c1-30e6-4f50-9f89-7219e92b7a26', '8c1a8608-0949-4743-98f7-7b8219f36199', NULL),
+(10, 1, 'Cortar em 8 pedaços.', 0, CURRENT_TIMESTAMP - INTERVAL '30 minutes', 4, '1e60c9e8-9a9b-4a9c-9b87-0452ef5ddc7a', '8c1a8608-0949-4743-98f7-7b8219f36199', NULL);
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(11, 1, 'Acompanha o hambúrguer ID 8', 0, CURRENT_TIMESTAMP - INTERVAL '40 minutes', 4, 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', '8c1a8608-0949-4743-98f7-7b8219f36199', 8),
+(12, 1, 'Sem gás por favor.', 1, CURRENT_TIMESTAMP - INTERVAL '5 minutes', 6, '9f8e7d6c-5b4a-3c2b-1a0f-e9d8c7b6a543', 'f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', NULL);
+
+INSERT INTO orders (id, amount, observation, status, ordered_time, guest_tab_id, product_id, user_id, parent_order_id) VALUES
+(13, 1, 'Bem passado', 1, CURRENT_TIMESTAMP - INTERVAL '8 minutes', 6, 'c1b3e8d2-5a6f-4c7e-8d9f-0a1b2c3d4e5f', 'f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', NULL),
+(14, 2, 'Para viagem', 0, CURRENT_TIMESTAMP - INTERVAL '5 minutes', 6, 'b2e8f0b5-7205-4b75-a629-e0c8c4c81515', 'f2d0f91e-7a71-4f7e-8b6c-18b4f32c75e5', NULL);

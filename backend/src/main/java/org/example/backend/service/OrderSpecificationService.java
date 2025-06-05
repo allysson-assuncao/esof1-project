@@ -22,7 +22,7 @@ public class OrderSpecificationService {
             Join<Order, GuestTab> guestTabJoin = root.join("guestTab");
             Join<GuestTab, LocalTable> localTableJoin = guestTabJoin.join("localTable");
 
-            if (filterDto.tableId() != null) {
+            /*if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
             } else {
                 // Maybe throw an exception
@@ -67,7 +67,7 @@ public class OrderSpecificationService {
             }
             if (filterDto.maxPrice() != null) {
                  predicates.add(criteriaBuilder.lessThanOrEqualTo(productJoin.get("price"), filterDto.maxPrice()));
-            }
+            }*/
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -57,8 +57,8 @@ export interface Order {
   id: string;
   productName: string;
   amount: number;
-  unitPrice: number;
-  totalItemPrice: number;
+  /*unitPrice: number;
+  totalItemPrice: number;*/
   orderStatus: OrderStatus;
   observation: string;
   orderedTime: string;

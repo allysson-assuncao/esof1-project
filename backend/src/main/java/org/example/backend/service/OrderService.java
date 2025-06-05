@@ -36,6 +36,7 @@ public class OrderService {
         Specification<Order> specification = this.orderSpecificationService.getOrderSpecification(filterDto);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
         Page<Order> ordersPage = this.orderRepository.findAll(specification, pageable);
+        System.out.println(ordersPage.getTotalElements());
 
         return ordersPage.map(this::convertToOrderDTO);
     }
@@ -49,13 +50,13 @@ public class OrderService {
                 .orderStatus(order.getStatus() != null ? order.getStatus() : null)
                 .orderedTime(order.getOrderedTime())
                 .orderTotalPrice(order.getProduct() != null ? order.getAmount() * order.getProduct().getPrice() : 0.0)
-                .additionalOrders(
-                        order.getAdditionalOrders() != null
+                /*.additionalOrders(
+                        order.getAdditionalOrders() != null && !order.getAdditionalOrders().isEmpty()
                                 ? order.getAdditionalOrders().stream()
                                 .map(Order::getId)
                                 .collect(Collectors.toSet())
                                 : null
-                )
+                )*/
                 .productName(order.getProduct() != null ? order.getProduct().getName() : null)
                 .productUnitPrice(order.getProduct() != null ? order.getProduct().getPrice() : 0.0)
                 .guestTabId(order.getGuestTab() != null ? order.getGuestTab().getId() : null)
