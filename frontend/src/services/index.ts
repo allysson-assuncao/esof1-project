@@ -13,5 +13,5 @@ export const testURL = axios.create({
 });
 
 export const orders = axios.create({
-    baseURL: `http://localhost:${port}/app/orders`,
+    baseURL: `http://localhost:${port}/app/order`,
 });

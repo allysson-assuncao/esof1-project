@@ -4,7 +4,8 @@ import {FetchOrdersParams} from "@/model/Interfaces";
 export const fetchFilteredProcesses = async (params: FetchOrdersParams) => {
     const response = await orders.post(`/filter`, params.filter, {
         /*headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            /!*'Authorization': `Bearer ${localStorage.getItem('token')}`,*!/
+            "Access-Control-Allow-Origin": "",
         },*/
         params: {
             page: params.page || 0,
