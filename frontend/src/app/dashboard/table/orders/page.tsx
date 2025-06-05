@@ -2,7 +2,7 @@
 
 import OrdersTable from "@/components/table/OrdersTable";
 
-const ApproveUsersPage = () => {
+const OrdersTablePage = () => {
     return (
         <div className="h-full">
             <OrdersTable/>
@@ -10,4 +10,4 @@ const ApproveUsersPage = () => {
     );
 };
 
-export default ApproveUsersPage;
+export default OrdersTablePage;
