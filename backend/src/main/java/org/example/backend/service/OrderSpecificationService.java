@@ -44,16 +44,16 @@ public class OrderSpecificationService {
 
             if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
                  predicates.add(guestTabJoin.get("status").in(filterDto.guestTabStatuses()));
-            }
+            }*/
 
             if (filterDto.productName() != null && !filterDto.productName().isBlank()) {
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(productJoin.get("name")),
                         "%" + filterDto.productName().toLowerCase() + "%"));
             }
 
-            if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
+            /*if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
                 predicates.add(userJoin.get("id").in(filterDto.waiterIds()));
-            }
+            }*/
 
             if (filterDto.startTime() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("orderedTime"), filterDto.startTime()));
@@ -67,7 +67,7 @@ public class OrderSpecificationService {
             }
             if (filterDto.maxPrice() != null) {
                  predicates.add(criteriaBuilder.lessThanOrEqualTo(productJoin.get("price"), filterDto.maxPrice()));
-            }*/
+            }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
