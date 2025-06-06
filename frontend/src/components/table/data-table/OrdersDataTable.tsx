@@ -13,6 +13,7 @@ import {Button} from '@/components/ui/button'
 import {DisplayGuestTabItem, DisplayOrderItem, OrderFilters} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
+import {arrayToDate} from "@/utils/operations/date-convertion";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -60,8 +61,7 @@ export function OrdersDataTable<TValue>({
     return (
         <div>
             {/* Filters */}
-            <div
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
                 <Input
                     placeholder="Nome do Produto: "
                     value={selectedFilters.productName}
@@ -154,10 +154,11 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                     <TableRow>
                         <TableHead>Produto</TableHead>
                         <TableHead className="text-center">Qtd.</TableHead>
-                        <TableHead>Garçom</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Hora</TableHead>
                         <TableHead>Observação</TableHead>
                         <TableHead className="text-right">Total Item</TableHead>
+                        <TableHead>Garçom</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -165,10 +166,11 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                         <TableRow key={order.orderId}>
                             <TableCell>{order.productName}</TableCell>
                             <TableCell className="text-center">{order.amount}</TableCell>
-                            <TableCell>{order.waiterName}</TableCell>
                             <TableCell>{order.orderStatus}</TableCell>
+                            <TableCell>{order.orderedTime}</TableCell>
                             <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
                             <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
+                            <TableCell>{order.waiterName}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
