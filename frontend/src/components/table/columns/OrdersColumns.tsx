@@ -1,41 +1,9 @@
 'use client'
 
 import {ColumnDef} from '@tanstack/react-table'
-import {DisplayGuestTabItem, DisplayOrderItem} from "@/model/Interfaces";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {DisplayGuestTabItem} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {DataTableColumnHeader} from "@/components/ui/data-table";
-
-const OrdersSubTable = ({ orders }: { orders: DisplayOrderItem[] }) => {
-  return (
-    <div className="p-4 bg-muted/50">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Produto</TableHead>
-            <TableHead className="text-center">Qtd.</TableHead>
-            <TableHead>Garçom</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Observação</TableHead>
-            <TableHead className="text-right">Total Item</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => (
-            <TableRow key={order.orderId}>
-              <TableCell>{order.productName}</TableCell>
-              <TableCell className="text-center">{order.amount}</TableCell>
-              <TableCell>{order.waiterName}</TableCell>
-              <TableCell>{order.orderStatus}</TableCell>
-              <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
-              <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
-}
 
 export const ordersColumns: ColumnDef<DisplayGuestTabItem>[] = [
     // DrillDown

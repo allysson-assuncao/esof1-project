@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react'
+import React, {SetStateAction, useState} from 'react'
 import {
     useReactTable,
     getCoreRowModel,
@@ -8,15 +8,15 @@ import {
     SortingState,
     ColumnDef, flexRender,
 } from '@tanstack/react-table'
-import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import {OrderFilters} from "@/model/Interfaces";
+import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
+import {Button} from '@/components/ui/button'
+import {DisplayGuestTabItem, DisplayOrderItem, OrderFilters} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
+interface DataTableProps<TValue> {
+    columns: ColumnDef<DisplayGuestTabItem, TValue>[];
+    data: DisplayGuestTabItem[];
     setPage: (page: (prev: number) => number) => void;
     selectedFilters: OrderFilters;
     setSelectedFilters: (filters: SetStateAction<OrderFilters>) => void;
@@ -25,21 +25,21 @@ interface DataTableProps<TData, TValue> {
     setPageSize: (page: number) => void;
 }
 
-export function OrdersDataTable<TData, TValue>({
-                                                  columns,
-                                                  data,
-                                                  setPage,
-                                                  selectedFilters,
-                                                  setSelectedFilters,
-                                                  page,
-                                                  totalPages,
-                                              }: DataTableProps<TData, TValue>) {
+export function OrdersDataTable<TValue>({
+                                            columns,
+                                            data,
+                                            setPage,
+                                            selectedFilters,
+                                            setSelectedFilters,
+                                            page,
+                                            totalPages,
+                                        }: DataTableProps<TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
 
     const table = useReactTable({
         data,
         columns,
-        state: { sorting },
+        state: {sorting},
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -60,32 +60,33 @@ export function OrdersDataTable<TData, TValue>({
     return (
         <div>
             {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
+            <div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
                 <Input
                     placeholder="Nome do Produto: "
                     value={selectedFilters.productName}
-                    onChange={(event) => setSelectedFilters({ ...selectedFilters, productName: event.target.value })}
+                    onChange={(event) => setSelectedFilters({...selectedFilters, productName: event.target.value})}
                     className="max-w-sm"
                 />
                 <Input
                     type="number"
                     placeholder="Preço min: "
                     value={selectedFilters.minPrice}
-                    onChange={(event) => setSelectedFilters({ ...selectedFilters, minPrice: event.target.valueAsNumber })}
+                    onChange={(event) => setSelectedFilters({...selectedFilters, minPrice: event.target.valueAsNumber})}
                     className="max-w-sm"
                 />
                 <Input
                     type="number"
                     placeholder="Preço max: "
                     value={selectedFilters.maxPrice}
-                    onChange={(event) => setSelectedFilters({ ...selectedFilters, maxPrice: event.target.valueAsNumber })}
+                    onChange={(event) => setSelectedFilters({...selectedFilters, maxPrice: event.target.valueAsNumber})}
                     className="max-w-sm"
                 />
                 <DatePicker
-                    onDateSelected={(startTime) => setSelectedFilters({ ...selectedFilters, startTime })}
+                    onDateSelected={(startTime) => setSelectedFilters({...selectedFilters, startTime})}
                 />
                 <DatePicker
-                    onDateSelected={(endTime) => setSelectedFilters({ ...selectedFilters, endTime })}
+                    onDateSelected={(endTime) => setSelectedFilters({...selectedFilters, endTime})}
                 />
             </div>
 
@@ -106,20 +107,29 @@ export function OrdersDataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.length ? (
+                        {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                <React.Fragment key={row.id}>
+                                    <TableRow data-state={row.getIsSelected() && "selected"}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                    {row.getIsExpanded() && (
+                                        <TableRow>
+                                            <TableCell colSpan={row.getVisibleCells().length}>
+                                                <OrdersSubTable orders={row.original.orders}/>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </React.Fragment>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center">
-                                    Nenhum resultado encontrado.
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    Nenhum resultado.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -132,6 +142,37 @@ export function OrdersDataTable<TData, TValue>({
                 <Button onClick={() => handlePreviousPage()} disabled={page == 0}>Anterior</Button>
                 <Button onClick={() => handleNextPage()} disabled={page >= totalPages - 1}>Próximo</Button>
             </div>
+        </div>
+    )
+}
+
+const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
+    return (
+        <div className="p-4 bg-muted/50">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Produto</TableHead>
+                        <TableHead className="text-center">Qtd.</TableHead>
+                        <TableHead>Garçom</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Observação</TableHead>
+                        <TableHead className="text-right">Total Item</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {orders.map((order) => (
+                        <TableRow key={order.orderId}>
+                            <TableCell>{order.productName}</TableCell>
+                            <TableCell className="text-center">{order.amount}</TableCell>
+                            <TableCell>{order.waiterName}</TableCell>
+                            <TableCell>{order.orderStatus}</TableCell>
+                            <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
+                            <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     )
 }
