@@ -51,8 +51,9 @@ const OrdersTable = () => {
     )
 
     const groupedData = useMemo(() => {
-        console.log(flatOrders)
-        return groupOrdersByGuestTab(flatOrders);
+        const content = !flatOrders ? [] : flatOrders;
+        console.log(content)
+        return groupOrdersByGuestTab(content);
     }, [flatOrders]);
 
     if (isLoading) return <DataTableSkeleton/>
