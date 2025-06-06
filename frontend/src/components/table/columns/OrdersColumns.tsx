@@ -1,11 +1,85 @@
 'use client'
 
-import { ColumnDef } from '@tanstack/react-table'
-import {Order, OrderStatus} from "@/model/Interfaces";
-import {TableHeader} from "@/components/ui/table";
-import {Checkbox} from "@/components/ui/checkbox";
+import {ColumnDef} from '@tanstack/react-table'
+import {DisplayGuestTabItem, DisplayOrderItem} from "@/model/Interfaces";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {ChevronDown, ChevronRight} from "lucide-react";
+import {DataTableColumnHeader} from "@/components/ui/data-table";
 
-export const ordersColumns: ColumnDef<Order>[] = [
+const OrdersSubTable = ({ orders }: { orders: DisplayOrderItem[] }) => {
+  return (
+    <div className="p-4 bg-muted/50">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Produto</TableHead>
+            <TableHead className="text-center">Qtd.</TableHead>
+            <TableHead>Garçom</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Observação</TableHead>
+            <TableHead className="text-right">Total Item</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => (
+            <TableRow key={order.orderId}>
+              <TableCell>{order.productName}</TableCell>
+              <TableCell className="text-center">{order.amount}</TableCell>
+              <TableCell>{order.waiterName}</TableCell>
+              <TableCell>{order.orderStatus}</TableCell>
+              <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
+              <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
+export const ordersColumns: ColumnDef<DisplayGuestTabItem>[] = [
+    // DrillDown
+    {
+        id: "expander",
+        header: ({table}) => (
+            <button
+                onClick={() => table.toggleAllRowsExpanded(!table.getIsAllRowsExpanded())}
+            >
+                {table.getIsAllRowsExpanded() ? <ChevronDown/> : <ChevronRight/>}
+            </button>
+        ),
+        cell: ({row}) => (
+            <button
+                onClick={() => row.toggleExpanded(!row.getIsExpanded())}
+            >
+                {row.getIsExpanded() ? <ChevronDown/> : <ChevronRight/>}
+            </button>
+        ),
+    },
+
+    // GuestTab
+    {
+        accessorKey: "guestTabId",
+        header: ({column}) => <DataTableColumnHeader column={column} title="Comanda ID"/>,
+    },
+    {
+        accessorKey: "totalPrice",
+        header: ({column}) => <DataTableColumnHeader column={column} title="Total da Comanda"/>,
+        cell: ({row}) => {
+            const formatted = new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            }).format(row.original.totalPrice);
+            return <div className="font-medium">{formatted}</div>;
+        },
+    },
+    {
+        header: "Qtd. Pedidos",
+        cell: ({row}) => row.original.orders.length,
+    },
+]
+
+/*export const ordersColumns: ColumnDef<DisplayGuestTabItem>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -40,16 +114,16 @@ export const ordersColumns: ColumnDef<Order>[] = [
         header: () => <TableHeader title="Qtd." />,
         cell: ({ row }) => <div className="text-center">{row.original.amount}</div>,
     },
-    /*{
+    {
         accessorKey: "unitPrice",
         header: () => <TableHeader title="Preço Unit." />,
-        cell: ({ row }) => <div>R$ {row.original.unitPrice.toFixed(2)}</div>,
+        cell: ({ row }) => <div>R$ {row.original.productUnitPrice.toFixed(2)}</div>,
     },
     {
         accessorKey: "totalItemPrice",
         header: () => <TableHeader title="Total Item" />,
-        cell: ({ row }) => <div>R$ {row.original.totalItemPrice.toFixed(2)}</div>,
-    },*/
+        cell: ({ row }) => <div>R$ {row.original.orderTotalPrice.toFixed(2)}</div>,
+    },
     {
         accessorKey: "orderStatus",
         header: () => <TableHeader title="Status" />,
@@ -58,9 +132,9 @@ export const ordersColumns: ColumnDef<Order>[] = [
             // Maybe add some color
             return <div>{statusLabel}</div>;
         },
-        /*filterFn: (row, id, value) => {
+        filterFn: (row, id, value) => {
           return value.includes(row.getValue(id));
-        },*/
+        },
     },
     {
         accessorKey: "waiterName",
@@ -77,8 +151,8 @@ export const ordersColumns: ColumnDef<Order>[] = [
         header: "Observação",
         cell: ({ row }) => <div className="truncate max-w-xs" title={row.original.observation}>{row.original.observation || '-'}</div>,
     },
-    /*{
+    {
       accessorKey: "guestTabId",
       header: "ID Comanda",
-    },*/
-];
+    },
+];*/

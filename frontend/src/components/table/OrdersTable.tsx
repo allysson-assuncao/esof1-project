@@ -1,11 +1,11 @@
 'use client'
 
 import {useQuery} from 'react-query'
-import {useState} from 'react'
+import {useMemo, useState} from 'react'
 import {OrdersDataTable} from "@/components/table/data-table/OrdersDataTable";
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
 import {ordersColumns} from "@/components/table/columns/OrdersColumns";
-import {OrderFilters} from "@/model/Interfaces";
+import {groupOrdersByGuestTab, OrderFilters} from "@/model/Interfaces";
 import {fetchFilteredProcesses} from "@/services/ordersService";
 
 const OrdersTable = () => {
@@ -27,8 +27,8 @@ const OrdersTable = () => {
     const [totalPages, setTotalPages] = useState(30);
     const [cachedPages, setCachedPages] = useState<{ [key: number]: OrderFilters[] }>({});
 
-    const {data, error, isLoading} = useQuery(
-        ['orders', selectedFilters, page],
+    const {data: flatOrders, error, isLoading} = useQuery(
+        ['orders', selectedFilters, page, pageSize],
         async () => {
             if (page !== 0 && cachedPages[page]) {
                 return cachedPages[page]
@@ -50,17 +50,22 @@ const OrdersTable = () => {
         },
     )
 
+    const groupedData = useMemo(() => {
+        const content = flatOrders?.content || [];
+        return groupOrdersByGuestTab(content);
+    }, [flatOrders]);
+
     if (isLoading) return <DataTableSkeleton/>
     if (error) return <div>Erro carregando os dados</div>
 
     return (
         <div className="container mx-auto py-10 w-full max-w-[1920px] 5xl:mx-auto 5xl:px-32">
             <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-8 items-start md:items-center">
-                Lista de Comandas
+                <h1 className="text-2xl font-bold">Comandas e Pedidos</h1>
             </div>
             <OrdersDataTable
                 columns={ordersColumns}
-                data={data || []}
+                data={groupedData}
                 setPage={setPage}
                 selectedFilters={selectedFilters}
                 setSelectedFilters={setSelectedFilters}

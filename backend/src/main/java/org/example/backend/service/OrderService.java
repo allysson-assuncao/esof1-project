@@ -49,7 +49,7 @@ public class OrderService {
                 .observation(order.getObservation())
                 .orderStatus(order.getStatus() != null ? order.getStatus() : null)
                 .orderedTime(order.getOrderedTime())
-                .orderTotalPrice(order.getProduct() != null ? order.getAmount() * order.getProduct().getPrice() : 0.0)
+                .totalPrice(order.getProduct() != null ? order.getAmount() * order.getProduct().getPrice() : 0.0)
                 /*.additionalOrders(
                         order.getAdditionalOrders() != null && !order.getAdditionalOrders().isEmpty()
                                 ? order.getAdditionalOrders().stream()

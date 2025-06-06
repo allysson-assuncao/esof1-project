@@ -8,4 +8,4 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
-public record OrderDTO(Long orderId, int amount, String observation, OrderStatus orderStatus, LocalDateTime orderedTime, double orderTotalPrice, Set<Long> additionalOrders, String productName, double productUnitPrice, Long guestTabId, GuestTabStatus guestTabStatus, LocalDateTime guestTabTimeOpened, String waiterName, int localTableNumber) { }
+public record OrderDTO(Long guestTabId, GuestTabStatus guestTabStatus, LocalDateTime guestTabTimeOpened, double totalPrice, Set<Long> additionalOrders, Long orderId, int amount, OrderStatus orderStatus, String observation, LocalDateTime orderedTime, String productName, double productUnitPrice, String waiterName, int localTableNumber) { }
