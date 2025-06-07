@@ -1,5 +1,3 @@
-import {undefined} from "zod";
-
 export type UserRole = keyof typeof UserRoles;
 
 export type GuestTabStatus = keyof typeof GuestTabStatus;
@@ -60,7 +58,7 @@ export interface DisplayOrderItem {
     amount: number;
     orderStatus: OrderStatus;
     observation: string;
-    orderedTime: string;
+    orderedTime: number[];
     productUnitPrice: number;
     productName: string;
     waiterName: string;
@@ -76,7 +74,7 @@ export interface OrderDTO {
     amount: number;
     orderStatus: OrderStatus;
     observation: string;
-    orderedTime: string;
+    orderedTime: number[];
     productName: string;
     productUnitPrice: number;
     waiterName: string;
