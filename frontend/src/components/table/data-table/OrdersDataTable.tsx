@@ -13,7 +13,7 @@ import {Button} from '@/components/ui/button'
 import {DisplayGuestTabItem, DisplayOrderItem, OrderFilters} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
-import {arrayToDate} from "@/utils/operations/date-convertion";
+import {formatDateDisplay} from "@/utils/operations/date-convertion";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -167,7 +167,7 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                             <TableCell>{order.productName}</TableCell>
                             <TableCell className="text-center">{order.amount}</TableCell>
                             <TableCell>{order.orderStatus}</TableCell>
-                            <TableCell>{order.orderedTime}</TableCell>
+                            <TableCell>{formatDateDisplay(order.orderedTime.toString())}</TableCell>
                             <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
                             <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
                             <TableCell>{order.waiterName}</TableCell>
