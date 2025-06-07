@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.LocalTableRequestDTO;
 import org.example.backend.service.LocalTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class LocalTableController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
+    public ResponseEntity<?> registerCategory(@RequestBody LocalTableRequestDTO request) {
         return this.localTableService.registerLocalTable(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
