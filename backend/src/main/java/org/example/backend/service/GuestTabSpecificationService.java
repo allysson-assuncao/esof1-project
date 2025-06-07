@@ -17,10 +17,10 @@ public class GuestTabSpecificationService {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            Join<Order, User> userJoin = root.join("waiter");
-            Join<Order, Product> productJoin = root.join("product");
-            Join<Order, GuestTab> guestTabJoin = root.join("guestTab");
-            Join<GuestTab, LocalTable> localTableJoin = guestTabJoin.join("localTable");
+            Join<GuestTab, Order> orderJoin = root.join("orders");
+            Join<GuestTab, User> userJoin = orderJoin.join("waiter");
+            Join<GuestTab, Product> productJoin = orderJoin.join("product");
+            Join<GuestTab, LocalTable> localTableJoin = root.join("localTable");
 
             /*if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
@@ -56,10 +56,10 @@ public class GuestTabSpecificationService {
             }*/
 
             if (filterDto.startTime() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("orderedTime"), filterDto.startTime()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderJoin.get("orderedTime"), filterDto.startTime()));
             }
             if (filterDto.endTime() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("orderedTime"), filterDto.endTime()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(orderJoin.get("orderedTime"), filterDto.endTime()));
             }
 
             if (filterDto.minPrice() != null) {

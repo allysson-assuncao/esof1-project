@@ -74,11 +74,11 @@ public class GuestTabService {
         if (order == null) return null;
 
         // Map additionalOrders to their IDs
-        Set<Long> additionalOrderIds = order.getAdditionalOrders() != null
+        /*Set<Long> additionalOrderIds = order.getAdditionalOrders() != null
                 ? order.getAdditionalOrders().stream()
                     .map(Order::getId)
                     .collect(Collectors.toSet())
-                : Set.of();
+                : Set.of();*/
 
         String productName = order.getProduct() != null ? order.getProduct().getName() : null;
         double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
@@ -90,7 +90,7 @@ public class GuestTabService {
                 .status(order.getStatus())
                 .observation(order.getObservation())
                 .orderedTime(order.getOrderedTime())
-                .additionalOrders(additionalOrderIds)
+                /*.additionalOrders(additionalOrderIds)*/
                 .productName(productName)
                 .productUnitPrice(productUnitPrice)
                 .waiterName(waiterName)

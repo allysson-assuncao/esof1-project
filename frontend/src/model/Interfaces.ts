@@ -54,13 +54,14 @@ export interface FetchGuestTabParams {
 }
 
 export interface DisplayOrderItem {
-    orderId: number;
+    id: number;
     amount: number;
-    orderStatus: OrderStatus;
+    status: OrderStatus;
     observation: string;
     orderedTime: number[];
-    productUnitPrice: number;
+    additionalOrders: number[];
     productName: string;
+    productUnitPrice: number;
     waiterName: string;
 }
 

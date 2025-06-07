@@ -163,10 +163,10 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                 </TableHeader>
                 <TableBody>
                     {orders.map((order) => (
-                        <TableRow key={order.orderId}>
+                        <TableRow key={order.id}>
                             <TableCell>{order.productName}</TableCell>
                             <TableCell className="text-center">{order.amount}</TableCell>
-                            <TableCell>{order.orderStatus}</TableCell>
+                            <TableCell>{order.status}</TableCell>
                             <TableCell>{formatDateDisplay(order.orderedTime.toString())}</TableCell>
                             <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
                             <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
