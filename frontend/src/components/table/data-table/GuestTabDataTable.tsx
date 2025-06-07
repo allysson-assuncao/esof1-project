@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table'
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
 import {Button} from '@/components/ui/button'
-import {DisplayGuestTabItem, DisplayOrderItem, OrderFilters} from "@/model/Interfaces";
+import {DisplayGuestTabItem, DisplayOrderItem, GuestTabFilters} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
@@ -19,14 +19,14 @@ interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
     data: DisplayGuestTabItem[];
     setPage: (page: (prev: number) => number) => void;
-    selectedFilters: OrderFilters;
-    setSelectedFilters: (filters: SetStateAction<OrderFilters>) => void;
+    selectedFilters: GuestTabFilters;
+    setSelectedFilters: (filters: SetStateAction<GuestTabFilters>) => void;
     page: number;
     totalPages: number;
     setPageSize: (page: number) => void;
 }
 
-export function OrdersDataTable<TValue>({
+export function GuestTabDataTable<TValue>({
                                             columns,
                                             data,
                                             setPage,

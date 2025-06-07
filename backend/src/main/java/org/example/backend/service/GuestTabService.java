@@ -2,7 +2,9 @@ package org.example.backend.service;
 
 import org.example.backend.dto.GuestTabDTO;
 import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.model.GuestTab;
+import org.example.backend.model.Order;
 import org.example.backend.repository.GuestTabRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GuestTabService {
@@ -29,7 +34,7 @@ public class GuestTabService {
         return false;
     }
 
-    /*public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
+    public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
         Specification<GuestTab> specification = this.guestTabSpecificationService.getGuestTabSpecification(filterDto);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
         Page<GuestTab> guestTabPage = this.guestTabRepository.findAll(specification, pageable);
@@ -40,28 +45,56 @@ public class GuestTabService {
 
     private GuestTabDTO convertToGuestTabDTO(GuestTab guestTab) {
         if (guestTab == null) return null;
-        return GuestTab.builder()
-                .orderId(guestTab.getId())
-                .amount(guestTab.getAmount())
-                .observation(guestTab.getObservation())
-                .orderStatus(guestTab.getStatus() != null ? guestTab.getStatus() : null)
-                .orderedTime(guestTab.getOrderedTime())
-                .totalPrice(guestTab.getProduct() != null ? guestTab.getAmount() * guestTab.getProduct().getPrice() : 0.0)
-                *//*.additionalOrders(
-                        order.getAdditionalOrders() != null && !order.getAdditionalOrders().isEmpty()
-                                ? order.getAdditionalOrders().stream()
-                                .map(Order::getId)
-                                .collect(Collectors.toSet())
-                                : null
-                )*//*
-                .productName(guestTab.getProduct() != null ? guestTab.getProduct().getName() : null)
-                .productUnitPrice(guestTab.getProduct() != null ? guestTab.getProduct().getPrice() : 0.0)
-                .guestTabId(guestTab.getGuestTab() != null ? guestTab.getGuestTab().getId() : null)
-                .guestTabStatus(guestTab.getGuestTab() != null && guestTab.getGuestTab().getStatus() != null ? guestTab.getGuestTab().getStatus() : null)
-                .guestTabTimeOpened(guestTab.getGuestTab() != null ? guestTab.getGuestTab().getTimeOpened() : null)
-                .waiterName(guestTab.getWaiter() != null ? guestTab.getWaiter().getName() : null)
-                .localTableNumber(guestTab.getGuestTab() != null && guestTab.getGuestTab().getLocalTable() != null ? guestTab.getGuestTab().getLocalTable().getNumber() : 0)
+
+        // Map orders to OrderDTO
+        Set<OrderDTO> orderDTOs = guestTab.getOrders() != null
+                ? guestTab.getOrders().stream()
+                    .map(this::convertToOrderDTO)
+                    .collect(Collectors.toSet())
+                : Set.of();
+
+        double totalPrice = orderDTOs.stream()
+                .mapToDouble(orderDTO -> orderDTO.productUnitPrice() * orderDTO.amount())
+                .sum();
+
+        int localTableNumber = guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0;
+
+        return GuestTabDTO.builder()
+                .id(guestTab.getId())
+                .status(guestTab.getStatus())
+                .timeOpened(guestTab.getTimeOpened())
+                .timeClosed(guestTab.getTimeClosed())
+                .orders(orderDTOs)
+                .totalPrice(totalPrice)
+                .localTableNumber(localTableNumber)
                 .build();
-    }*/
+    }
+
+    private OrderDTO convertToOrderDTO(Order order) {
+        if (order == null) return null;
+
+        // Map additionalOrders to their IDs
+        Set<Long> additionalOrderIds = order.getAdditionalOrders() != null
+                ? order.getAdditionalOrders().stream()
+                    .map(Order::getId)
+                    .collect(Collectors.toSet())
+                : Set.of();
+
+        String productName = order.getProduct() != null ? order.getProduct().getName() : null;
+        double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
+        String waiterName = order.getWaiter() != null ? order.getWaiter().getName() : null;
+
+        return OrderDTO.builder()
+                .id(order.getId())
+                .amount(order.getAmount())
+                .status(order.getStatus())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .additionalOrders(additionalOrderIds)
+                .productName(productName)
+                .productUnitPrice(productUnitPrice)
+                .waiterName(waiterName)
+                .build();
+    }
 
 }

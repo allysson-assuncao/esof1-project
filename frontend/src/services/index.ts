@@ -12,6 +12,6 @@ export const testURL = axios.create({
     baseURL: `http://localhost:${port}/app/auth`,
 });
 
-export const orders = axios.create({
-    baseURL: `http://localhost:${port}/app/order`,
+export const guestTab = axios.create({
+    baseURL: `http://localhost:${port}/app/guest-tab`,
 });

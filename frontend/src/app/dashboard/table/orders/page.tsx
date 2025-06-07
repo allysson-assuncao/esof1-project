@@ -1,11 +1,11 @@
 "use client";
 
-import OrdersTable from "@/components/table/OrdersTable";
+import GuestTabTable from "@/components/table/GuestTabTable";
 
 const OrdersTablePage = () => {
     return (
         <div className="h-full">
-            <OrdersTable/>
+            <GuestTabTable/>
         </div>
     );
 };

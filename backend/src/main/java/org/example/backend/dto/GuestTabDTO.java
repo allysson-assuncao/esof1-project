@@ -4,6 +4,7 @@ import lombok.Builder;
 import org.example.backend.model.enums.GuestTabStatus;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Builder
-public record GuestTabDTO(Long guestTabId, GuestTabStatus guestTabStatus, LocalDateTime guestTabTimeOpened, double totalPrice, int localTableNumber) { }
+public record GuestTabDTO(Long id, GuestTabStatus status, LocalDateTime timeOpened, LocalDateTime timeClosed, Set<OrderDTO> orders, double totalPrice, int localTableNumber) { }

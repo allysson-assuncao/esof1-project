@@ -5,7 +5,7 @@ import {DisplayGuestTabItem} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {DataTableColumnHeader} from "@/components/ui/data-table";
 
-export const ordersColumns: ColumnDef<DisplayGuestTabItem>[] = [
+export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     // DrillDown
     {
         id: "expander",
@@ -27,7 +27,7 @@ export const ordersColumns: ColumnDef<DisplayGuestTabItem>[] = [
 
     // GuestTab
     {
-        accessorKey: "guestTabId",
+        accessorKey: "id",
         header: ({column}) => <DataTableColumnHeader column={column} title="Comanda ID"/>,
     },
     {

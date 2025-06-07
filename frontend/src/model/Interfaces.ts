@@ -31,7 +31,7 @@ export const OrderStatus = {
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
 } as const
 
-export interface OrderFilters {
+export interface GuestTabFilters {
     tableId?: string;
     guestTabIds?: number[];
     orderIds?: number[];
@@ -45,8 +45,8 @@ export interface OrderFilters {
     productName?: string;
 }
 
-export interface FetchOrdersParams {
-    filter: OrderFilters;
+export interface FetchGuestTabParams {
+    filter: GuestTabFilters;
     page?: number;
     size?: number;
     orderBy?: string;
@@ -64,55 +64,12 @@ export interface DisplayOrderItem {
     waiterName: string;
 }
 
-export interface OrderDTO {
-    guestTabId: number;
-    guestTabStatus: GuestTabStatus;
-    guestTabTimeOpened: Date | undefined;
-    totalPrice: number;
-    additionalOrders: number[];
-    orderId: number;
-    amount: number;
-    orderStatus: OrderStatus;
-    observation: string;
-    orderedTime: number[];
-    productName: string;
-    productUnitPrice: number;
-    waiterName: string;
-    localTableNumber: number;
-}
-
 export interface DisplayGuestTabItem {
-    guestTabId: number;
-    guestTabStatus: GuestTabStatus | null;
-    guestTabTimeOpened: Date | null;
+    id: number;
+    status: GuestTabStatus | null;
+    timeOpened: Date | null;
+    timeClosed: Date | null;
+    orders: DisplayOrderItem[];
     totalPrice: number;
     waiterName?: string;
-    orders: DisplayOrderItem[];
-}
-
-export function groupOrdersByGuestTab(orders: OrderDTO[]): DisplayGuestTabItem[] {
-    const guestTabMap = new Map<number, DisplayGuestTabItem>();
-
-    orders.forEach((order) => {
-        const guestTabId = (order as OrderDTO).guestTabId;
-        if (!guestTabId) return;
-
-        if (!guestTabMap.has(guestTabId)) {
-            guestTabMap.set(guestTabId, {
-                guestTabId: guestTabId,
-                guestTabStatus: null,
-                guestTabTimeOpened: null,
-                waiterName: "",
-                totalPrice: 0,
-                orders: []
-            });
-        }
-
-        const guestTab = guestTabMap.get(guestTabId)!;
-
-        guestTab.orders.push(order as DisplayOrderItem);
-        guestTab.totalPrice += order.totalPrice;
-    });
-
-    return Array.from(guestTabMap.values());
 }
