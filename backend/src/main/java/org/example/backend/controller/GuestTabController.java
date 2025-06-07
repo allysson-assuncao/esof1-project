@@ -1,9 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.FilteredPageDTO;
-import org.example.backend.dto.GuestTabDTO;
-import org.example.backend.dto.OrderDTO;
-import org.example.backend.dto.OrderFilterDTO;
+import org.example.backend.dto.*;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,18 +27,17 @@ public class GuestTabController {
                 ResponseEntity.badRequest().body("");
     }
 
-    /*@PostMapping("/filter")
-    public ResponseEntity<FilteredPageDTO<GuestTabDTO>> filterOutputFiles(
-            @RequestBody OrderFilterDTO filterDto,
+    @PostMapping("/filter")
+    public ResponseEntity<FilteredPageDTO<GuestTabDTO>> filterGuestTabs(
+            @RequestBody GuestTabFilterDTO filterDto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "startTime") String orderBy,
             @RequestParam(defaultValue = "DESC") Sort.Direction direction
     ) {
         System.out.println(filterDto.toString());
-        System.out.println("Received");
-        Page<OrderDTO> ordersPage = this.orderService.getOrdersByFilters(filterDto, page, size, orderBy, direction);
-        return ResponseEntity.ok(new FilteredPageDTO<>(ordersPage.getContent(), ordersPage.getTotalPages()));
-    }*/
+        Page<GuestTabDTO> guestTabPage = this.guestTabService.getGuestTabByFilters(filterDto, page, size, orderBy, direction);
+        return ResponseEntity.ok(new FilteredPageDTO<>(guestTabPage.getContent(), guestTabPage.getTotalPages()));
+    }
 
 }
