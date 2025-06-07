@@ -22,7 +22,7 @@ public class CategoryController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerCategory(@RequestBody String request) {
-        System.out.println("https://code-with-me.global.jetbrains.com/gOiBa8zC2QQEE7ul66wGyA");
+        System.out.println("https://code-with-me.global.jetbrains.com/zrgyM8aYougQZ_bx2hYu5w");
         return this.categoryService.registerCategory(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
