@@ -1,9 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.FilteredPageDTO;
-import org.example.backend.dto.GuestTabDTO;
-import org.example.backend.dto.GuestTabFilterDTO;
-import org.example.backend.dto.GuestTabRequestDTO;
+import org.example.backend.dto.*;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/guest-tab")
@@ -22,6 +21,12 @@ public class GuestTabController {
     public GuestTabController(GuestTabService guestTabService) {
         this.guestTabService = guestTabService;
     }
+
+    @GetMapping("/tabs")
+    public List<GuestTabGetDTO> getGuestTabs() {
+        return guestTabService.getGuestTabs();
+    }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {

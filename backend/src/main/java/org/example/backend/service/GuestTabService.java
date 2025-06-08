@@ -1,10 +1,7 @@
 package org.example.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.GuestTabDTO;
-import org.example.backend.dto.GuestTabFilterDTO;
-import org.example.backend.dto.GuestTabRequestDTO;
-import org.example.backend.dto.OrderDTO;
+import org.example.backend.dto.*;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
@@ -20,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,10 +50,19 @@ public class GuestTabService {
                 .name(request.guestName())
                 .localTable(table)
                 .status(GuestTabStatus.OPEN)
+                .timeOpened(LocalDateTime.now())
                 .build();
 
         guestTabRepository.save(guestTab);
         return true;
+    }
+
+    public List<GuestTabGetDTO> getGuestTabs() {
+        return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
+                x.getId(),
+                x.getName(),
+                x.getTimeOpened(),
+                x.getLocalTable().getNumber())).toList();
     }
 
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
