@@ -1,11 +1,16 @@
 package org.example.backend.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.GuestTabDTO;
 import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.GuestTabRequestDTO;
 import org.example.backend.dto.OrderDTO;
 import org.example.backend.model.GuestTab;
+import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
+import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
+import org.example.backend.repository.LocalTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,8 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,16 +29,32 @@ public class GuestTabService {
 
     private final GuestTabRepository guestTabRepository;
     private final GuestTabSpecificationService guestTabSpecificationService;
+    private final LocalTableRepository localTableRepository;
 
     @Autowired
-    public GuestTabService(GuestTabRepository guestTapRepository, GuestTabSpecificationService guestTabSpecificationService) {
+    public GuestTabService(GuestTabRepository guestTapRepository,
+                           GuestTabSpecificationService guestTabSpecificationService,
+                           LocalTableRepository localTableRepository) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
+        this.localTableRepository = localTableRepository;
     }
 
-    // Todo...
-    public boolean registerGuestTap(String request){
-        return false;
+    @Transactional
+    public boolean registerGuestTab(GuestTabRequestDTO request){
+        LocalTable table = localTableRepository.findByNumber(request.tableNumber())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Table number " + request.tableNumber() + " not found."
+        ));
+
+        GuestTab guestTab = GuestTab.builder()
+                .name(request.guestName())
+                .localTable(table)
+                .status(GuestTabStatus.OPEN)
+                .build();
+
+        guestTabRepository.save(guestTab);
+        return true;
     }
 
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {

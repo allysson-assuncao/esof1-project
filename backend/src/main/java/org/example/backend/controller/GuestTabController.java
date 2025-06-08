@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.GuestTabDTO;
 import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.GuestTabRequestDTO;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,8 +24,8 @@ public class GuestTabController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
-        return this.guestTabService.registerGuestTap(request) ?
+    public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {
+        return this.guestTabService.registerGuestTab(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
     }

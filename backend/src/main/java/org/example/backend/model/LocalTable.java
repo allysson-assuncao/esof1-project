@@ -32,4 +32,5 @@ public class LocalTable {
     @JsonIgnore
     private List<GuestTab> guestTabs;
 
+
 }
