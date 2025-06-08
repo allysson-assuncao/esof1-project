@@ -2,14 +2,11 @@ package org.example.backend.controller;
 
 import org.example.backend.dto.LocalTableGetDTO;
 import org.example.backend.dto.LocalTableRequestDTO;
-import org.example.backend.model.LocalTable;
 import org.example.backend.service.LocalTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/app/local-table")
