@@ -1,13 +1,13 @@
 "use client";
 
 import {LocalTable, LocalTableStatus} from "@/model/Interfaces";
-import {useRouter} from "next/router";
 import {toast} from "sonner"
 import {useEffect, useState} from "react";
 import {useMutation} from "react-query";
 import {AxiosError} from "axios";
 import {fetchLocalTables} from "@/services/localTableService";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {useRouter} from "next/navigation";
 
 const statusStyles: Record<LocalTableStatus, string> = {
     FREE: "bg-green-100 border-green-400 text-green-800 hover:bg-green-200",
@@ -80,7 +80,7 @@ export function LocalTableSelectionGrid() {
                                 </div>
                             </div>
                             <CardDescription>
-                                {table.status}
+                                {LocalTableStatus[table.status]?.label || table.status}
                             </CardDescription>
                         </CardContent>
                     </Card>

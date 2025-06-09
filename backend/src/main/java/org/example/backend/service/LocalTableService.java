@@ -1,8 +1,6 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.LocalTableDTO;
-import org.example.backend.dto.LocalTableGetDTO;
-import org.example.backend.dto.LocalTableRequestDTO;
+import org.example.backend.dto.*;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.LocalTableStatus;
 import org.example.backend.repository.LocalTableRepository;
@@ -10,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LocalTableService {
@@ -49,9 +50,27 @@ public class LocalTableService {
     }
 
     public List<LocalTableDTO> getGridTables() {
-        List<LocalTableDTO> localTableDTOList = this.localTableRepository.findAllWithGuestTabCountTodayRaw();
+        List<LocalTableDTO> localTableDTOList = this.localTableRepository.findAll()
+                .stream()
+                .map(this::convertToLocalTableDTO)
+                .collect(Collectors.toList());
         System.out.println(localTableDTOList.getFirst().toString());
         return localTableDTOList;
+    }
+
+    private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
+        if (localTable == null) return null;
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
+        int guestTabCountToday = this.localTableRepository.findGuestTabCountTodayById(localTable.getId(), startOfDay, endOfDay);
+
+        return LocalTableDTO.builder()
+                .id(localTable.getId())
+                .number(localTable.getNumber())
+                .status(localTable.getStatus())
+                .guestTabCountToday(guestTabCountToday)
+                .build();
     }
 
 }
