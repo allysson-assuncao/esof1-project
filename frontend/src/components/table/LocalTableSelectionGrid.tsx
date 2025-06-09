@@ -53,7 +53,7 @@ export function LocalTableSelectionGrid() {
     }, []);
 
     if (!tables || mutation.isLoading) {
-        return <div>Carregando perfil...</div>;
+        return <div>Carregando mesas...</div>;
     }
 
     return (
