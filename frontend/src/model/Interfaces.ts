@@ -75,6 +75,11 @@ export interface DisplayGuestTabItem {
     waiterName?: string;
 }
 
+export interface GuestTab {
+    id: number;
+    clientName: string;
+}
+
 export interface LocalTable {
   id: string;
   number: number;

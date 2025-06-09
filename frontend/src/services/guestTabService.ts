@@ -18,3 +18,13 @@ export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
     console.log(response.data)
     return response.data;
 };
+
+export const fetchGuestTabs = async () => {
+    const response = await guestTab.get(`/filter`, {
+        /*headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },*/
+    });
+    console.log(response.data)
+    return response.data;
+};

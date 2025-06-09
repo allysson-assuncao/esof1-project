@@ -1,4 +1,4 @@
-import React, {SetStateAction, useState} from 'react'
+import React, {SetStateAction, useEffect, useState} from 'react'
 import {
     useReactTable,
     getCoreRowModel,
@@ -10,10 +10,13 @@ import {
 } from '@tanstack/react-table'
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
 import {Button} from '@/components/ui/button'
-import {DisplayGuestTabItem, DisplayOrderItem, GuestTabFilters} from "@/model/Interfaces";
+import {DisplayGuestTabItem, DisplayOrderItem, GuestTab, GuestTabFilters, UserRoles} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
+import {useQuery} from "react-query";
+import {fetchGuestTabs} from "@/services/guestTabService";
+import {MultiSelect} from "@/components/ui/multi-select";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -58,10 +61,52 @@ export function GuestTabDataTable<TValue>({
         setPage((prev) => prev + 1)
     }
 
+    const { data: guestTabs, isLoading } = useQuery<GuestTab[]>('guestTabs', fetchGuestTabs);
+    const [initialized, setInitialized] = useState<boolean>(false);
+
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, [])
+
+    useEffect(() => {
+        if (guestTabs && guestTabs.length > 0 && !initialized) {
+            setInitialized(true);
+        }
+    }, [guestTabs, initialized]);
+
+    if (isClient && isLoading) {
+        return <div>Carregando...</div>
+    }
+
+    const guestTabsOptions =
+        guestTabs?.map((tab) => ({
+            value: tab.id.toString(),
+            label: tab.clientName,
+        })) ?? [];
+
     return (
         <div>
             {/* Filters */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
+                <MultiSelect
+                    options={guestTabsOptions}
+                    onValueChange={(selectedValues) =>
+                        setSelectedFilters({
+                            ...selectedFilters,
+                            guestTabIds: selectedValues.map((id) => Number(id)),
+                        })
+                    }
+                    defaultValue={
+                        selectedFilters.guestTabIds
+                            ? selectedFilters.guestTabIds.map(String)
+                            : []
+                    }
+                    placeholder="Selecione a comanda do cliente"
+                    animation={2}
+                    maxCount={3}
+                />
                 <Input
                     placeholder="Nome do Produto: "
                     value={selectedFilters.productName}
