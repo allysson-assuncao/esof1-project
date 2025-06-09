@@ -22,11 +22,16 @@ public class GuestTabController {
         this.guestTabService = guestTabService;
     }
 
-    @GetMapping("/tabs")
+    @GetMapping("/all-tabs")
     public List<GuestTabGetDTO> getGuestTabs() {
         return guestTabService.getGuestTabs();
     }
 
+    //Acessar {{host}}/app/guest-tab/tabs
+    @GetMapping("/{tableNumber}")
+    public List<GuestTabGetDTO> getGuestTabsByTableNumber(@PathVariable int tableNumber) {
+        return guestTabService.getGuestTabsByTableNumber(tableNumber);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {

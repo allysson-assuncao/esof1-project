@@ -39,6 +39,7 @@ public class GuestTabService {
         this.localTableRepository = localTableRepository;
     }
 
+    //Registra nova guest tab
     @Transactional
     public boolean registerGuestTab(GuestTabRequestDTO request){
         LocalTable table = localTableRepository.findByNumber(request.tableNumber())
@@ -57,12 +58,29 @@ public class GuestTabService {
         return true;
     }
 
+    //Retorna todas as GuestTabs
+    @Transactional
     public List<GuestTabGetDTO> getGuestTabs() {
         return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
                 x.getId(),
                 x.getName(),
                 x.getTimeOpened(),
                 x.getLocalTable().getNumber())).toList();
+    }
+
+    //Retorna todas as GuestTabs relacionadas a uma determinada mesa
+    @Transactional
+    public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
+        List<GuestTabGetDTO> result = guestTabRepository.findByLocalTable(
+                localTableRepository.findByNumber(tableNumber).stream().findFirst().orElse(null)
+        ).stream().map(x -> new GuestTabGetDTO(
+                x.getId(),
+                x.getName(),
+                x.getTimeOpened(),
+                x.getLocalTable().getNumber()
+        )).toList();
+
+        return result;
     }
 
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
