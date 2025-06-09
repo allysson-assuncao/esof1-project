@@ -15,3 +15,7 @@ export const testURL = axios.create({
 export const guestTab = axios.create({
     baseURL: `http://localhost:${port}/app/guest-tab`,
 });
+
+export const localTable = axios.create({
+    baseURL: `http://localhost:${port}/app/local-table`,
+});

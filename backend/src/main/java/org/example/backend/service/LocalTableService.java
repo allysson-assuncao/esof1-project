@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.LocalTableDTO;
 import org.example.backend.dto.LocalTableGetDTO;
 import org.example.backend.dto.LocalTableRequestDTO;
 import org.example.backend.model.LocalTable;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class LocalTableService {
@@ -46,4 +47,11 @@ public class LocalTableService {
         localTableRepository.save(table);
         return true;
     }
+
+    public List<LocalTableDTO> getGridTables() {
+        List<LocalTableDTO> localTableDTOList = this.localTableRepository.findAllWithGuestTabCountTodayRaw();
+        System.out.println(localTableDTOList.getFirst().toString());
+        return localTableDTOList;
+    }
+
 }

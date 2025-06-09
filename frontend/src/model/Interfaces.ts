@@ -74,3 +74,10 @@ export interface DisplayGuestTabItem {
     totalPrice: number;
     waiterName?: string;
 }
+
+export interface LocalTable {
+  id: string;
+  number: number;
+  status: LocalTableStatus;
+  guestTabCountToday: number;
+}
