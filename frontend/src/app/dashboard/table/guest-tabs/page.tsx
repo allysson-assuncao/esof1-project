@@ -2,10 +2,14 @@
 
 import GuestTabTable from "@/components/table/GuestTabTable";
 
-const OrdersTablePage = () => {
+function OrdersTablePage({
+                             params,
+                         }: {
+    params: { id: string };
+}) {
     return (
         <div className="h-full">
-            <GuestTabTable/>
+            <GuestTabTable localTableId={params.id} />
         </div>
     );
 };
