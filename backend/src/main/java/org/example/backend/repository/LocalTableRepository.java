@@ -17,8 +17,6 @@ public interface LocalTableRepository extends JpaRepository<LocalTable, UUID> {
     @Query(nativeQuery = true, value = "INSERT INTO tables (number, status) VALUES (:number, 0)")
     void insertLocalTable(@Param("number") int number);
 
-    Optional<LocalTable> findById(UUID id);
-
     Optional<LocalTable> findByNumber(int number);
 
     @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.timeOpened >= :startOfDay AND gt.timeOpened <= :endOfDay")

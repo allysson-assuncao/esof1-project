@@ -22,7 +22,7 @@ public class GuestTabSpecificationService {
             Join<GuestTab, Product> productJoin = orderJoin.join("product");
             Join<GuestTab, LocalTable> localTableJoin = root.join("localTable");
 
-            /*if (filterDto.tableId() != null) {
+            if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
             } else {
                 // Maybe throw an exception
@@ -30,7 +30,7 @@ public class GuestTabSpecificationService {
                 predicates.add(criteriaBuilder.disjunction());
             }
 
-            if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
+            /*if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
                 predicates.add(guestTabJoin.get("id").in(filterDto.guestTabIds()));
             }
 

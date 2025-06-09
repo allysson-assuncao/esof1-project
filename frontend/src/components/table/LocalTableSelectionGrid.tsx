@@ -10,9 +10,9 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {useRouter} from "next/navigation";
 
 const statusStyles: Record<LocalTableStatus, string> = {
-    FREE: "bg-green-100 border-green-400 text-green-800 hover:bg-green-200",
-    OCCUPIED: "bg-red-100 border-red-400 text-red-800 hover:bg-red-200",
-    RESERVED: "bg-gray-200 border-gray-400 text-gray-600 hover:bg-gray-300",
+    FREE: "bg-green-100 border-green-400 hover:bg-green-200",
+    OCCUPIED: "bg-red-100 border-red-400 hover:bg-red-200",
+    RESERVED: "bg-gray-200 border-gray-400 hover:bg-gray-300",
 };
 
 export function LocalTableSelectionGrid() {
