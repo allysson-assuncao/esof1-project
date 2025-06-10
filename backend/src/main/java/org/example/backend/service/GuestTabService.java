@@ -37,7 +37,7 @@ public class GuestTabService {
         return false;
     }
 
-    public List<SimpleGuestTabDTO> selectAllGuestTabs(UUID localTableID){
+    public List<SimpleGuestTabDTO> selectGuestTabsByLocalTableId(UUID localTableID){
         return this.guestTabRepository.findByLocalTableId(localTableID).stream()
                 .map(this::convertToSimpleGuestTabDTO)
                 .collect(Collectors.toList());

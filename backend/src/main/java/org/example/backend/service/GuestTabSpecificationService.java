@@ -34,9 +34,9 @@ public class GuestTabSpecificationService {
                 predicates.add(root.get("id").in(filterDto.guestTabIds()));
             }
 
-            /*if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
+            if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
                 predicates.add(root.get("id").in(filterDto.orderIds()));
-            }*/
+            }
 
             if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
                  predicates.add(root.get("status").in(filterDto.guestTabStatuses()));
@@ -51,9 +51,9 @@ public class GuestTabSpecificationService {
                         "%" + filterDto.productName().toLowerCase() + "%"));
             }
 
-            /*if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
+            if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
                 predicates.add(userJoin.get("id").in(filterDto.waiterIds()));
-            }*/
+            }
 
             if (filterDto.startTime() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderJoin.get("orderedTime"), filterDto.startTime()));

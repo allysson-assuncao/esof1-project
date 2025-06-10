@@ -15,14 +15,16 @@ import {
     DisplayOrderItem,
     SimpleGuestTab,
     GuestTabFilters,
-    GuestTabStatus, OrderStatus
+    GuestTabStatus, OrderStatus, SimpleOrder, SimpleWaiter
 } from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
 import {useQuery} from "react-query";
-import {fetchGuestTabs} from "@/services/guestTabService";
+import {fetchSimpleGuestTabs} from "@/services/guestTabService";
 import {MultiSelect} from "@/components/ui/multi-select";
+import {fetchSimpleOrders} from "@/services/orderService";
+import {fetchSimpleWaiters} from "@/services/userService";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -69,12 +71,22 @@ export function GuestTabDataTable<TValue>({
         setPage((prev) => prev + 1)
     }
 
-    const {data: guestTabs, isLoading} = useQuery<SimpleGuestTab[]>(
-        ['guestTabs', localTableId],
-        () => fetchGuestTabs(localTableId)
+    const {data: simpleGuestTabs, isLoading: isLoadingGuestTabs} = useQuery<SimpleGuestTab[]>(
+        ['simpleGuestTabs', localTableId],
+        () => fetchSimpleGuestTabs(localTableId)
     );
-    const [initialized, setInitialized] = useState<boolean>(false);
 
+    const {data: simpleOrders, isLoading: isLoadingOrders} = useQuery<SimpleOrder[]>(
+        ["simpleOrders", localTableId],
+        () => fetchSimpleOrders(localTableId)
+    );
+
+    const {data: simpleWaiters, isLoading: isLoadingWaiters} = useQuery<SimpleWaiter[]>(
+        ["simpleWaiters", localTableId],
+        () => fetchSimpleWaiters(localTableId)
+    );
+
+    const [initialized, setInitialized] = useState<boolean>(false);
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -82,27 +94,41 @@ export function GuestTabDataTable<TValue>({
     }, [])
 
     useEffect(() => {
-        if (guestTabs && guestTabs.length > 0 && !initialized) {
+        if (simpleGuestTabs && simpleGuestTabs.length > 0 &&
+            simpleOrders && simpleOrders.length > 0 &&
+            simpleWaiters && simpleWaiters.length > 0 && !initialized) {
             setInitialized(true);
         }
-    }, [guestTabs, initialized]);
+    }, [simpleGuestTabs, initialized, simpleOrders, simpleWaiters]);
 
-    if (isClient && isLoading) {
+    if (isClient && isLoadingGuestTabs && isLoadingOrders && isLoadingWaiters) {
         return <div>Carregando...</div>
     }
 
     const guestTabsOptions =
-        guestTabs?.map((tab) => ({
+        simpleGuestTabs?.map((tab) => ({
             value: tab.id.toString(),
             label: tab.id + tab.clientName,
         })) ?? [];
 
-    const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, { value, label }]) => ({
+    const orderOptions =
+        simpleOrders?.map((tab) => ({
+            value: tab.id.toString(),
+            label: tab.id.toString(),
+        })) ?? [];
+
+    const waiterOptions =
+        simpleWaiters?.map((tab) => ({
+            value: tab.id,
+            label: tab.id + tab.userName,
+        })) ?? [];
+
+    const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
         value,
         label,
     }));
 
-    const orderStatusOptions = Object.entries(OrderStatus).map(([, { value, label }]) => ({
+    const orderStatusOptions = Object.entries(OrderStatus).map(([, {value, label}]) => ({
         value,
         label,
     }));
@@ -125,7 +151,7 @@ export function GuestTabDataTable<TValue>({
                             ? selectedFilters.guestTabIds.map(String)
                             : []
                     }
-                    placeholder="Selecione a comanda do cliente"
+                    placeholder="Selecione as comandas"
                     animation={2}
                     maxCount={3}
                 />
@@ -148,6 +174,40 @@ export function GuestTabDataTable<TValue>({
                     })}
                     defaultValue={selectedFilters.orderStatuses || []}
                     placeholder="Selecione o status do pedido"
+                    animation={2}
+                    maxCount={3}
+                />
+                <MultiSelect
+                    options={orderOptions}
+                    onValueChange={(selectedValues) =>
+                        setSelectedFilters({
+                            ...selectedFilters,
+                            orderIds: selectedValues.map((id) => Number(id)),
+                        })
+                    }
+                    defaultValue={
+                        selectedFilters.orderIds
+                            ? selectedFilters.orderIds.map(String)
+                            : []
+                    }
+                    placeholder="Selecione os pedidos"
+                    animation={2}
+                    maxCount={3}
+                />
+                <MultiSelect
+                    options={waiterOptions}
+                    onValueChange={(selectedValues) =>
+                        setSelectedFilters({
+                            ...selectedFilters,
+                            waiterIds: selectedValues.map((id) => id),
+                        })
+                    }
+                    defaultValue={
+                        selectedFilters.waiterIds
+                            ? selectedFilters.waiterIds.map(String)
+                            : []
+                    }
+                    placeholder="Selecione a garçom"
                     animation={2}
                     maxCount={3}
                 />

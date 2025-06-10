@@ -75,14 +75,23 @@ export interface DisplayGuestTabItem {
     waiterName?: string;
 }
 
-export interface SimpleGuestTab {
-    id: number;
-    clientName: string;
-}
-
 export interface LocalTable {
   id: string;
   number: number;
   status: LocalTableStatus;
   guestTabCountToday: number;
+}
+
+export interface SimpleGuestTab {
+    id: number;
+    clientName: string;
+}
+
+export interface SimpleOrder {
+    id: number;
+}
+
+export interface SimpleWaiter {
+    id: string;
+    userName: string;
 }

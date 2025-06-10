@@ -35,8 +35,8 @@ public class GuestTabController {
     }
 
     @GetMapping("/select-all/{localTableID}")
-    public ResponseEntity<List<SimpleGuestTabDTO>> selectAllGuestTabs(@PathVariable UUID localTableID) {
-        return ResponseEntity.ok(this.guestTabService.selectAllGuestTabs(localTableID));
+    public ResponseEntity<List<SimpleGuestTabDTO>> selectGuestTabsByLocalTableId(@PathVariable UUID localTableID) {
+        return ResponseEntity.ok(this.guestTabService.selectGuestTabsByLocalTableId(localTableID));
     }
 
     @PostMapping("/filter")
