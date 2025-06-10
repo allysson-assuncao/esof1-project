@@ -2,14 +2,14 @@
 
 import {useQuery} from 'react-query'
 import {useState} from 'react'
-import {OrdersDataTable} from "@/components/table/data-table/OrdersDataTable";
+import {GuestTabDataTable} from "@/components/table/data-table/GuestTabDataTable";
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
-import {ordersColumns} from "@/components/table/columns/OrdersColumns";
-import {OrderFilters} from "@/model/Interfaces";
-import {fetchFilteredProcesses} from "@/services/ordersService";
+import {guestTabColumns} from "@/components/table/columns/GuestTabColumns";
+import {GuestTabFilters} from "@/model/Interfaces";
+import {fetchFilteredGuestTabs} from "@/services/guestTabService";
 
-const OrdersTable = () => {
-    const [selectedFilters, setSelectedFilters] = useState<OrderFilters>({
+const GuestTabTable = () => {
+    const [selectedFilters, setSelectedFilters] = useState<GuestTabFilters>({
         tableId: "",
         guestTabIds: [],
         orderIds: [],
@@ -25,15 +25,15 @@ const OrdersTable = () => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(30);
-    const [cachedPages, setCachedPages] = useState<{ [key: number]: OrderFilters[] }>({});
+    const [cachedPages, setCachedPages] = useState<{ [key: number]: GuestTabFilters[] }>({});
 
     const {data, error, isLoading} = useQuery(
-        ['orders', selectedFilters, page],
+        ['guestTabs', selectedFilters, page],
         async () => {
             if (page !== 0 && cachedPages[page]) {
                 return cachedPages[page]
             } else {
-                const res = await fetchFilteredProcesses({
+                const res = await fetchFilteredGuestTabs({
                     filter: selectedFilters,
                     page: page,
                     size: pageSize,
@@ -56,10 +56,10 @@ const OrdersTable = () => {
     return (
         <div className="container mx-auto py-10 w-full max-w-[1920px] 5xl:mx-auto 5xl:px-32">
             <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-8 items-start md:items-center">
-                Lista de Comandas
+                <h1 className="text-2xl font-bold">Comandas e Pedidos</h1>
             </div>
-            <OrdersDataTable
-                columns={ordersColumns}
+            <GuestTabDataTable
+                columns={guestTabColumns}
                 data={data || []}
                 setPage={setPage}
                 selectedFilters={selectedFilters}
@@ -72,4 +72,4 @@ const OrdersTable = () => {
     )
 }
 
-export default OrdersTable
+export default GuestTabTable

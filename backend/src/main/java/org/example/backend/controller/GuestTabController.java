@@ -1,13 +1,15 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.*;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/guest-tab")
@@ -20,11 +22,35 @@ public class GuestTabController {
         this.guestTabService = guestTabService;
     }
 
+    @GetMapping("/all-tabs")
+    public List<GuestTabGetDTO> getGuestTabs() {
+        return guestTabService.getGuestTabs();
+    }
+
+    //Acessar {{host}}/app/guest-tab/tabs
+    @GetMapping("/{tableNumber}")
+    public List<GuestTabGetDTO> getGuestTabsByTableNumber(@PathVariable int tableNumber) {
+        return guestTabService.getGuestTabsByTableNumber(tableNumber);
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
-        return this.guestTabService.registerGuestTap(request) ?
+    public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {
+        return this.guestTabService.registerGuestTab(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<FilteredPageDTO<GuestTabDTO>> filterGuestTabs(
+            @RequestBody GuestTabFilterDTO filterDto,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "startTime") String orderBy,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction
+    ) {
+        System.out.println(filterDto.toString());
+        Page<GuestTabDTO> guestTabPage = this.guestTabService.getGuestTabByFilters(filterDto, page, size, orderBy, direction);
+        return ResponseEntity.ok(new FilteredPageDTO<>(guestTabPage.getContent(), guestTabPage.getTotalPages()));
     }
 
 }

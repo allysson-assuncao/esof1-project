@@ -22,7 +22,7 @@ public class LocalTable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "number", nullable = false)
+    @Column(name = "number", nullable = false, unique = true)
     private int number;
 
     @Column(name = "status", nullable = false)
@@ -31,5 +31,6 @@ public class LocalTable {
     @OneToMany(mappedBy = "localTable", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<GuestTab> guestTabs;
+
 
 }

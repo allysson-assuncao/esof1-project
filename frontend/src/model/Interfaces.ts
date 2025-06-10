@@ -7,31 +7,31 @@ export type LocalTableStatus = keyof typeof LocalTableStatus;
 export type OrderStatus = keyof typeof OrderStatus;
 
 export const UserRoles = {
-    ADMIN: { value: 'ADMIN', label: 'Administrador' },
-    CASHIER: { value: 'CASHIER', label: 'Caixa' },
-    COOK: { value: 'COOK', label: 'Cozinheiroz' },
-    WAITER: { value: 'WAITER', label: 'Garçom' },
+    ADMIN: {value: 'ADMIN', label: 'Administrador'},
+    CASHIER: {value: 'CASHIER', label: 'Caixa'},
+    COOK: {value: 'COOK', label: 'Cozinheiroz'},
+    WAITER: {value: 'WAITER', label: 'Garçom'},
 } as const
 
 export const GuestTabStatus = {
-    OPEN: { value: 'OPEN', label: 'Aberta' },
-    CLOSED: { value: 'CLOSED', label: 'Fechada' },
-    CANCELED: { value: 'CANCELED', label: 'Cancelada' },
+    OPEN: {value: 'OPEN', label: 'Aberta'},
+    CLOSED: {value: 'CLOSED', label: 'Fechada'},
+    CANCELED: {value: 'CANCELED', label: 'Cancelada'},
 } as const
 
 export const LocalTableStatus = {
-    FREE: { value: 'FREE', label: 'Livre' },
-    OCCUPIED: { value: 'OCCUPIED', label: 'Ocupada' },
-    RESERVED: { value: 'RESERVED', label: 'Reservada' },
+    FREE: {value: 'FREE', label: 'Livre'},
+    OCCUPIED: {value: 'OCCUPIED', label: 'Ocupada'},
+    RESERVED: {value: 'RESERVED', label: 'Reservada'},
 } as const
 
 export const OrderStatus = {
-    IN_PREPARE: { value: 'IN_PREPARE', label: 'Em Preparo' },
-    READY: { value: 'READY', label: 'Pronta' },
-    CANCELED: { value: 'CANCELED', label: 'Cancelada' },
+    IN_PREPARE: {value: 'IN_PREPARE', label: 'Em Preparo'},
+    READY: {value: 'READY', label: 'Pronta'},
+    CANCELED: {value: 'CANCELED', label: 'Cancelada'},
 } as const
 
-export interface OrderFilters {
+export interface GuestTabFilters {
     tableId?: string;
     guestTabIds?: number[];
     orderIds?: number[];
@@ -45,31 +45,32 @@ export interface OrderFilters {
     productName?: string;
 }
 
-export interface FetchOrdersParams {
-    filter: OrderFilters;
+export interface FetchGuestTabParams {
+    filter: GuestTabFilters;
     page?: number;
     size?: number;
     orderBy?: string;
     direction?: 'ASC' | 'DESC';
 }
 
-export interface Order {
-  id: string;
-  productName: string;
-  amount: number;
-  /*unitPrice: number;
-  totalItemPrice: number;*/
-  orderStatus: OrderStatus;
-  observation: string;
-  orderedTime: string;
-  waiterName: string;
+export interface DisplayOrderItem {
+    id: number;
+    amount: number;
+    status: OrderStatus;
+    observation: string;
+    orderedTime: number[];
+    additionalOrders: number[];
+    productName: string;
+    productUnitPrice: number;
+    waiterName: string;
 }
 
-export interface GuestTab {
-  id: string;
-  guestTabStatus: GuestTabStatus;
-  timeOpened: Date | undefined;
-  totalGuestTabPrice: number;
-  waiterName?: string;
-  orders: Order[];
+export interface DisplayGuestTabItem {
+    id: number;
+    status: GuestTabStatus | null;
+    timeOpened: Date | null;
+    timeClosed: Date | null;
+    orders: DisplayOrderItem[];
+    totalPrice: number;
+    waiterName?: string;
 }

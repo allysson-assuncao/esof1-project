@@ -1,8 +1,8 @@
-import {orders} from "@/services/index";
-import {FetchOrdersParams} from "@/model/Interfaces";
+import {guestTab} from "@/services/index";
+import {FetchGuestTabParams} from "@/model/Interfaces";
 
-export const fetchFilteredProcesses = async (params: FetchOrdersParams) => {
-    const response = await orders.post(`/filter`, params.filter, {
+export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
+    const response = await guestTab.post(`/filter`, params.filter, {
         /*headers: {
             /!*'Authorization': `Bearer ${localStorage.getItem('token')}`,*!/
             "Access-Control-Allow-Origin": "",
