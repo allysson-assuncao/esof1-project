@@ -31,6 +31,9 @@ public class GuestTab {
     @Column(name = "time_closed")
     private LocalDateTime timeClosed;
 
+    @Column(name = "client_name")
+    private String clientName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_table_id")
     private LocalTable localTable;

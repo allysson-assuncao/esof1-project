@@ -3,6 +3,7 @@ package org.example.backend.service;
 import org.example.backend.dto.GuestTabDTO;
 import org.example.backend.dto.GuestTabFilterDTO;
 import org.example.backend.dto.OrderDTO;
+import org.example.backend.dto.SimpleGuestTabDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.repository.GuestTabRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,20 @@ public class GuestTabService {
     // Todo...
     public boolean registerGuestTap(String request){
         return false;
+    }
+
+    public List<SimpleGuestTabDTO> selectAllGuestTabs(){
+        return this.guestTabRepository.findAll().stream()
+                .map(this::convertToSimpleGuestTabDTO)
+                .collect(Collectors.toList());
+    }
+
+    private SimpleGuestTabDTO convertToSimpleGuestTabDTO(GuestTab guestTab) {
+        if (guestTab == null) return null;
+        return SimpleGuestTabDTO.builder()
+                .id(guestTab.getId())
+                .clientName(guestTab.getClientName())
+                .build();
     }
 
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {

@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table'
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
 import {Button} from '@/components/ui/button'
-import {DisplayGuestTabItem, DisplayOrderItem, GuestTab, GuestTabFilters, UserRoles} from "@/model/Interfaces";
+import {DisplayGuestTabItem, DisplayOrderItem, SimpleGuestTab, GuestTabFilters, UserRoles} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
@@ -61,7 +61,7 @@ export function GuestTabDataTable<TValue>({
         setPage((prev) => prev + 1)
     }
 
-    const { data: guestTabs, isLoading } = useQuery<GuestTab[]>('guestTabs', fetchGuestTabs);
+    const { data: guestTabs, isLoading } = useQuery<SimpleGuestTab[]>('guestTabs', fetchGuestTabs);
     const [initialized, setInitialized] = useState<boolean>(false);
 
     const [isClient, setIsClient] = useState(false);
@@ -83,7 +83,7 @@ export function GuestTabDataTable<TValue>({
     const guestTabsOptions =
         guestTabs?.map((tab) => ({
             value: tab.id.toString(),
-            label: tab.clientName,
+            label: tab.id + tab.clientName,
         })) ?? [];
 
     return (

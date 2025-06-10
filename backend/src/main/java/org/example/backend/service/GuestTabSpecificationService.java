@@ -30,11 +30,11 @@ public class GuestTabSpecificationService {
                 predicates.add(criteriaBuilder.disjunction());
             }
 
-            /*if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
-                predicates.add(guestTabJoin.get("id").in(filterDto.guestTabIds()));
+            if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
+                predicates.add(root.get("id").in(filterDto.guestTabIds()));
             }
 
-            if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
+            /*if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
                 predicates.add(root.get("id").in(filterDto.orderIds()));
             }
 

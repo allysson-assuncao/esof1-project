@@ -20,7 +20,7 @@ export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
 };
 
 export const fetchGuestTabs = async () => {
-    const response = await guestTab.get(`/filter`, {
+    const response = await guestTab.get(`/select-all`, {
         /*headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },*/

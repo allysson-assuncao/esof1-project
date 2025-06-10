@@ -75,7 +75,7 @@ export interface DisplayGuestTabItem {
     waiterName?: string;
 }
 
-export interface GuestTab {
+export interface SimpleGuestTab {
     id: number;
     clientName: string;
 }

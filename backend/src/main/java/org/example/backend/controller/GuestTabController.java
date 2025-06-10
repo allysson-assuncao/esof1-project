@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.GuestTabDTO;
 import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.SimpleGuestTabDTO;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -28,6 +31,11 @@ public class GuestTabController {
         return this.guestTabService.registerGuestTap(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
+    }
+
+    @GetMapping("/select-all")
+    public ResponseEntity<List<SimpleGuestTabDTO>> selectAllGuestTabs() {
+        return ResponseEntity.ok(this.guestTabService.selectAllGuestTabs());
     }
 
     @PostMapping("/filter")

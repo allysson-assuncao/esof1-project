@@ -50,12 +50,10 @@ public class LocalTableService {
     }
 
     public List<LocalTableDTO> getGridTables() {
-        List<LocalTableDTO> localTableDTOList = this.localTableRepository.findAll()
+        return this.localTableRepository.findAll()
                 .stream()
                 .map(this::convertToLocalTableDTO)
                 .collect(Collectors.toList());
-        System.out.println(localTableDTOList.getFirst().toString());
-        return localTableDTOList;
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
