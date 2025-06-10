@@ -10,7 +10,13 @@ import {
 } from '@tanstack/react-table'
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
 import {Button} from '@/components/ui/button'
-import {DisplayGuestTabItem, DisplayOrderItem, SimpleGuestTab, GuestTabFilters} from "@/model/Interfaces";
+import {
+    DisplayGuestTabItem,
+    DisplayOrderItem,
+    SimpleGuestTab,
+    GuestTabFilters,
+    GuestTabStatus, OrderStatus
+} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
@@ -91,6 +97,16 @@ export function GuestTabDataTable<TValue>({
             label: tab.id + tab.clientName,
         })) ?? [];
 
+    const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, { value, label }]) => ({
+        value,
+        label,
+    }));
+
+    const orderStatusOptions = Object.entries(OrderStatus).map(([, { value, label }]) => ({
+        value,
+        label,
+    }));
+
     return (
         <div>
             {/* Filters */}
@@ -110,6 +126,28 @@ export function GuestTabDataTable<TValue>({
                             : []
                     }
                     placeholder="Selecione a comanda do cliente"
+                    animation={2}
+                    maxCount={3}
+                />
+                <MultiSelect
+                    options={guestTabStatusOptions}
+                    onValueChange={(selectedValues) => setSelectedFilters({
+                        ...selectedFilters,
+                        guestTabStatuses: selectedValues,
+                    })}
+                    defaultValue={selectedFilters.guestTabStatuses || []}
+                    placeholder="Selecione o status da comanda"
+                    animation={2}
+                    maxCount={3}
+                />
+                <MultiSelect
+                    options={orderStatusOptions}
+                    onValueChange={(selectedValues) => setSelectedFilters({
+                        ...selectedFilters,
+                        orderStatuses: selectedValues,
+                    })}
+                    defaultValue={selectedFilters.orderStatuses || []}
+                    placeholder="Selecione o status do pedido"
                     animation={2}
                     maxCount={3}
                 />
@@ -217,7 +255,7 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                         <TableRow key={order.id}>
                             <TableCell>{order.productName}</TableCell>
                             <TableCell className="text-center">{order.amount}</TableCell>
-                            <TableCell>{order.status}</TableCell>
+                            <TableCell>{OrderStatus[order.status]?.label || order.status}</TableCell>
                             <TableCell>{formatDateDisplay(order.orderedTime.toString())}</TableCell>
                             <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
                             <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>

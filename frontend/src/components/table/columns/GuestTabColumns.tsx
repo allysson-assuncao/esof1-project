@@ -1,7 +1,7 @@
 'use client'
 
 import {ColumnDef} from '@tanstack/react-table'
-import {DisplayGuestTabItem} from "@/model/Interfaces";
+import {DisplayGuestTabItem, GuestTabStatus} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {DataTableColumnHeader} from "@/components/ui/data-table";
 
@@ -28,7 +28,14 @@ export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     // GuestTab
     {
         accessorKey: "id",
-        header: ({column}) => <DataTableColumnHeader column={column} title="Comanda ID"/>,
+        header: ({column}) => <DataTableColumnHeader column={column} title="ID Comanda"/>,
+    },
+    {
+        accessorKey: "status",
+        header: ({column}) => <DataTableColumnHeader column={column} title="Status"/>,
+        cell: ({row}) => {
+            return GuestTabStatus[row.original.status as keyof typeof GuestTabStatus]?.label || row.original.status || "-";
+        },
     },
     {
         accessorKey: "totalPrice",

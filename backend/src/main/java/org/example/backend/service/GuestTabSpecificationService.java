@@ -36,15 +36,15 @@ public class GuestTabSpecificationService {
 
             /*if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
                 predicates.add(root.get("id").in(filterDto.orderIds()));
+            }*/
+
+            if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
+                 predicates.add(root.get("status").in(filterDto.guestTabStatuses()));
             }
 
             if (filterDto.orderStatuses() != null && !filterDto.orderStatuses().isEmpty()) {
-                 predicates.add(root.get("status").in(filterDto.orderStatuses()));
+                 predicates.add(orderJoin.get("status").in(filterDto.orderStatuses()));
             }
-
-            if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
-                 predicates.add(guestTabJoin.get("status").in(filterDto.guestTabStatuses()));
-            }*/
 
             if (filterDto.productName() != null && !filterDto.productName().isBlank()) {
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(productJoin.get("name")),
