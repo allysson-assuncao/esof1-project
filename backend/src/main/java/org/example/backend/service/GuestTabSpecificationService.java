@@ -35,7 +35,7 @@ public class GuestTabSpecificationService {
             }
 
             if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
-                predicates.add(root.get("id").in(filterDto.orderIds()));
+                predicates.add(orderJoin.get("id").in(filterDto.orderIds()));
             }
 
             if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
