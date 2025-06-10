@@ -67,6 +67,7 @@ const GuestTabTable = ({localTableId} : { localTableId: string}) => {
                 page={page}
                 totalPages={totalPages}
                 setPageSize={setPageSize}
+                localTableId={localTableId}
             />
         </div>
     )

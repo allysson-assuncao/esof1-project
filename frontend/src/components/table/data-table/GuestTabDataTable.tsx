@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table'
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from '@/components/ui/table'
 import {Button} from '@/components/ui/button'
-import {DisplayGuestTabItem, DisplayOrderItem, SimpleGuestTab, GuestTabFilters, UserRoles} from "@/model/Interfaces";
+import {DisplayGuestTabItem, DisplayOrderItem, SimpleGuestTab, GuestTabFilters} from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
@@ -27,17 +27,19 @@ interface DataTableProps<TValue> {
     page: number;
     totalPages: number;
     setPageSize: (page: number) => void;
+    localTableId: string;
 }
 
 export function GuestTabDataTable<TValue>({
-                                            columns,
-                                            data,
-                                            setPage,
-                                            selectedFilters,
-                                            setSelectedFilters,
-                                            page,
-                                            totalPages,
-                                        }: DataTableProps<TValue>) {
+                                              columns,
+                                              data,
+                                              setPage,
+                                              selectedFilters,
+                                              setSelectedFilters,
+                                              page,
+                                              totalPages,
+                                              localTableId,
+                                          }: DataTableProps<TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
 
     const table = useReactTable({
@@ -61,7 +63,10 @@ export function GuestTabDataTable<TValue>({
         setPage((prev) => prev + 1)
     }
 
-    const { data: guestTabs, isLoading } = useQuery<SimpleGuestTab[]>('guestTabs', fetchGuestTabs);
+    const {data: guestTabs, isLoading} = useQuery<SimpleGuestTab[]>(
+        ['guestTabs', localTableId],
+        () => fetchGuestTabs(localTableId)
+    );
     const [initialized, setInitialized] = useState<boolean>(false);
 
     const [isClient, setIsClient] = useState(false);
@@ -89,7 +94,8 @@ export function GuestTabDataTable<TValue>({
     return (
         <div>
             {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
+            <div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
                 <MultiSelect
                     options={guestTabsOptions}
                     onValueChange={(selectedValues) =>

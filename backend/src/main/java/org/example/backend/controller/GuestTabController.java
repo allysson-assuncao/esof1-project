@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin("*")
@@ -33,9 +34,9 @@ public class GuestTabController {
                 ResponseEntity.badRequest().body("");
     }
 
-    @GetMapping("/select-all")
-    public ResponseEntity<List<SimpleGuestTabDTO>> selectAllGuestTabs() {
-        return ResponseEntity.ok(this.guestTabService.selectAllGuestTabs());
+    @GetMapping("/select-all/{localTableID}")
+    public ResponseEntity<List<SimpleGuestTabDTO>> selectAllGuestTabs(@PathVariable UUID localTableID) {
+        return ResponseEntity.ok(this.guestTabService.selectAllGuestTabs(localTableID));
     }
 
     @PostMapping("/filter")

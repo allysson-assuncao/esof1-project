@@ -19,8 +19,8 @@ export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
     return response.data;
 };
 
-export const fetchGuestTabs = async () => {
-    const response = await guestTab.get(`/select-all`, {
+export const fetchGuestTabs = async (localTableId: string) => {
+    const response = await guestTab.get(`/select-all/${localTableId}`, {
         /*headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },*/

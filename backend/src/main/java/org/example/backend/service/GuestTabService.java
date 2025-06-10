@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,8 @@ public class GuestTabService {
         return false;
     }
 
-    public List<SimpleGuestTabDTO> selectAllGuestTabs(){
-        return this.guestTabRepository.findAll().stream()
+    public List<SimpleGuestTabDTO> selectAllGuestTabs(UUID localTableID){
+        return this.guestTabRepository.findByLocalTableId(localTableID).stream()
                 .map(this::convertToSimpleGuestTabDTO)
                 .collect(Collectors.toList());
     }
