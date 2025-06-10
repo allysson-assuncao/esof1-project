@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/app/auth/**").permitAll()
                         .requestMatchers("/app/order/**").permitAll()
-                        .requestMatchers("/app/product/**").hasRole("ADMIN")
+                        .requestMatchers("/app/product/**").hasRole("ADMIN").anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
