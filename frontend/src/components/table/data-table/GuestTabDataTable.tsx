@@ -120,7 +120,7 @@ export function GuestTabDataTable<TValue>({
     const waiterOptions =
         simpleWaiters?.map((tab) => ({
             value: tab.id,
-            label: tab.id + tab.userName,
+            label: tab.userName,
         })) ?? [];
 
     const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
