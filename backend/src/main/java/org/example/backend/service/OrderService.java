@@ -1,5 +1,7 @@
 package org.example.backend.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
@@ -14,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -62,4 +67,35 @@ public class OrderService {
         return true;
     }
 
+    // Busca todos os pedidos de uma comanda (GuestTab)
+    public List<OrderDTO> getOrdersByGuestTabId(Long guestTabId) {
+        GuestTab guestTab = guestTabRepository.findById(guestTabId)
+                .orElseThrow(() -> new EntityNotFoundException("Comanda não encontrada"));
+
+        return guestTab.getOrders().stream()
+                .map(this::convertToOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+    private OrderDTO convertToOrderDTO(Order order) {
+        String productName = order.getProduct() != null ? order.getProduct().getName() : null;
+        double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
+        String waiterName = order.getWaiter() != null ? order.getWaiter().getName() : null;
+
+        Set<Long> additionalOrderIds = order.getAdditionalOrders() != null
+                ? order.getAdditionalOrders().stream().map(Order::getId).collect(Collectors.toSet())
+                : Set.of();
+
+        return OrderDTO.builder()
+                .id(order.getId())
+                .amount(order.getAmount())
+                .status(order.getStatus())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .additionalOrders(additionalOrderIds)
+                .productName(productName)
+                .productUnitPrice(productUnitPrice)
+                .waiterName(waiterName)
+                .build();
+    }
 }
