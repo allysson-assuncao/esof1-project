@@ -83,6 +83,14 @@ public class GuestTabService {
         return result;
     }
 
+    /*public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
+        return guestTabRepository.get.stream().map(x -> new GuestTabGetDTO(
+                x.getId(),
+                x.getName(),
+                x.getTimeOpened(),
+                x.getLocalTable().getNumber())).toList();
+    }*/
+
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
         Specification<GuestTab> specification = this.guestTabSpecificationService.getGuestTabSpecification(filterDto);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
