@@ -1,10 +1,14 @@
 package org.example.backend.service;
 
+import jakarta.transaction.Transactional;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
+import org.example.backend.model.enums.OrderStatus;
+import org.example.backend.model.enums.ProductDestination;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
@@ -12,7 +16,10 @@ import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -33,29 +40,27 @@ public class OrderService {
 
     }
 
-    // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
+    // Test Product id: 35392b1a-f4e9-4bf4-8b9a-66690b19d527
+    // Cria e registra um pedido a partir de um OrderRequestDTO cujos parametros são passados na requisição
     public boolean registerOrder(OrderRequestDTO request) {
-        //User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
-        GuestTab guestTabOp = guestTabRepository.findById(request.guestTabId()).orElse(null);
-
-
-        Product product = productRepository.findById(request.productId()).get();
-
-        Optional<Order> parentOrder = null;
-        try {
+        System.out.println("Request: " + request.toString());
+        User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
+        GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
+        Product product = productRepository.findById(request.productId()).orElseThrow();
+        Optional<Order> parentOrder = Optional.empty();
+        if(request.parentOrderId() != null) {
             parentOrder = orderRepository.findById(request.parentOrderId());
-        } catch (NullPointerException e) {
-            parentOrder = Optional.empty();
         }
 
         Order order = Order.builder()
                 .amount(request.amount())
                 .observation(request.observation())
                 .parentOrder(parentOrder.orElse(null))
-                .guestTab(guestTabOp)
+                .guestTab(guestTab)
                 .product(product)
                 .status(OrderStatus.IN_PREPARE)
-                //.waiter(waiter)
+                .orderedTime(LocalDateTime.now())
+                .waiter(waiter)
                 .build();
 
         orderRepository.save(order);
@@ -63,4 +68,23 @@ public class OrderService {
         return true;
     }
 
+
+    @Transactional
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderDTO::new).toList();
+    }
+
+    @Transactional
+    public List<OrderDTO> getOrdersInPrepareAndBar() {
+        List<Order> orders =
+                orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.BAR).orElseThrow();
+
+        return orders.stream().map(OrderDTO::new).toList();
+    }
+
+    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
+        List<Order> orders = orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.KITCHEN).orElseThrow();
+        return orders.stream().map(OrderDTO::new).toList();
+    }
 }

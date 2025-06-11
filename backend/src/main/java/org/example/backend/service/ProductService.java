@@ -26,6 +26,7 @@ public class ProductService {
                 product.setDescription(productDTO.description());
                 product.setActive(true);
                 product.setPrice(productDTO.price());
+                product.setDestination(productDTO.destination());
                 productRepository.save(product);
                 return true;
             } catch (Exception e) {

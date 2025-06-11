@@ -61,11 +61,7 @@ public class GuestTabService {
     //Retorna todas as GuestTabs
     @Transactional
     public List<GuestTabGetDTO> getGuestTabs() {
-        return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
-                x.getId(),
-                x.getName(),
-                x.getTimeOpened(),
-                x.getLocalTable().getNumber())).toList();
+        return guestTabRepository.findAll().stream().map(GuestTabGetDTO::new).toList();
     }
 
     //Retorna todas as GuestTabs relacionadas a uma determinada mesa
