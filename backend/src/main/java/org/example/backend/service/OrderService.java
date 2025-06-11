@@ -35,9 +35,12 @@ public class OrderService {
 
     // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
     public boolean registerOrder(OrderRequestDTO request) {
-        User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
-        GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
-        Product product = productRepository.findById(request.productId()).orElseThrow();
+        //User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
+        GuestTab guestTabOp = guestTabRepository.findById(request.guestTabId()).orElse(null);
+
+
+        Product product = productRepository.findById(request.productId()).get();
+
         Optional<Order> parentOrder = null;
         try {
             parentOrder = orderRepository.findById(request.parentOrderId());
@@ -49,9 +52,10 @@ public class OrderService {
                 .amount(request.amount())
                 .observation(request.observation())
                 .parentOrder(parentOrder.orElse(null))
-                .guestTab(guestTab)
+                .guestTab(guestTabOp)
                 .product(product)
-                .waiter(waiter)
+                .status(OrderStatus.IN_PREPARE)
+                //.waiter(waiter)
                 .build();
 
         orderRepository.save(order);

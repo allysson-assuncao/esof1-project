@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/app/auth/**").permitAll()
                         .requestMatchers("/app/order/**").permitAll()
                         .requestMatchers("/app/guest-tab/**").permitAll()
-                        .requestMatchers("/app/product/**").hasRole("ADMIN")
+                        .requestMatchers("/app/product/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

@@ -23,6 +23,8 @@ public class ProductService {
             try {
                 Product product = new Product();
                 product.setName(productDTO.name());
+                product.setDescription(productDTO.description());
+                product.setActive(true);
                 product.setPrice(productDTO.price());
                 productRepository.save(product);
                 return true;

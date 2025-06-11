@@ -150,7 +150,7 @@ public class GuestTabService {
                 /*.additionalOrders(additionalOrderIds)*/
                 .productName(productName)
                 .productUnitPrice(productUnitPrice)
-                .waiterName(waiterName)
+                //.waiterName(waiterName)
                 .build();
     }
 
