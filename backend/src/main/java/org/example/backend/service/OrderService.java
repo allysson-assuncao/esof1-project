@@ -36,6 +36,7 @@ public class OrderService {
     }
 
     // Test Product id: 35392b1a-f4e9-4bf4-8b9a-66690b19d527
+    // Cria e registra um pedido a partir de um OrderRequestDTO cujos parametros são passados na requisição
     public boolean registerOrder(OrderRequestDTO request) {
         User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
