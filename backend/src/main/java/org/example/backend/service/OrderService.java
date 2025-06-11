@@ -5,6 +5,7 @@ import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
+import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
@@ -12,6 +13,7 @@ import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -33,16 +35,14 @@ public class OrderService {
 
     }
 
-    // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
+    // Test Product id: 35392b1a-f4e9-4bf4-8b9a-66690b19d527
     public boolean registerOrder(OrderRequestDTO request) {
         User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
         Product product = productRepository.findById(request.productId()).orElseThrow();
-        Optional<Order> parentOrder = null;
-        try {
+        Optional<Order> parentOrder = Optional.empty();
+        if(request.parentOrderId() != null) {
             parentOrder = orderRepository.findById(request.parentOrderId());
-        } catch (NullPointerException e) {
-            parentOrder = Optional.empty();
         }
 
         Order order = Order.builder()
@@ -51,6 +51,8 @@ public class OrderService {
                 .parentOrder(parentOrder.orElse(null))
                 .guestTab(guestTab)
                 .product(product)
+                .status(OrderStatus.IN_PREPARE)
+                .orderedTime(LocalDateTime.now())
                 .waiter(waiter)
                 .build();
 
