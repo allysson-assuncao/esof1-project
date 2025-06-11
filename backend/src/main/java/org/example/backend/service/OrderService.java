@@ -14,6 +14,7 @@ import org.example.backend.repository.ProductRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,18 +43,25 @@ public class OrderService {
 
     // Test Product id: 35392b1a-f4e9-4bf4-8b9a-66690b19d527
     // Cria e registra um pedido a partir de um OrderRequestDTO cujos parametros são passados na requisição
+    @Transactional
     public boolean registerOrder(OrderRequestDTO request) {
-        User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
-        GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
-        Product product = productRepository.findById(request.productId()).orElseThrow();
-        Optional<Order> parentOrder = Optional.empty();
-        if(request.parentOrderId() != null) {
-            parentOrder = orderRepository.findById(request.parentOrderId());
-        }
+        Order order = convertRequestToOrder(request);
+        orderRepository.save(order);
+        return true;
+    }
 
-        Order order = Order.builder()
-                .amount(request.amount())
-                .observation(request.observation())
+    //Converte uma OrderRequestDTO em um objeto Order, para ser salvo no banco
+    public Order convertRequestToOrder(OrderRequestDTO order) {
+        User waiter = userRepository.findByEmail(order.userEmail()).orElseThrow();
+        GuestTab guestTab = guestTabRepository.findById(order.guestTabId()).orElseThrow();
+        Product product = productRepository.findById(order.productId()).orElseThrow();
+        Optional<Order> parentOrder = Optional.empty();
+        if(order.parentOrderId() != null) {
+            parentOrder = orderRepository.findById(order.parentOrderId());
+        }
+        return Order.builder()
+                .amount(order.amount())
+                .observation(order.observation())
                 .parentOrder(parentOrder.orElse(null))
                 .guestTab(guestTab)
                 .product(product)
@@ -61,13 +69,19 @@ public class OrderService {
                 .orderedTime(LocalDateTime.now())
                 .waiter(waiter)
                 .build();
+    }
 
-        orderRepository.save(order);
+    //Retorna lista com todos os pedidos
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getAllOrders() {
+        List<OrderDTO> orders = orderRepository.findAll().stream()
+                .map(this::convertToOrderDTO).toList();
 
-        return true;
+        return orders;
     }
 
     // Busca todos os pedidos de uma comanda (GuestTab)
+    @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByGuestTabId(Long guestTabId) {
         GuestTab guestTab = guestTabRepository.findById(guestTabId)
                 .orElseThrow(() -> new EntityNotFoundException("Comanda não encontrada"));
@@ -76,6 +90,7 @@ public class OrderService {
                 .map(this::convertToOrderDTO)
                 .collect(Collectors.toList());
     }
+
 
     private OrderDTO convertToOrderDTO(Order order) {
         String productName = order.getProduct() != null ? order.getProduct().getName() : null;

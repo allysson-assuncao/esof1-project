@@ -35,5 +35,10 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/queue")
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
 
 }
