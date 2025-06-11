@@ -1,5 +1,7 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.ProductDTO;
+import org.example.backend.model.Product;
 import org.example.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,20 @@ public class ProductService {
     }
 
     // Todo...
-    public boolean registerProduct(String request){
+    public boolean registerProduct(ProductDTO productDTO){
+
+        if(!this.productRepository.existsByName(productDTO.name())) {
+            try {
+                Product product = new Product();
+                product.setName(productDTO.name());
+                product.setPrice(productDTO.price());
+                productRepository.save(product);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
         return false;
     }
-
 }
