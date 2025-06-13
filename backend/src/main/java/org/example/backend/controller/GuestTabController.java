@@ -27,9 +27,20 @@ public class GuestTabController {
         this.guestTabService = guestTabService;
     }
 
+    @GetMapping("/all-tabs")
+    public List<GuestTabGetDTO> getGuestTabs() {
+        return guestTabService.getGuestTabs();
+    }
+
+    //Acessar {{host}}/app/guest-tab/tabs
+    @GetMapping("/{tableNumber}")
+    public List<GuestTabGetDTO> getGuestTabsByTableNumber(@PathVariable int tableNumber) {
+        return guestTabService.getGuestTabsByTableNumber(tableNumber);
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
-        return this.guestTabService.registerGuestTap(request) ?
+    public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {
+        return this.guestTabService.registerGuestTab(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
     }

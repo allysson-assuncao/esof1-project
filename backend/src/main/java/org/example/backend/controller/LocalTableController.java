@@ -26,6 +26,7 @@ public class LocalTableController {
     @GetMapping("/{number}")
     public ResponseEntity<LocalTableGetDTO> findByNumber(@PathVariable int number) {
         var dto = localTableService.findByNumber(number);
+        System.out.println("Teste");
         return dto != null ?
                 ResponseEntity.ok(dto) :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build();

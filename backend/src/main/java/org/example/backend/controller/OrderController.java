@@ -1,6 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.dto.SimpleOrderDTO;
+import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,10 @@ public class OrderController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
+    public ResponseEntity<?> registerOrder(@RequestBody OrderRequestDTO request) {
         return this.orderService.registerOrder(request) ?
-                ResponseEntity.status(HttpStatus.OK).body("") :
-                ResponseEntity.badRequest().body("");
+                ResponseEntity.status(HttpStatus.OK).body("Pedido registrado com sucesso") :
+                ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
     }
 
     @GetMapping("/select-all/{localTableID}")
