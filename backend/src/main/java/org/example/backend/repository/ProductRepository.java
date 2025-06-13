@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     Optional<Product> findById(UUID uuid);
+    boolean existsByName(String name);
 }

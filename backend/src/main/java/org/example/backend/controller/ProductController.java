@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.ProductDTO;
 import org.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ public class ProductController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody String request) {
-        return this.productService.registerProduct(request) ?
-                ResponseEntity.status(HttpStatus.OK).body("") :
-                ResponseEntity.badRequest().body("");
+    public ResponseEntity<?> registerCategory(@RequestBody ProductDTO productDTO) {
+        return this.productService.registerProduct(productDTO) ?
+                ResponseEntity.status(HttpStatus.OK).body("Deu certo!") :
+                ResponseEntity.badRequest().body("Deu errado");
     }
 
 }
