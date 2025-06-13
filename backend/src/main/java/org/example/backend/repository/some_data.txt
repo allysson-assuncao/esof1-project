@@ -23,13 +23,13 @@ INSERT INTO tables (id, "number", status) VALUES
 
 
 -- ========== COMANDAS (guest_tabs) ==========
-INSERT INTO guest_tabs (id, status, time_opened, time_closed, local_table_id) VALUES
-(1, 0, CURRENT_TIMESTAMP - INTERVAL '2 hours 30 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01
-(2, 0, CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01 (outra comanda)
-(3, 0, CURRENT_TIMESTAMP - INTERVAL '5 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours', 'b1c2d3e4-f5a6-4b5c-9d0e-1f2a3b4c5d6e'), -- Mesa M02 (comanda antiga, fechada)
-(4, 0, CURRENT_TIMESTAMP - INTERVAL '45 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f'), -- Mesa M03
-(5, 2, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days' + INTERVAL '10 minutes', 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d'), -- Mesa M01 (comanda cancelada)
-(6, 1, CURRENT_TIMESTAMP - INTERVAL '10 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f'); -- Mesa M03
+INSERT INTO guest_tabs (id, status, time_opened, time_closed, local_table_id, client_name) VALUES
+(1, 0, CURRENT_TIMESTAMP - INTERVAL '2 hours 30 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d', 'Roberto'), -- Mesa M01
+(2, 0, CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes', NULL, 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d', 'Roberto'), -- Mesa M01 (outra comanda)
+(3, 0, CURRENT_TIMESTAMP - INTERVAL '5 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours', 'b1c2d3e4-f5a6-4b5c-9d0e-1f2a3b4c5d6e', 'Roberto'), -- Mesa M02 (comanda antiga, fechada)
+(4, 0, CURRENT_TIMESTAMP - INTERVAL '45 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f', 'Roberto'), -- Mesa M03
+(5, 2, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days' + INTERVAL '10 minutes', 'a0b1c2d3-e4f5-4a5b-8c9d-0e1f2a3b4c5d', 'Roberto'), -- Mesa M01 (comanda cancelada)
+(6, 1, CURRENT_TIMESTAMP - INTERVAL '10 minutes', NULL, 'c2d3e4f5-a6b7-4c5d-0e1f-2a3b4c5d6e7f', 'Roberto'); -- Mesa M03
 
 
 -- ========== PEDIDOS (orders) ==========

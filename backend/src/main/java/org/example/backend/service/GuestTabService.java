@@ -48,7 +48,7 @@ public class GuestTabService {
         ));
 
         GuestTab guestTab = GuestTab.builder()
-                .name(request.guestName())
+                .clientName(request.guestName())
                 .localTable(table)
                 .status(GuestTabStatus.OPEN)
                 .timeOpened(LocalDateTime.now())
@@ -63,7 +63,7 @@ public class GuestTabService {
     public List<GuestTabGetDTO> getGuestTabs() {
         return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
                 x.getId(),
-                x.getName(),
+                x.getClientName(),
                 x.getTimeOpened(),
                 x.getLocalTable().getNumber())).toList();
     }
@@ -75,7 +75,7 @@ public class GuestTabService {
                 localTableRepository.findByNumber(tableNumber).stream().findFirst().orElse(null)
         ).stream().map(x -> new GuestTabGetDTO(
                 x.getId(),
-                x.getName(),
+                x.getClientName(),
                 x.getTimeOpened(),
                 x.getLocalTable().getNumber()
         )).toList();
