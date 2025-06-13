@@ -70,5 +70,3 @@ public class LocalTableService {
                 .guestTabCountToday(guestTabCountToday)
                 .build();
     }
-
-}

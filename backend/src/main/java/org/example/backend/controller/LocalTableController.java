@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import org.example.backend.dto.LocalTableDTO;
 import org.example.backend.dto.LocalTableGetDTO;
 import org.example.backend.dto.LocalTableRequestDTO;
+import org.example.backend.dto.LocalTableRequestDTO;
 import org.example.backend.service.LocalTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
