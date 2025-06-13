@@ -1,7 +1,12 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.dto.SimpleOrderDTO;
+import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
+import org.example.backend.model.Product;
+import org.example.backend.model.User;
+import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
 import org.example.backend.repository.UserRepository;

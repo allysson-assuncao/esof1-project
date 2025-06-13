@@ -1,9 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.FilteredPageDTO;
-import org.example.backend.dto.GuestTabDTO;
-import org.example.backend.dto.GuestTabFilterDTO;
-import org.example.backend.dto.SimpleGuestTabDTO;
+import org.example.backend.dto.*;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
