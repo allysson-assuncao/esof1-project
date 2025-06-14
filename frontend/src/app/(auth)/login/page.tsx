@@ -1,9 +1,11 @@
 "use client";
 
+import LoginForm from "@/components/form/LoginForm";
+
 const LoginPage = () => {
     return (
         <div className="h-full">
-            Login
+            <LoginForm />
         </div>
     );
 };
