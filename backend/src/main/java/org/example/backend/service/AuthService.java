@@ -1,8 +1,10 @@
 package org.example.backend.service;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.AuthResponseDTO;
 import org.example.backend.dto.UserLoginDTO;
+import org.example.backend.dto.UserRegisterDTO;
 import org.example.backend.infra.security.TokenService;
 import org.example.backend.model.User;
 import org.example.backend.repository.UserRepository;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,9 +39,25 @@ public class AuthService {
         return Optional.empty();
     }
 
-    public boolean test(String message) {
-        System.out.println(message);
-        return message.contains("teste");
+    public Optional<AuthResponseDTO> register(UserRegisterDTO userRegisterDTO) {
+        Optional<User> user = this.userRepository.findByEmail(userRegisterDTO.email());
+
+        if (user.isPresent()) {
+            throw new EntityExistsException("Usuário com email '" + userRegisterDTO.email() + "' já esta cadastrado");
+        }
+
+        User newUser = User.builder()
+                .email(userRegisterDTO.email())
+                .username(userRegisterDTO.username())
+                .password(passwordEncoder.encode(userRegisterDTO.password()))
+                .name(userRegisterDTO.name())
+                .role(userRegisterDTO.role())
+                .build();
+
+        this.userRepository.save(newUser);
+
+        String token = this.tokenService.generateToken(newUser);
+        return Optional.of(new AuthResponseDTO(newUser.getUsername(), token, newUser.getRole()));
     }
 
 }
