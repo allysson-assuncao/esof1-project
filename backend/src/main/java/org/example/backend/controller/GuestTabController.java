@@ -47,6 +47,11 @@ public class GuestTabController {
         return ResponseEntity.ok(this.guestTabService.selectGuestTabsByLocalTableId(localTableID));
     }
 
+    @PutMapping("/close-tab/{tabId}")
+    public ResponseEntity<String> closeGuestTab(@PathVariable Long tabId) {
+        return ResponseEntity.ok(this.guestTabService.closeTabById(tabId));
+    }
+
     @PostMapping("/filter")
     public ResponseEntity<FilteredPageDTO<GuestTabDTO>> filterGuestTabs(
             @RequestBody GuestTabFilterDTO filterDto,

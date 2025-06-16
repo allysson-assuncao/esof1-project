@@ -58,6 +58,29 @@ public class GuestTabService {
         return true;
     }
 
+    @Transactional
+    public String closeTabById(Long id){
+        GuestTab tab = guestTabRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        StringBuilder output = new StringBuilder();
+        double accum = 0.0;
+        List<Order> orders = tab.getOrders();
+        output.append(tab.getGuestName());
+        output.append("\n");
+        output.append("Nome         Quantidade          Preço\n");
+        for (Order it: orders) {
+            output.append(it.getProduct().getName());
+            output.append("         ");
+            output.append(it.getAmount());
+            output.append("         R$");
+            output.append(it.getProduct().getPrice());
+            output.append("\n");
+            accum += it.getProduct().getPrice();
+        }
+        output.append("\n" + "Preço total: R$ " + accum);
+        tab.setStatus(GuestTabStatus.CLOSED);
+        return output.toString();
+    }
+
     //Retorna todas as GuestTabs
     @Transactional
     public List<GuestTabGetDTO> getGuestTabs() {
