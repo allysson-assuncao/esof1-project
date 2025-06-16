@@ -25,14 +25,14 @@ public class GuestTab {
     @Column(name = "status", nullable = false)
     private GuestTabStatus status;
 
+    @Column(name = "guest_name")
+    private String guestName;
+
     @Column(name = "time_opened", nullable = false, updatable = false)
     private LocalDateTime timeOpened;
 
     @Column(name = "time_closed")
     private LocalDateTime timeClosed;
-
-    @Column(name = "client_name")
-    private String clientName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_table_id")

@@ -1,11 +1,14 @@
 package org.example.backend.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.example.backend.dto.DetailedOrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
+import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
@@ -13,6 +16,7 @@ import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,20 +44,27 @@ public class OrderService {
 
     // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
     public boolean registerOrder(OrderRequestDTO request) {
-        User waiter = userRepository.findByEmail(request.userEmail()).orElseThrow();
-        GuestTab guestTab = guestTabRepository.findById(request.guestTabId()).orElseThrow();
-        Product product = productRepository.findById(request.productId()).orElseThrow();
-        Optional<Order> parentOrder = null;
-        try {
-            parentOrder = orderRepository.findById(request.parentOrderId());
-        } catch (NullPointerException e) {
-            parentOrder = Optional.empty();
+        User waiter = userRepository.findByEmail(request.userEmail())
+                .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
+
+        GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+
+        Product product = productRepository.findById(request.productId())
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+
+        Order parent = null;
+        if (request.parentOrderId() != null) {
+            parent = orderRepository.findById(request.parentOrderId())
+                    .orElse(null);  // Aceita null se não existir
         }
 
         Order order = Order.builder()
                 .amount(request.amount())
                 .observation(request.observation())
-                .parentOrder(parentOrder.orElse(null))
+                .status(OrderStatus.IN_PREPARE)
+                .orderedTime(LocalDateTime.now())
+                .parentOrder(parent)  // Diretamente o objeto ou null
                 .guestTab(guestTab)
                 .product(product)
                 .waiter(waiter)
@@ -62,6 +73,13 @@ public class OrderService {
         orderRepository.save(order);
 
         return true;
+    }
+
+    public List<DetailedOrderDTO> selectOrdersByGuestTabId (Long guestTabId) {
+        return orderRepository.findByGuestTabId(guestTabId).stream()
+                .map(this::convertToDetailedOrderDTO)
+                .collect(Collectors.toList());
+
     }
 
     public List<SimpleOrderDTO> selectOrdersByLocalTableId(UUID localTableID) {
@@ -74,6 +92,22 @@ public class OrderService {
         if (order == null) return null;
         return SimpleOrderDTO.builder()
                 .id(order.getId())
+                .build();
+    }
+
+    private DetailedOrderDTO convertToDetailedOrderDTO(Order order) {
+        if (order == null) return null;
+
+
+        return DetailedOrderDTO.builder()
+                .id(order.getId())
+                .tableNumber(order.getGuestTab().getLocalTable().getNumber())
+                .guestName(order.getGuestTab().getGuestName())
+                .productName(order.getProduct().getName())
+                .waiterName(order.getWaiter().getName())
+                .amount(order.getAmount())
+                .price(order.getProduct().getPrice())
+                .timeOrdered(order.getOrderedTime())
                 .build();
     }
 }
