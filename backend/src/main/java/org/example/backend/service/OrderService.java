@@ -15,6 +15,7 @@ import org.example.backend.repository.ProductRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,7 +43,15 @@ public class OrderService {
 
     }
 
+    @Transactional
+    public List<DetailedOrderDTO> getQueue() {
+        return orderRepository.findAll().stream()
+                .map(this::convertToDetailedOrderDTO)
+                .collect(Collectors.toList());
+    }
+
     // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
+    @Transactional
     public boolean registerOrder(OrderRequestDTO request) {
         User waiter = userRepository.findByEmail(request.userEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
@@ -56,7 +65,7 @@ public class OrderService {
         Order parent = null;
         if (request.parentOrderId() != null) {
             parent = orderRepository.findById(request.parentOrderId())
-                    .orElse(null);  // Aceita null se não existir
+                    .orElse(null);
         }
 
         Order order = Order.builder()
@@ -64,7 +73,7 @@ public class OrderService {
                 .observation(request.observation())
                 .status(OrderStatus.IN_PREPARE)
                 .orderedTime(LocalDateTime.now())
-                .parentOrder(parent)  // Diretamente o objeto ou null
+                .parentOrder(parent)
                 .guestTab(guestTab)
                 .product(product)
                 .waiter(waiter)
@@ -74,6 +83,7 @@ public class OrderService {
 
         return true;
     }
+
 
     public List<DetailedOrderDTO> selectOrdersByGuestTabId (Long guestTabId) {
         return orderRepository.findByGuestTabId(guestTabId).stream()

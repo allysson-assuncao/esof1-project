@@ -31,6 +31,11 @@ public class OrderController {
                 ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
     }
 
+    @GetMapping("/queue")
+    public ResponseEntity<List<DetailedOrderDTO>> getQueue() {
+        return ResponseEntity.ok(this.orderService.getQueue());
+    }
+
     @GetMapping("/by-tab/{guestTabId}")
     public ResponseEntity<List<DetailedOrderDTO>> selectOrderByGuestTabId(@PathVariable Long guestTabId) {
         return ResponseEntity.ok(this.orderService.selectOrdersByGuestTabId(guestTabId));
