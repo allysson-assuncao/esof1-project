@@ -18,19 +18,21 @@ public class ProductService {
 
     // Todo...
     public boolean registerProduct(ProductDTO productDTO){
-
         if(!this.productRepository.existsByName(productDTO.name())) {
             try {
                 Product product = new Product();
                 product.setName(productDTO.name());
+                product.setDescription(productDTO.description());
                 product.setPrice(productDTO.price());
+                product.setActive(productDTO.active());
+                // Pode inicializar listas vazias ou deixar null se usar lazy
                 productRepository.save(product);
                 return true;
             } catch (Exception e) {
+                e.printStackTrace(); // ajuda no debug
                 return false;
             }
         }
-
         return false;
     }
 }

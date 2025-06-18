@@ -22,10 +22,12 @@ public class ProductController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody ProductDTO productDTO) {
-        return this.productService.registerProduct(productDTO) ?
-                ResponseEntity.status(HttpStatus.OK).body("Deu certo!") :
-                ResponseEntity.badRequest().body("Deu errado");
+    public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
+        boolean success = productService.registerProduct(productDTO);
+        if(success) {
+            return ResponseEntity.ok("Produto cadastrado com sucesso!");
+        } else {
+            return ResponseEntity.badRequest().body("Erro ao cadastrar produto");
+        }
     }
-
 }
