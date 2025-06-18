@@ -1,5 +1,7 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,17 +9,20 @@ import lombok.*;
 import java.util.Set;
 import java.util.UUID;
 
-@Table(name = "categories")
 @Entity
-@Data
+@Table(name = "categories")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Category {
+
     @Id
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(name = "name", nullable = false, unique = true)
@@ -25,13 +30,14 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
+    @JsonBackReference // Evita recursão infinita na serialização
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+    @JsonManagedReference // Serializa subcategorias normalmente
     private Set<Category> subCategories;
 
     @ManyToMany(mappedBy = "categoryList", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnore // Ignora relação com produtos na serialização
     private Set<Product> products;
-
 }

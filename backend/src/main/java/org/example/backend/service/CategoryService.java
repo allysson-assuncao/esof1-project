@@ -19,43 +19,41 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    private Category addSubCategoryWithParent(Category parent, String subCategoryName) {
+        Category subCategory = categoryRepository.findByName(subCategoryName)
+                .orElseGet(() -> {
+                    Category newSub = Category.builder().name(subCategoryName).build();
+                    return categoryRepository.save(newSub);
+                });
+
+        subCategory.setParentCategory(parent);
+        return categoryRepository.save(subCategory); // garante persistência com parent atualizado
+    }
+
     // Todo...
     public boolean registerCategory(CategoryDTO categoryDTO) {
-
-        Set<Category> subCategories = new HashSet<>(); //Para evitar "NullPointerException"
-
-        //Inicia o cadastro das subcategorias
-        for (String subCategory : categoryDTO.subCategories()) {
-            if(!this.categoryRepository.existsByName(subCategory)){
-                Category category = Category.builder()
-                    .name(subCategory)
-                    .build();
-                this.categoryRepository.save(category);
-                subCategories.add(category);
-            } else {
-                subCategories.add(this.categoryRepository.findByName(subCategory).get());
-            }
-        }
-
-        //Nome obrigatório
-        if(categoryDTO.name().isEmpty()){
+        if (categoryDTO.name().isEmpty()) {
             return false;
         }
 
-        //Cria uma categoria
+        // Cria a categoria principal
         Category category = Category.builder()
                 .name(categoryDTO.name())
-                .subCategories(subCategories)
                 .build();
 
-        this.categoryRepository.save(category);
+        category = categoryRepository.save(category); // salva para gerar ID antes de atribuir como parent
 
-        //Cada subcategoria tem um parent, que é atualizado:
-        for (Category subCategory : subCategories) {
-            subCategory.setParentCategory(category);
-            this.categoryRepository.save(subCategory);
+        Set<Category> subCategories = new HashSet<>();
+
+        for (String subCategoryName : categoryDTO.subCategories()) {
+            Category subCategory = addSubCategoryWithParent(category, subCategoryName);
+            subCategories.add(subCategory);
         }
+
+        category.setSubCategories(subCategories);
+        categoryRepository.save(category); // atualiza a lista de subcategorias
 
         return true;
     }
+
 }
