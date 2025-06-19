@@ -29,7 +29,7 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(name = "ordered_time")
+    @Column(name = "ordered_time", nullable = false)
     private LocalDateTime orderedTime;
 
     @OneToMany(mappedBy = "parentOrder", cascade = CascadeType.ALL)
@@ -40,15 +40,19 @@ public class Order {
     private Order parentOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guestTab_id")
+    @JoinColumn(name = "guestTab_id", nullable = false)
     private GuestTab guestTab;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User waiter;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workstation_id", nullable = false)
+    private Workstation workstation;
 
 }

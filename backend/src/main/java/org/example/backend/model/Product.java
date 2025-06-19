@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"additionalList", "orders"})
 public class Product {
     @Id
     @Column(name = "id", nullable = false, unique = true, updatable = false)

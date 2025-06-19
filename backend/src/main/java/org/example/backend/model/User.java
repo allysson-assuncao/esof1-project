@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Table(name = "users")
@@ -44,6 +45,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "waiter", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
+
+    @ManyToMany(mappedBy = "users")
+    @JsonIgnore
+    private Set<Workstation> workstations;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
