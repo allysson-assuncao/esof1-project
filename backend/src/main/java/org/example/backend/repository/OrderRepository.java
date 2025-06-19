@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+import java.util.Optional;
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     List<Order> findByGuestTabLocalTableId(UUID localTableId);
+    List<Order> findByGuestTabId(Long guestTabId);
+    Optional<Order> findById(Long id);
 }

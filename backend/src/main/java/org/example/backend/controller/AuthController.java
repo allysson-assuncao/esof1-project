@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import jakarta.validation.Valid;
 import org.example.backend.dto.AuthResponseDTO;
 import org.example.backend.dto.UserLoginDTO;
+import org.example.backend.dto.UserRegisterDTO;
 import org.example.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,11 +34,10 @@ public class AuthController {
                 ResponseEntity.badRequest().body(Map.of("message", "Credenciais inválidas!"));
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<?> test(@RequestBody String message) {
-        return this.authService.test(message) ?
-                ResponseEntity.status(HttpStatus.OK).body(Map.of("message","Mensagem de teste recebida com sucesso")) :
-                ResponseEntity.badRequest().body(Map.of("message","Mensagem nao continha teste"));
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid UserRegisterDTO userRegisterDTO) {
+        Optional<AuthResponseDTO> optionalAuthResponseDTO = this.authService.register(userRegisterDTO);
+        return optionalAuthResponseDTO.map(authResponseDTO -> ResponseEntity.status(HttpStatus.CREATED).body(authResponseDTO)).orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
 }

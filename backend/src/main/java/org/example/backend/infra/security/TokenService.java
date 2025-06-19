@@ -22,12 +22,11 @@ public class TokenService {
     public String generateToken(User userModel) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                     .withIssuer("esof1")
                     .withSubject(userModel.getEmail())
                     .withExpiresAt(LocalDateTime.now().plusDays(EXPIRATION_TIME_IN_DAYS).toInstant(ZoneOffset.of("-03:00")))
                     .sign(algorithm);
-            return token;
         }catch (JWTCreationException exception){
             throw new RuntimeException("Erro na autenticação", exception);
         }
