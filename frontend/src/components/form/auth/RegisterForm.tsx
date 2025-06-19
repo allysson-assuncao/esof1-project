@@ -3,7 +3,7 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import {registerSchema} from '@/utils/authValidation'
 import {useMutation} from 'react-query'
 import {useDispatch} from 'react-redux'
-import {login, logout} from '@/store/slices/authSlice'
+import {logout, signup} from '@/store/slices/authSlice'
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Button} from '@/components/ui/button'
 import {Icons} from '@/public/icons'
@@ -59,20 +59,20 @@ const RegisterForm = () => {
     const mutation = useMutation(registerRequest, {
         onSuccess: (data) => {
             dispatch(logout())
-            dispatch(login({username: data.username, token: data.token, role: data.role}))
+            dispatch(signup({ username: data.username, token: data.token, role: data.role }))
             router.push('dashboard/home')
 
-            toast.success("Mesas carregadas com sucesso!", {
-                description: `Total de mesas: ${data.length}`,
+            toast.success("Usuário cadastrado com sucesso!", {
+                description: `Bem-vindo, ${data.username}!`,
             })
         },
         onError: (error: unknown) => {
             if (error instanceof AxiosError) {
-                toast.error("Erro ao fazer login", {
+                toast.error("Erro ao fazer o cadastro", {
                     description: error.response?.data?.message || 'Ocorreu um erro inesperado.',
                 })
             } else {
-                toast.error("Erro ao fazer login", {
+                toast.error("Erro ao fazer o cadastro", {
                     description: 'Ocorreu um erro inesperado.',
                 })
             }

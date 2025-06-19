@@ -36,8 +36,8 @@ const LoginForm = () => {
             dispatch(login({username: data.username, token: data.token, role: data.role}))
             router.push('dashboard/home')
 
-            toast.success("Mesas carregadas com sucesso!", {
-                description: `Total de mesas: ${data.length}`,
+            toast.success("Login realizado com sucesso!", {
+                description: `Bem-vindo, ${data.username}!`,
             })
         },
         onError: (error: unknown) => {
