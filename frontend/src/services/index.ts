@@ -12,6 +12,18 @@ export const testURL = axios.create({
     baseURL: `http://localhost:${port}/app/auth`,
 });
 
+export const user = axios.create({
+    baseURL: `http://localhost:${port}/app/user`,
+});
+
+export const localTable = axios.create({
+    baseURL: `http://localhost:${port}/app/local-table`,
+});
+
 export const guestTab = axios.create({
     baseURL: `http://localhost:${port}/app/guest-tab`,
+});
+
+export const order = axios.create({
+    baseURL: `http://localhost:${port}/app/order`,
 });

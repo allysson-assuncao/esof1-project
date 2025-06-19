@@ -8,9 +8,9 @@ import {guestTabColumns} from "@/components/table/columns/GuestTabColumns";
 import {GuestTabFilters} from "@/model/Interfaces";
 import {fetchFilteredGuestTabs} from "@/services/guestTabService";
 
-const GuestTabTable = () => {
+const GuestTabTable = ({localTableId} : { localTableId: string}) => {
     const [selectedFilters, setSelectedFilters] = useState<GuestTabFilters>({
-        tableId: "",
+        tableId: localTableId,
         guestTabIds: [],
         orderIds: [],
         orderStatuses: [],
@@ -67,6 +67,7 @@ const GuestTabTable = () => {
                 page={page}
                 totalPages={totalPages}
                 setPageSize={setPageSize}
+                localTableId={localTableId}
             />
         </div>
     )

@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.LocalTableDTO;
 import org.example.backend.dto.LocalTableGetDTO;
 import org.example.backend.dto.LocalTableRequestDTO;
 import org.example.backend.service.LocalTableService;
@@ -8,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/app/local-table")
 public class LocalTableController {
 
@@ -39,4 +43,11 @@ public class LocalTableController {
                     .body("Table number " + request.number() + " already exists");
         }
     }
+
+    @GetMapping("/select-all")
+    public ResponseEntity<List<LocalTableDTO>> getGridTables() {
+        List<LocalTableDTO> tables = localTableService.getGridTables();
+        return ResponseEntity.ok(tables);
+    }
+
 }

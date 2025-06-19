@@ -1,13 +1,12 @@
 package org.example.backend.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.*;
+import org.example.backend.dto.GuestTabDTO;
+import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.OrderDTO;
+import org.example.backend.dto.SimpleGuestTabDTO;
 import org.example.backend.model.GuestTab;
-import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
-import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
-import org.example.backend.repository.LocalTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,12 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,59 +25,30 @@ public class GuestTabService {
 
     private final GuestTabRepository guestTabRepository;
     private final GuestTabSpecificationService guestTabSpecificationService;
-    private final LocalTableRepository localTableRepository;
 
     @Autowired
-    public GuestTabService(GuestTabRepository guestTapRepository,
-                           GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository) {
+    public GuestTabService(GuestTabRepository guestTapRepository, GuestTabSpecificationService guestTabSpecificationService) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
-        this.localTableRepository = localTableRepository;
     }
 
-    //Registra nova guest tab
-    @Transactional
-    public boolean registerGuestTab(GuestTabRequestDTO request){
-        LocalTable table = localTableRepository.findByNumber(request.tableNumber())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Table number " + request.tableNumber() + " not found."
-        ));
+    // Todo...
+    public boolean registerGuestTap(String request){
+        return false;
+    }
 
-        GuestTab guestTab = GuestTab.builder()
-                .name(request.guestName())
-                .localTable(table)
-                .status(GuestTabStatus.OPEN)
-                .timeOpened(LocalDateTime.now())
+    public List<SimpleGuestTabDTO> selectGuestTabsByLocalTableId(UUID localTableID){
+        return this.guestTabRepository.findByLocalTableId(localTableID).stream()
+                .map(this::convertToSimpleGuestTabDTO)
+                .collect(Collectors.toList());
+    }
+
+    private SimpleGuestTabDTO convertToSimpleGuestTabDTO(GuestTab guestTab) {
+        if (guestTab == null) return null;
+        return SimpleGuestTabDTO.builder()
+                .id(guestTab.getId())
+                .clientName(guestTab.getClientName())
                 .build();
-
-        guestTabRepository.save(guestTab);
-        return true;
-    }
-
-    //Retorna todas as GuestTabs
-    @Transactional
-    public List<GuestTabGetDTO> getGuestTabs() {
-        return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
-                x.getId(),
-                x.getName(),
-                x.getTimeOpened(),
-                x.getLocalTable().getNumber())).toList();
-    }
-
-    //Retorna todas as GuestTabs relacionadas a uma determinada mesa
-    @Transactional
-    public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
-        List<GuestTabGetDTO> result = guestTabRepository.findByLocalTable(
-                localTableRepository.findByNumber(tableNumber).stream().findFirst().orElse(null)
-        ).stream().map(x -> new GuestTabGetDTO(
-                x.getId(),
-                x.getName(),
-                x.getTimeOpened(),
-                x.getLocalTable().getNumber()
-        )).toList();
-
-        return result;
     }
 
     public Page<GuestTabDTO> getGuestTabByFilters(GuestTabFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {

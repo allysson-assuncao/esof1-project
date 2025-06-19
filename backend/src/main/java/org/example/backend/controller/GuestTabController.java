@@ -1,6 +1,9 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.*;
+import org.example.backend.dto.FilteredPageDTO;
+import org.example.backend.dto.GuestTabDTO;
+import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.SimpleGuestTabDTO;
 import org.example.backend.service.GuestTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/app/guest-tab")
 public class GuestTabController {
 
@@ -22,22 +27,16 @@ public class GuestTabController {
         this.guestTabService = guestTabService;
     }
 
-    @GetMapping("/all-tabs")
-    public List<GuestTabGetDTO> getGuestTabs() {
-        return guestTabService.getGuestTabs();
-    }
-
-    //Acessar {{host}}/app/guest-tab/tabs
-    @GetMapping("/{tableNumber}")
-    public List<GuestTabGetDTO> getGuestTabsByTableNumber(@PathVariable int tableNumber) {
-        return guestTabService.getGuestTabsByTableNumber(tableNumber);
-    }
-
     @PostMapping("/register")
-    public ResponseEntity<?> registerGuestTab(@RequestBody GuestTabRequestDTO request) {
-        return this.guestTabService.registerGuestTab(request) ?
+    public ResponseEntity<?> registerCategory(@RequestBody String request) {
+        return this.guestTabService.registerGuestTap(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("") :
                 ResponseEntity.badRequest().body("");
+    }
+
+    @GetMapping("/select-all/{localTableID}")
+    public ResponseEntity<List<SimpleGuestTabDTO>> selectGuestTabsByLocalTableId(@PathVariable UUID localTableID) {
+        return ResponseEntity.ok(this.guestTabService.selectGuestTabsByLocalTableId(localTableID));
     }
 
     @PostMapping("/filter")

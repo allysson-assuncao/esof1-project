@@ -22,7 +22,7 @@ public class GuestTabSpecificationService {
             Join<GuestTab, Product> productJoin = orderJoin.join("product");
             Join<GuestTab, LocalTable> localTableJoin = root.join("localTable");
 
-            /*if (filterDto.tableId() != null) {
+            if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
             } else {
                 // Maybe throw an exception
@@ -31,29 +31,29 @@ public class GuestTabSpecificationService {
             }
 
             if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
-                predicates.add(guestTabJoin.get("id").in(filterDto.guestTabIds()));
+                predicates.add(root.get("id").in(filterDto.guestTabIds()));
             }
 
             if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
-                predicates.add(root.get("id").in(filterDto.orderIds()));
-            }
-
-            if (filterDto.orderStatuses() != null && !filterDto.orderStatuses().isEmpty()) {
-                 predicates.add(root.get("status").in(filterDto.orderStatuses()));
+                predicates.add(orderJoin.get("id").in(filterDto.orderIds()));
             }
 
             if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
-                 predicates.add(guestTabJoin.get("status").in(filterDto.guestTabStatuses()));
-            }*/
+                 predicates.add(root.get("status").in(filterDto.guestTabStatuses()));
+            }
+
+            if (filterDto.orderStatuses() != null && !filterDto.orderStatuses().isEmpty()) {
+                 predicates.add(orderJoin.get("status").in(filterDto.orderStatuses()));
+            }
 
             if (filterDto.productName() != null && !filterDto.productName().isBlank()) {
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(productJoin.get("name")),
                         "%" + filterDto.productName().toLowerCase() + "%"));
             }
 
-            /*if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
+            if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
                 predicates.add(userJoin.get("id").in(filterDto.waiterIds()));
-            }*/
+            }
 
             if (filterDto.startTime() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderJoin.get("orderedTime"), filterDto.startTime()));
