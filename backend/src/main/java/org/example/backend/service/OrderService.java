@@ -1,11 +1,15 @@
 package org.example.backend.service;
 
+import jakarta.transaction.Transactional;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
+import org.example.backend.model.enums.OrderStatus;
+import org.example.backend.model.enums.ProductDestination;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
@@ -76,4 +80,23 @@ public class OrderService {
                 .id(order.getId())
                 .build();
     }
+
+    @Transactional
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderDTO::new).toList();
+    }
+
+    /*@Transactional
+    public List<OrderDTO> getOrdersInPrepareAndBar() {
+        List<Order> orders =
+                orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.BAR).orElseThrow();
+
+        return orders.stream().map(OrderDTO::new).toList();
+    }
+
+    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
+        List<Order> orders = orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.KITCHEN).orElseThrow();
+        return orders.stream().map(OrderDTO::new).toList();
+    }*/
 }
