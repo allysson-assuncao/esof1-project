@@ -3,6 +3,7 @@ package org.example.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.backend.model.enums.ProductDestination;
 
 import java.util.List;
 import java.util.Set;
@@ -48,5 +49,8 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
+
+    @Column(name = "destination", nullable = false)
+    private ProductDestination destination;
 
 }
