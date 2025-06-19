@@ -43,7 +43,7 @@ public class OrderController {
         return this.orderService.getAllOrders();
     }
 
-    @GetMapping("/get/in-prepare/bar")
+    /*@GetMapping("/get/in-prepare/bar")
     public List<OrderDTO> getOrdersInPrepareAndBar() {
         return this.orderService.getOrdersInPrepareAndBar();
     }
@@ -51,7 +51,6 @@ public class OrderController {
     @GetMapping("/get/in-prepare/kitchen")
     public List<OrderDTO> getOrdersInPrepareAndKitchen() {
         return this.orderService.getOrdersInPrepareAndKitchen();
-    }
-
+    }*/
 
 }
