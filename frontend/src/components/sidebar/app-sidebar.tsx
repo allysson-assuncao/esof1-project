@@ -54,6 +54,7 @@ const data = {
             title: "Operação",
             /*url: "#",*/
             icon: FolderKanbanIcon,
+            isActive: true,
             items: [
                 {
                     title: "Seleção de Mesas",
