@@ -19,7 +19,7 @@ export default function DashboardLayout({children,}: Readonly<{ children: React.
                 <SidebarProvider>
                     <AppSidebar/>
                     <main className="flex-grow h-full w-full max-w-[1920px] px-4 md:px-8 5xl:mx-auto 5xl:px-32">
-                        <SidebarInset>
+                        {/*<SidebarInset>
                             <header className="flex h-16 shrink-0 items-center gap-2">
                                 <div className="flex items-center gap-2 px-4">
                                     <SidebarTrigger className="-ml-1"/>
@@ -42,8 +42,7 @@ export default function DashboardLayout({children,}: Readonly<{ children: React.
                                     </Breadcrumb>
                                 </div>
                             </header>
-                        </SidebarInset>
-
+                        </SidebarInset>*/}
                         {children}
                     </main>
                 </SidebarProvider>
