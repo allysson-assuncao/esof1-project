@@ -25,6 +25,27 @@ import {fetchSimpleGuestTabs} from "@/services/guestTabService";
 import {MultiSelect} from "@/components/ui/multi-select";
 import {fetchSimpleOrders} from "@/services/orderService";
 import {fetchSimpleWaiters} from "@/services/userService";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from "@/components/ui/drawer";
+import useMediaQuery from "react-query/types/devtools/useMediaQuery";
+import {AddOrderForm} from "@/components/form/add/AddOrderForm";
+import {AddGuestTabForm} from "@/components/form/add/AddGuestTabForm";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -49,6 +70,9 @@ export function GuestTabDataTable<TValue>({
                                               localTableId,
                                           }: DataTableProps<TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
+    const [openAddGuestTab, setOpenAddGuestTab] = useState(false);
+
+    const isDesktop = useMediaQuery("(min-width: 768px)");
 
     const table = useReactTable({
         data,
@@ -257,24 +281,67 @@ export function GuestTabDataTable<TValue>({
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <React.Fragment key={row.id}>
-                                    <TableRow data-state={row.getIsSelected() && "selected"}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                    {row.getIsExpanded() && (
-                                        <TableRow>
-                                            <TableCell colSpan={row.getVisibleCells().length}>
-                                                <OrdersSubTable orders={row.original.orders}/>
-                                            </TableCell>
+                            <>
+                                {table.getRowModel().rows.map((row) => (
+                                    <React.Fragment key={row.id}>
+                                        <TableRow data-state={row.getIsSelected() && "selected"}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
                                         </TableRow>
-                                    )}
-                                </React.Fragment>
-                            ))
+                                        {row.getIsExpanded() && (
+                                            <TableRow>
+                                                <TableCell colSpan={row.getVisibleCells().length}>
+                                                    <OrdersSubTable orders={row.original.orders}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                                {/* Row to add Guest Tab */}
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center">
+                                        {isDesktop ? (
+                                            <Dialog open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline">Adicionar comanda</Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px]">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Nova Comanda</DialogTitle>
+                                                        <DialogDescription>
+                                                            Preencha os dados da nova comanda.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                                                </DialogContent>
+                                            </Dialog>
+                                        ) : (
+                                            <Drawer open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
+                                                <DrawerTrigger asChild>
+                                                    <Button variant="outline">Adicionar comanda</Button>
+                                                </DrawerTrigger>
+                                                <DrawerContent>
+                                                    <DrawerHeader className="text-left">
+                                                        <DrawerTitle>Nova Comanda</DrawerTitle>
+                                                        <DrawerDescription>
+                                                            Preencha os dados da nova comanda.
+                                                        </DrawerDescription>
+                                                    </DrawerHeader>
+                                                    <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                                                    <DrawerFooter className="pt-2">
+                                                        <DrawerClose asChild>
+                                                            <Button variant="outline">Cancelar</Button>
+                                                        </DrawerClose>
+                                                    </DrawerFooter>
+                                                </DrawerContent>
+                                            </Drawer>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            </>
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -296,6 +363,9 @@ export function GuestTabDataTable<TValue>({
 }
 
 const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
+    const [openAddOrder, setOpenAddOrder] = React.useState(false);
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+
     return (
         <div className="p-4 bg-muted/50">
             <Table>
@@ -322,8 +392,49 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                             <TableCell>{order.waiterName}</TableCell>
                         </TableRow>
                     ))}
+                    {/* Row to add Order */}
+                    <TableRow>
+                        <TableCell colSpan={7} className="text-center">
+                            {isDesktop ? (
+                                <Dialog open={openAddOrder} onOpenChange={setOpenAddOrder}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline">Adicionar pedido</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Novo Pedido</DialogTitle>
+                                            <DialogDescription>
+                                                Preencha os dados do novo pedido.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <AddOrderForm onSubmit={() => setOpenAddOrder(false)}/>
+                                    </DialogContent>
+                                </Dialog>
+                            ) : (
+                                <Drawer open={openAddOrder} onOpenChange={setOpenAddOrder}>
+                                    <DrawerTrigger asChild>
+                                        <Button variant="outline">Adicionar pedido</Button>
+                                    </DrawerTrigger>
+                                    <DrawerContent>
+                                        <DrawerHeader className="text-left">
+                                            <DrawerTitle>Novo Pedido</DrawerTitle>
+                                            <DrawerDescription>
+                                                Preencha os dados do novo pedido.
+                                            </DrawerDescription>
+                                        </DrawerHeader>
+                                        <AddOrderForm onSubmit={() => setOpenAddOrder(false)}/>
+                                        <DrawerFooter className="pt-2">
+                                            <DrawerClose asChild>
+                                                <Button variant="outline">Cancelar</Button>
+                                            </DrawerClose>
+                                        </DrawerFooter>
+                                    </DrawerContent>
+                                </Drawer>
+                            )}
+                        </TableCell>
+                    </TableRow>
                 </TableBody>
             </Table>
         </div>
-    )
+    );
 }
