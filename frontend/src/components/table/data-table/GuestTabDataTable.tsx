@@ -72,7 +72,8 @@ export function GuestTabDataTable<TValue>({
     const [sorting, setSorting] = useState<SortingState>([])
     const [openAddGuestTab, setOpenAddGuestTab] = useState(false);
 
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    /*const isDesktop = useMediaQuery("(min-width: 768px)");*/
+    const isDesktop = true;
 
     const table = useReactTable({
         data,
@@ -364,7 +365,7 @@ export function GuestTabDataTable<TValue>({
 
 const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
     const [openAddOrder, setOpenAddOrder] = React.useState(false);
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const isDesktop = true;
 
     return (
         <div className="p-4 bg-muted/50">

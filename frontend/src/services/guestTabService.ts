@@ -3,10 +3,9 @@ import {FetchGuestTabParams} from "@/model/Interfaces";
 
 export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
     const response = await guestTab.post(`/filter`, params.filter, {
-        /*headers: {
-            /!*'Authorization': `Bearer ${localStorage.getItem('token')}`,*!/
-            "Access-Control-Allow-Origin": "",
-        },*/
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
         params: {
             page: params.page || 0,
             size: params.size || 350,
