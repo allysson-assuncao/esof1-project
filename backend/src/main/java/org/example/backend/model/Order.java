@@ -52,7 +52,7 @@ public class Order {
     private User waiter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workstation_id", nullable = false)
+    @JoinColumn(name = "workstation_id")
     private Workstation workstation;
 
 }

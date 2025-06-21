@@ -43,14 +43,14 @@ public class Product {
     private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
 
-    @Column(name = "destination", nullable = false)
+    @Column(name = "destination")
     private ProductDestination destination;
 
 }
