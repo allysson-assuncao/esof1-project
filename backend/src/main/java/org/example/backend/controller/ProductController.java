@@ -5,10 +5,9 @@ import org.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/app/product")
@@ -23,11 +22,24 @@ public class ProductController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
-        boolean success = productService.registerProduct(productDTO);
-        if(success) {
-            return ResponseEntity.ok("Produto cadastrado com sucesso!");
-        } else {
-            return ResponseEntity.badRequest().body("Erro ao cadastrar produto");
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(productService.registerProduct(productDTO));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/update/{name}")
+    public ResponseEntity<?> updateProductByName(@PathVariable String name, @RequestBody ProductDTO productDTO) {
+        try {
+            return ResponseEntity.ok(productService.updateProductByName(name, productDTO));
+        } catch (RuntimeException e) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("não encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+            }
+            return ResponseEntity.badRequest().body(msg);
+        }
+    }
+
 }

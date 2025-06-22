@@ -40,7 +40,7 @@ public class Category {
     @Column(name = "single", nullable = false)
     private boolean single;
 
-    @ManyToMany(mappedBy = "categoryList", fetch = FetchType.LAZY)
-    @JsonIgnore // Ignora relação com produtos na serialização
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Product> products;
 }
