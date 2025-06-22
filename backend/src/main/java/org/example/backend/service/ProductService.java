@@ -30,8 +30,8 @@ public class ProductService {
             if (!productRepository.existsByName(productDTO.name())) {
                 try {
                     // Busca categoria pelo nome (pode ser por ID, se preferir)
-                    Category category = categoryRepository.findByName(productDTO.category())
-                            .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.category()));
+                    Category category = categoryRepository.findById(productDTO.idCategory())
+                            .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
 
                     Product product = new Product();
                     product.setName(productDTO.name());
@@ -52,18 +52,18 @@ public class ProductService {
         }
     }
 
-    public Product updateProductByName(String name, ProductDTO productDTO) {
-        Product existingProduct = productRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + name));
+    public Product updateProductById(UUID id, ProductDTO productDTO) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
 
-        // Se o nome novo for diferente e já existir outro produto com esse nome, erro
+        // Verifica se o nome novo já existe em outro produto
         if (!existingProduct.getName().equals(productDTO.name())
                 && productRepository.existsByName(productDTO.name())) {
             throw new RuntimeException("Já existe outro produto com o nome: " + productDTO.name());
         }
 
-        Category category = categoryRepository.findByName(productDTO.category())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.category()));
+        Category category = categoryRepository.findById(productDTO.idCategory())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
 
         existingProduct.setName(productDTO.name());
         existingProduct.setDescription(productDTO.description());

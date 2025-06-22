@@ -29,10 +29,10 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/update/{name}")
-    public ResponseEntity<?> updateProductByName(@PathVariable String name, @RequestBody ProductDTO productDTO) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateProductByName(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
         try {
-            return ResponseEntity.ok(productService.updateProductByName(name, productDTO));
+            return ResponseEntity.ok(productService.updateProductById(id, productDTO));
         } catch (RuntimeException e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("não encontrado")) {
