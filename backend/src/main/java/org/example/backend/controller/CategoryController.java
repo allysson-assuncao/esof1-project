@@ -1,6 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.dto.CategoryDTO;
+import org.example.backend.model.Category;
 import org.example.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,9 @@ public class CategoryController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCategory(@RequestBody CategoryDTO categoryDTO) {
-        return this.categoryService.registerCategory(categoryDTO) ?
-                ResponseEntity.status(HttpStatus.OK).body("Deu certo!") :
-                ResponseEntity.badRequest().body("Deu errado");
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryDTO categoryDTO) {
+        Category savedCategory = categoryService.saveOrUpdateCategory(categoryDTO);
+        return ResponseEntity.ok(savedCategory);
     }
 
 }

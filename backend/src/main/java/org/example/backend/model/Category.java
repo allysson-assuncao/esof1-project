@@ -37,6 +37,9 @@ public class Category {
     @JsonManagedReference // Serializa subcategorias normalmente
     private Set<Category> subCategories;
 
+    @Column(name = "single", nullable = false)
+    private boolean single;
+
     @ManyToMany(mappedBy = "categoryList", fetch = FetchType.LAZY)
     @JsonIgnore // Ignora relação com produtos na serialização
     private Set<Product> products;
