@@ -37,8 +37,8 @@ public class Category {
     @JsonManagedReference // Serializa subcategorias normalmente
     private Set<Category> subCategories;
 
-    @Column(name = "single", nullable = false)
-    private boolean single;
+    @Column(name = "isMultiple", nullable = false)
+    private boolean isMultiple;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @JsonIgnore

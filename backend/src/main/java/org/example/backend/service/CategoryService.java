@@ -35,7 +35,7 @@ public class CategoryService {
         Category existingCategory = categoryRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + name));
 
-        existingCategory.setSingle(dto.single());
+        existingCategory.setMultiple(dto.isMultiple());
 
         if (dto.subcategories() != null) {
             for (CategoryDTO subDTO : dto.subcategories()) {
@@ -49,13 +49,13 @@ public class CategoryService {
                         .orElse(null);
 
                 if (existingSub != null) {
-                    if (existingSub.isSingle() != subDTO.single()) {
-                        existingSub.setSingle(subDTO.single());
+                    if (existingSub.isMultiple() != subDTO.isMultiple()) {
+                        existingSub.setMultiple(subDTO.isMultiple());
                     }
                 } else {
                     Category newSub = Category.builder()
                             .name(subDTO.name())
-                            .single(subDTO.single())
+                            .isMultiple(subDTO.isMultiple())
                             .parentCategory(existingCategory)
                             .build();
                     existingCategory.getSubCategories().add(newSub);
@@ -70,7 +70,7 @@ public class CategoryService {
     private Category saveCategory(CategoryDTO dto, Category parent) {
         Category category = Category.builder()
                 .name(dto.name())
-                .single(dto.single())
+                .isMultiple(dto.isMultiple())
                 .parentCategory(parent)
                 .build();
 

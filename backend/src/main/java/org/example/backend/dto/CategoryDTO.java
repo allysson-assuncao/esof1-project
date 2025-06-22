@@ -5,4 +5,4 @@ import lombok.Builder;
 import java.util.Set;
 
 @Builder
-public record CategoryDTO(String name, boolean single, Set<CategoryDTO> subcategories) {}
+public record CategoryDTO(String name, boolean isMultiple, Set<CategoryDTO> subcategories) {}
