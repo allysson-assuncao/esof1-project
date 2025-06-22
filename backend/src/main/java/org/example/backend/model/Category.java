@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"subCategories", "products"})
 public class Category {
 
     @Id
@@ -28,6 +29,9 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "is_multiple", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean isMultiple;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
     @JsonBackReference // Evita recursão infinita na serialização
@@ -37,10 +41,12 @@ public class Category {
     @JsonManagedReference // Serializa subcategorias normalmente
     private Set<Category> subCategories;
 
-    @Column(name = "isMultiple", nullable = false)
-    private boolean isMultiple;
-
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Product> products;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workstation_id")
+    private Workstation workstation;
+
 }

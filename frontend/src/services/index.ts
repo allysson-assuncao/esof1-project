@@ -8,10 +8,6 @@ export const auth = axios.create({
     baseURL: `http://localhost:${port}/app/auth`,
 });
 
-export const testURL = axios.create({
-    baseURL: `http://localhost:${port}/app/auth`,
-});
-
 export const user = axios.create({
     baseURL: `http://localhost:${port}/app/user`,
 });

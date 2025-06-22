@@ -2,6 +2,7 @@ package org.example.backend.controller;
 
 import org.example.backend.dto.DetailedOrderDTO;
 import org.example.backend.dto.SimpleOrderDTO;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -45,5 +48,20 @@ public class OrderController {
     public ResponseEntity<List<SimpleOrderDTO>> selectOrdersByLocalTableId(@PathVariable UUID localTableID) {
         return ResponseEntity.ok(this.orderService.selectOrdersByLocalTableId(localTableID));
     }
+
+    @GetMapping("/get/all")
+    public List<OrderDTO> getAllOrders() {
+        return this.orderService.getAllOrders();
+    }
+
+    /*@GetMapping("/get/in-prepare/bar")
+    public List<OrderDTO> getOrdersInPrepareAndBar() {
+        return this.orderService.getOrdersInPrepareAndBar();
+    }
+
+    @GetMapping("/get/in-prepare/kitchen")
+    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
+        return this.orderService.getOrdersInPrepareAndKitchen();
+    }*/
 
 }

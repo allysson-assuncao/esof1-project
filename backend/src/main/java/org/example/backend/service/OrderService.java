@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.DetailedOrderDTO;
+import jakarta.transaction.Transactional;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
@@ -9,14 +11,13 @@ import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
+import org.example.backend.model.enums.ProductDestination;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -120,4 +121,23 @@ public class OrderService {
                 .timeOrdered(order.getOrderedTime())
                 .build();
     }
+
+    @Transactional
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderDTO::new).toList();
+    }
+
+    /*@Transactional
+    public List<OrderDTO> getOrdersInPrepareAndBar() {
+        List<Order> orders =
+                orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.BAR).orElseThrow();
+
+        return orders.stream().map(OrderDTO::new).toList();
+    }
+
+    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
+        List<Order> orders = orderRepository.findByStatusAndProduct_Destination(OrderStatus.IN_PREPARE, ProductDestination.KITCHEN).orElseThrow();
+        return orders.stream().map(OrderDTO::new).toList();
+    }*/
 }
