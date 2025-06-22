@@ -6,6 +6,7 @@ import org.example.backend.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,32 +19,40 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    // Método público para criação (falha se já existir)
     @Transactional
-    public Category saveOrUpdateCategory(CategoryDTO dto) {
-        Category existingCategory = categoryRepository.findByName(dto.name()).orElse(null);
-
-        if (existingCategory == null) {
-            return saveCategory(dto, null); // cria normalmente se não existe
+    public Category createCategory(CategoryDTO dto) {
+        Optional<Category> existing = categoryRepository.findByName(dto.name());
+        if (existing.isPresent()) {
+            throw new RuntimeException("Categoria já existe com o nome: " + dto.name());
         }
+        return saveCategory(dto, null);
+    }
 
-        // Atualiza campo 'single' da categoria principal
+    // Método público para atualização
+    @Transactional
+    public Category updateCategory(String name, CategoryDTO dto) {
+        Category existingCategory = categoryRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + name));
+
         existingCategory.setSingle(dto.single());
 
-        if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
+        if (dto.subcategories() != null) {
             for (CategoryDTO subDTO : dto.subcategories()) {
-                // Procura subcategoria existente pelo nome (ignora maiúsculas/minúsculas)
+                if (subDTO == null || subDTO.name() == null) {
+                    // pula elementos nulos ou com nome nulo
+                    continue;
+                }
                 Category existingSub = existingCategory.getSubCategories().stream()
                         .filter(cat -> cat.getName().equalsIgnoreCase(subDTO.name()))
                         .findFirst()
                         .orElse(null);
 
                 if (existingSub != null) {
-                    // Atualiza o campo 'single' se for diferente
                     if (existingSub.isSingle() != subDTO.single()) {
                         existingSub.setSingle(subDTO.single());
                     }
                 } else {
-                    // Cria nova subcategoria
                     Category newSub = Category.builder()
                             .name(subDTO.name())
                             .single(subDTO.single())
@@ -57,6 +66,7 @@ public class CategoryService {
         return categoryRepository.save(existingCategory);
     }
 
+    // Método auxiliar recursivo para criar categoria e subcategorias
     private Category saveCategory(CategoryDTO dto, Category parent) {
         Category category = Category.builder()
                 .name(dto.name())
@@ -64,17 +74,13 @@ public class CategoryService {
                 .parentCategory(parent)
                 .build();
 
-        // Salva primeiro para gerar ID (se quiser, mas o Cascade ALL já cuida disso)
-        // category = categoryRepository.save(category);
-
         if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
             Set<Category> subCats = dto.subcategories().stream()
-                    .map(subDto -> saveCategory(subDto, category)) // recursivo, passando a categoria atual como pai
+                    .map(subDto -> saveCategory(subDto, category))
                     .collect(Collectors.toSet());
             category.setSubCategories(subCats);
         }
 
-        // Salva categoria (e subcategorias em cascata)
         return categoryRepository.save(category);
     }
 }
