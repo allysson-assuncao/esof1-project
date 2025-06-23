@@ -42,11 +42,11 @@ public class GuestTabService {
 
     //Registra nova guest tab
     @Transactional
-    public boolean registerGuestTab(GuestTabRequestDTO request){
+    public boolean registerGuestTab(GuestTabRequestDTO request) {
         LocalTable table = localTableRepository.findByNumber(request.tableNumber())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Table number " + request.tableNumber() + " not found."
-        ));
+                ));
 
         GuestTab guestTab = GuestTab.builder()
                 .clientName(request.guestName())
@@ -92,7 +92,7 @@ public class GuestTabService {
                 x.getLocalTable().getNumber())).toList();
     }*/
 
-    public List<SimpleGuestTabDTO> selectGuestTabsByLocalTableId(UUID localTableID){
+    public List<SimpleGuestTabDTO> selectGuestTabsByLocalTableId(UUID localTableID) {
         return this.guestTabRepository.findByLocalTableId(localTableID).stream()
                 .map(this::convertToSimpleGuestTabDTO)
                 .collect(Collectors.toList());
@@ -119,10 +119,10 @@ public class GuestTabService {
         if (guestTab == null) return null;
 
         // Map orders to OrderDTO
-        Set<OrderDTO> orderDTOs = guestTab.getOrders() != null
+        Set<DrillDownOrderDTO> orderDTOs = guestTab.getOrders() != null
                 ? guestTab.getOrders().stream()
-                    .map(this::convertToOrderDTO)
-                    .collect(Collectors.toSet())
+                .map(this::convertToOrderDTO)
+                .collect(Collectors.toSet())
                 : Set.of();
 
         double totalPrice = orderDTOs.stream()
@@ -142,30 +142,29 @@ public class GuestTabService {
                 .build();
     }
 
-    private OrderDTO convertToOrderDTO(Order order) {
+    private DrillDownOrderDTO convertToOrderDTO(Order order) {
         if (order == null) return null;
 
-        // Map additionalOrders to their IDs
-        /*Set<Long> additionalOrderIds = order.getAdditionalOrders() != null
+        /*Set<DrillDownOrderDTO> additionalOrderDTOs = order.getAdditionalOrders() != null
                 ? order.getAdditionalOrders().stream()
-                    .map(Order::getId)
-                    .collect(Collectors.toSet())
+                .map(this::convertToOrderDTO)
+                .collect(Collectors.toSet())
                 : Set.of();*/
 
         String productName = order.getProduct() != null ? order.getProduct().getName() : null;
         double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
         String waiterName = order.getWaiter() != null ? order.getWaiter().getName() : null;
 
-        return OrderDTO.builder()
+        return DrillDownOrderDTO.builder()
                 .id(order.getId())
                 .amount(order.getAmount())
                 .status(order.getStatus())
                 .observation(order.getObservation())
                 .orderedTime(order.getOrderedTime())
-                /*.additionalOrders(additionalOrderIds)*/
+                /*.additionalOrders(additionalOrderDTOs)*/
                 .productName(productName)
                 .productUnitPrice(productUnitPrice)
-                //.waiterName(waiterName)
+                .waiterName(waiterName)
                 .build();
     }
 

@@ -59,7 +59,7 @@ export interface DisplayOrderItem {
     status: OrderStatus;
     observation: string;
     orderedTime: number[];
-    additionalOrders: number[];
+    additionalOrders: DisplayOrderItem[];
     productName: string;
     productUnitPrice: number;
     waiterName: string;
