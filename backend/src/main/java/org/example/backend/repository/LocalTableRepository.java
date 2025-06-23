@@ -20,8 +20,9 @@ public interface LocalTableRepository extends JpaRepository<LocalTable, UUID> {
 
     Optional<LocalTable> findByNumber(int number);
 
-    @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.timeOpened >= :startOfDay AND gt.timeOpened <= :endOfDay")
+    @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.localTable.id = :tableId AND gt.timeOpened >= :startOfDay AND gt.timeOpened <= :endOfDay")
     int findGuestTabCountTodayById(@Param("tableId") UUID tableId,
                                    @Param("startOfDay") LocalDateTime startOfDay,
                                    @Param("endOfDay") LocalDateTime endOfDay);
+
 }
