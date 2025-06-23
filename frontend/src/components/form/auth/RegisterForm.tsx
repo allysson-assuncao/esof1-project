@@ -188,7 +188,7 @@ const RegisterForm = () => {
                                 <div className="flex justify-center">
                                     <Button className="w-full justify-center touch-manipulation"
                                             type="submit" disabled={mutation.isLoading}>
-                                        {mutation.isLoading ? <Icons.spinner className="animate-spin"/> : 'Login'}
+                                        {mutation.isLoading ? <Icons.spinner className="animate-spin"/> : 'Cadastro'}
                                     </Button>
                                 </div>
                             </div>
