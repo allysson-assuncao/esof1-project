@@ -16,7 +16,7 @@ public class WorkstationService {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    public WorkstationService(WorkstationRepository workstationRepository, CategoryService categoryService) {
+    public WorkstationService(WorkstationRepository workstationRepository, CategoryRepository categoryRepository) {
         this.workstationRepository = workstationRepository;
         this.categoryRepository = categoryRepository;
     }
@@ -24,14 +24,23 @@ public class WorkstationService {
     public boolean registerWorkstation(WorkstationRegisterDTO workstationRegisterDTO) {
         if(workstationRegisterDTO == null) return false;
 
+        Set<Category> categories = new HashSet<>();
+        for(UUID it: workstationRegisterDTO.categoryIds()){
+            categories.add(categoryRepository.findById(it).orElseThrow());
+        }
+
         Workstation workstation = Workstation.builder()
                 .name(workstationRegisterDTO.name())
-                .categories(new HashSet<>())
+                .categories(categories)
                 .users(new HashSet<>())
                 .ordersQueue(new ArrayList<>())
                 .build();
 
         workstationRepository.save(workstation);
+        for(Category it: categories){
+            it.setWorkstation(workstation);
+            categoryRepository.save(it);
+        }
 
         return true;
     }
