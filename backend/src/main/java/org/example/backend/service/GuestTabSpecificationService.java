@@ -22,6 +22,8 @@ public class GuestTabSpecificationService {
             Join<GuestTab, Product> productJoin = orderJoin.join("product");
             Join<GuestTab, LocalTable> localTableJoin = root.join("localTable");
 
+            predicates.add(criteriaBuilder.isNull(orderJoin.get("parentOrder")));
+
             if (filterDto.tableId() != null) {
                 predicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
             } else {
