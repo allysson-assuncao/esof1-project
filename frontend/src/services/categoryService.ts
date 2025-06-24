@@ -4,7 +4,7 @@ import {SimpleCategory} from "@/model/Interfaces";
 
 export const fetchSimpleCategories = async (): Promise<SimpleCategory[]> => {
     try {
-        const response = await category.get(`/select-all/`);
+        const response = await category.get(`/select-all`);
         console.log("API Response:", response);
         return response.data;
     } catch (error) {
