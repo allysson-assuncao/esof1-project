@@ -1,11 +1,13 @@
 package org.example.backend.service;
 
 import org.example.backend.dto.CategoryDTO;
+import org.example.backend.dto.SimpleCategoryDTO;
 import org.example.backend.model.Category;
 import org.example.backend.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +29,18 @@ public class CategoryService {
             throw new RuntimeException("Categoria já existe com o nome: " + dto.name());
         }
         return saveCategory(dto, null);
+    }
+
+    public List<SimpleCategoryDTO> getAllCategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::convertToSimpleCategoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private SimpleCategoryDTO convertToSimpleCategoryDTO(Category category) {
+        SimpleCategoryDTO result = new SimpleCategoryDTO(category.getId(), category.getName());
+        return result;
     }
 
     // Método público para atualização

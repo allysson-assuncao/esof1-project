@@ -4,16 +4,25 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
+import {useQuery} from "react-query";
+import {SimpleCategory, SimpleGuestTab} from "@/model/Interfaces";
+import {fetchSimpleGuestTabs} from "@/services/guestTabService";
+import {fetchSimpleCategories} from "@/services/categoryService";
 
 export function AddWorkstationForm({className, onSubmit}: { className?: string; onSubmit?: (data: any) => void }) {
     const [workstationName, setWorkstationName] = React.useState("");
     const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
 
-    const items = [
+    /*const items = [
         { id: "category1", name: "Placeholder_Category_1" },
         { id: "category2", name: "Placeholder_Category_2" },
         // ...
-    ];
+    ];*/
+
+    const {data: simpleCategories} = useQuery<SimpleCategory[]>(
+        ["simpleCategories"],
+        () => fetchSimpleCategories()
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +38,7 @@ export function AddWorkstationForm({className, onSubmit}: { className?: string; 
             <div className="grid gap-3">
                 <Label>Selecione as categorias</Label>
                 <div className="space-y-2">
-                    {items.map((item) => (
+                    {simpleCategories.map((item) => (
                         <div key={item.id} className="flex items-center gap-2">
                             <Checkbox
                                 id={item.id}

@@ -1,15 +1,14 @@
 package org.example.backend.controller;
 
 import org.example.backend.dto.CategoryDTO;
+import org.example.backend.dto.SimpleCategoryDTO;
 import org.example.backend.model.Category;
-import org.example.backend.repository.CategoryRepository;
 import org.example.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -31,6 +30,11 @@ public class CategoryController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/select-all")
+    public ResponseEntity<List<SimpleCategoryDTO>> selectAll() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @PutMapping("/update/{name}")
