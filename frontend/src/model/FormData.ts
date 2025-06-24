@@ -10,3 +10,9 @@ export interface RegisterFormData {
     name: string;
     role: string;
 }
+
+export interface WorkstationRegisterFormData {
+    id: string;
+    name: string;
+    categoryIds: string[];
+}

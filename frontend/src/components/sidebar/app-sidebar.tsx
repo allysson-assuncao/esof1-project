@@ -45,6 +45,10 @@ const data = {
                     url: '/dashboard/register/category',
                 },
                 {
+                    title: "Cadastro de Destinos",
+                    url: '/dashboard/register/workstation',
+                },
+                {
                     title: "Cadastro de Mesas",
                     url: '/dashboard/register/table',
                 },
