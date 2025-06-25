@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -37,10 +38,10 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @PutMapping("/update/{name}")
-    public ResponseEntity<?> update(@PathVariable String name, @RequestBody CategoryDTO dto) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
         try {
-            Category updated = categoryService.updateCategory(name, dto);
+            Category updated = categoryService.updateCategoryById(id, dto);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
