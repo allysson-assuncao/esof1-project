@@ -24,10 +24,10 @@ public class CategoryController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> create(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<String> create(@RequestBody CategoryDTO dto) {
         try {
-            Category created = categoryService.createCategory(dto);
-            return ResponseEntity.status(201).body(created);
+            categoryService.createCategory(dto);
+            return ResponseEntity.status(201).body("Categoria cadastrada com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -39,10 +39,10 @@ public class CategoryController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
         try {
-            Category updated = categoryService.updateCategoryById(id, dto);
-            return ResponseEntity.ok(updated);
+            categoryService.updateCategoryById(id, dto);
+            return ResponseEntity.ok("Categoria atualizada com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }

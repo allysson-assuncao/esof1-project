@@ -23,7 +23,8 @@ public class ProductController {
     @PostMapping("/register")
     public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(productService.registerProduct(productDTO));
+            productService.registerProduct(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Produto cadastrado com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -32,7 +33,8 @@ public class ProductController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateProductByName(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
         try {
-            return ResponseEntity.ok(productService.updateProductById(id, productDTO));
+            productService.updateProductById(id, productDTO);
+            return ResponseEntity.ok("Produto atualizado com sucesso!");
         } catch (RuntimeException e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("não encontrado")) {
@@ -41,5 +43,4 @@ public class ProductController {
             return ResponseEntity.badRequest().body(msg);
         }
     }
-
 }
