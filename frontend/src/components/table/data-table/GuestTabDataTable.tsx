@@ -46,6 +46,8 @@ import {
 import useMediaQuery from "react-query/types/devtools/useMediaQuery";
 import {AddOrderForm} from "@/components/form/add/AddOrderForm";
 import {AddGuestTabForm} from "@/components/form/add/AddGuestTabForm";
+import {getExpandedRowModel} from "@tanstack/table-core";
+import {ChevronDown, ChevronRight} from "lucide-react";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -294,8 +296,11 @@ export function GuestTabDataTable<TValue>({
                                         </TableRow>
                                         {row.getIsExpanded() && (
                                             <TableRow>
-                                                <TableCell colSpan={row.getVisibleCells().length}>
-                                                    <OrdersSubTable orders={row.original.orders}/>
+                                                <TableCell colSpan={row.getVisibleCells().length} className="p-0">
+                                                    <OrdersSubTable
+                                                        orders={row.original.orders}
+                                                        guestTabId={row.original.id}
+                                                    />
                                                 </TableCell>
                                             </TableRow>
                                         )}
@@ -363,39 +368,106 @@ export function GuestTabDataTable<TValue>({
     )
 }
 
-const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
+const getOrderColumns = (): ColumnDef<DisplayOrderItem>[] => [
+    {
+        id: "expander",
+        header: () => null,
+        cell: ({ row }) => {
+            const canExpand = row.original.additionalOrders && row.original.additionalOrders.length > 0;
+            return canExpand ? (
+                <button {...{ onClick: () => row.toggleExpanded(!row.getIsExpanded()) }}>
+                    {row.getIsExpanded() ? <ChevronDown /> : <ChevronRight />}
+                </button>
+            ) : <span className="inline-block w-4"></span>;
+        },
+        size: 20,
+    },
+    { accessorKey: "productName", header: "Produto" },
+    { accessorKey: "amount", header: "Qtd.", cell: ({row}) => <div className="text-center">{row.original.amount}</div> },
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => OrderStatus[row.original.status as keyof typeof OrderStatus]?.label || row.original.status
+    },
+    {
+        accessorKey: "orderedTime",
+        header: "Hora",
+        cell: ({ row }) => formatDateDisplay(row.original.orderedTime.toString())
+    },
+    { accessorKey: "observation", header: "Observação", cell: ({ row }) => <p className="truncate max-w-xs">{row.original.observation || "-"}</p> },
+    {
+        accessorKey: "productUnitPrice",
+        header: "Total Item",
+        cell: ({ row }) => {
+             const total = row.original.productUnitPrice * row.original.amount;
+             return <div className="text-right">R$ {total.toFixed(2)}</div>
+        }
+    },
+    { accessorKey: "waiterName", header: "Garçom" },
+];
+
+const OrdersSubTable = ({
+    orders,
+    guestTabId,
+    parentOrderId = null
+}: {
+    orders: DisplayOrderItem[],
+    guestTabId: number,
+    parentOrderId?: number | null
+}) => {
+
     const [openAddOrder, setOpenAddOrder] = React.useState(false);
     const isDesktop = true;
 
+    const columns = React.useMemo(() => getOrderColumns(), []);
+
+    const table = useReactTable({
+        data: orders,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+    });
+
     return (
-        <div className="p-4 bg-muted/50">
+        <div className="p-4 bg-muted/50 pl-6">
             <Table>
                 <TableHeader>
-                    <TableRow>
-                        <TableHead>Produto</TableHead>
-                        <TableHead className="text-center">Qtd.</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Hora</TableHead>
-                        <TableHead>Observação</TableHead>
-                        <TableHead className="text-right">Total Item</TableHead>
-                        <TableHead>Garçom</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {orders.map((order) => (
-                        <TableRow key={order.id}>
-                            <TableCell>{order.productName}</TableCell>
-                            <TableCell className="text-center">{order.amount}</TableCell>
-                            <TableCell>{OrderStatus[order.status]?.label || order.status}</TableCell>
-                            <TableCell>{formatDateDisplay(order.orderedTime.toString())}</TableCell>
-                            <TableCell className="truncate max-w-xs">{order.observation || "-"}</TableCell>
-                            <TableCell className="text-right">R$ {order.productUnitPrice.toFixed(2)}</TableCell>
-                            <TableCell>{order.waiterName}</TableCell>
+                    {table.getHeaderGroups().map(headerGroup => (
+                        <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map(header => (
+                                <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? `${header.getSize()}px` : undefined }}>
+                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                </TableHead>
+                            ))}
                         </TableRow>
                     ))}
-                    {/* Row to add Order */}
+                </TableHeader>
+                <TableBody>
+                    {table.getRowModel().rows.map(row => (
+                        <React.Fragment key={row.id}>
+                            <TableRow>
+                                {row.getVisibleCells().map(cell => (
+                                    <TableCell key={cell.id}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                            {row.getIsExpanded() && (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="p-0">
+                                        <OrdersSubTable
+                                            orders={row.original.additionalOrders}
+                                            guestTabId={guestTabId}
+                                            parentOrderId={row.original.id}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </React.Fragment>
+                    ))}
+
                     <TableRow>
-                        <TableCell colSpan={7} className="text-center">
+                        <TableCell colSpan={columns.length} className="text-center">
                             {isDesktop ? (
                                 <Dialog open={openAddOrder} onOpenChange={setOpenAddOrder}>
                                     <DialogTrigger asChild>
@@ -408,7 +480,11 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                                                 Preencha os dados do novo pedido.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <AddOrderForm onSubmit={() => setOpenAddOrder(false)}/>
+                                        <AddOrderForm
+                                            guestTabId={guestTabId}
+                                            parentOrderId={parentOrderId}
+                                            onSubmit={() => setOpenAddOrder(false)}
+                                        />
                                     </DialogContent>
                                 </Dialog>
                             ) : (
@@ -423,7 +499,11 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
                                                 Preencha os dados do novo pedido.
                                             </DrawerDescription>
                                         </DrawerHeader>
-                                        <AddOrderForm onSubmit={() => setOpenAddOrder(false)}/>
+                                        <AddOrderForm
+                                            guestTabId={guestTabId}
+                                            parentOrderId={parentOrderId}
+                                            onSubmit={() => setOpenAddOrder(false)}
+                                        />
                                         <DrawerFooter className="pt-2">
                                             <DrawerClose asChild>
                                                 <Button variant="outline">Cancelar</Button>
@@ -438,4 +518,4 @@ const OrdersSubTable = ({orders}: { orders: DisplayOrderItem[] }) => {
             </Table>
         </div>
     );
-}
+};

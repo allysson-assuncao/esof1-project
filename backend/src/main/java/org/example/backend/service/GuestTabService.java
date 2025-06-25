@@ -18,10 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,23 +108,26 @@ public class GuestTabService {
         Specification<GuestTab> specification = this.guestTabSpecificationService.getGuestTabSpecification(filterDto);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
         Page<GuestTab> guestTabPage = this.guestTabRepository.findAll(specification, pageable);
-        System.out.println(guestTabPage.getTotalElements());
 
-        return guestTabPage.map(this::convertToGuestTabDTO);
+        return guestTabPage.map(this::convertToGuestTabDTOWithNestedOrders);
     }
 
-    private GuestTabDTO convertToGuestTabDTO(GuestTab guestTab) {
+    private GuestTabDTO convertToGuestTabDTOWithNestedOrders(GuestTab guestTab) {
         if (guestTab == null) return null;
 
-        // Map orders to OrderDTO
-        Set<DrillDownOrderDTO> orderDTOs = guestTab.getOrders() != null
-                ? guestTab.getOrders().stream()
-                .map(this::convertToOrderDTO)
-                .collect(Collectors.toSet())
-                : Set.of();
+        List<Order> allOrders = new ArrayList<>(guestTab.getOrders());
 
-        double totalPrice = orderDTOs.stream()
-                .mapToDouble(orderDTO -> orderDTO.productUnitPrice() * orderDTO.amount())
+        Map<Long, List<Order>> subOrdersByParentId = allOrders.stream()
+                .filter(order -> order.getParentOrder() != null)
+                .collect(Collectors.groupingBy(order -> order.getParentOrder().getId()));
+
+        Set<DrillDownOrderDTO> topLevelOrderDTOs = allOrders.stream()
+                .filter(order -> order.getParentOrder() == null)
+                .map(parentOrder -> convertToDrillDownOrderDTO(parentOrder, subOrdersByParentId))
+                .collect(Collectors.toSet());
+
+        double totalPrice = topLevelOrderDTOs.stream()
+                .mapToDouble(this::calculateOrderTotal)
                 .sum();
 
         int localTableNumber = guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0;
@@ -136,20 +137,20 @@ public class GuestTabService {
                 .status(guestTab.getStatus())
                 .timeOpened(guestTab.getTimeOpened())
                 .timeClosed(guestTab.getTimeClosed())
-                .orders(orderDTOs)
+                .orders(topLevelOrderDTOs)
                 .totalPrice(totalPrice)
                 .localTableNumber(localTableNumber)
                 .build();
     }
 
-    private DrillDownOrderDTO convertToOrderDTO(Order order) {
+    private DrillDownOrderDTO convertToDrillDownOrderDTO(Order order, Map<Long, List<Order>> subOrdersMap) {
         if (order == null) return null;
 
-        /*Set<DrillDownOrderDTO> additionalOrderDTOs = order.getAdditionalOrders() != null
-                ? order.getAdditionalOrders().stream()
-                .map(this::convertToOrderDTO)
-                .collect(Collectors.toSet())
-                : Set.of();*/
+        List<Order> children = subOrdersMap.getOrDefault(order.getId(), Collections.emptyList());
+
+        Set<DrillDownOrderDTO> additionalOrderDTOs = children.stream()
+                .map(child -> convertToDrillDownOrderDTO(child, subOrdersMap))
+                .collect(Collectors.toSet());
 
         String productName = order.getProduct() != null ? order.getProduct().getName() : null;
         double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
@@ -161,11 +162,19 @@ public class GuestTabService {
                 .status(order.getStatus())
                 .observation(order.getObservation())
                 .orderedTime(order.getOrderedTime())
-                /*.additionalOrders(additionalOrderDTOs)*/
+                .additionalOrders(additionalOrderDTOs)
                 .productName(productName)
                 .productUnitPrice(productUnitPrice)
                 .waiterName(waiterName)
                 .build();
+    }
+
+    private double calculateOrderTotal(DrillDownOrderDTO orderDTO) {
+        double selfTotal = orderDTO.productUnitPrice() * orderDTO.amount();
+        double childrenTotal = orderDTO.additionalOrders().stream()
+                .mapToDouble(this::calculateOrderTotal)
+                .sum();
+        return selfTotal + childrenTotal;
     }
 
 }
