@@ -1,6 +1,7 @@
 package org.example.backend.service;
 
 import org.example.backend.dto.ProductDTO;
+import org.example.backend.dto.SimpleCategoryDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
@@ -8,7 +9,9 @@ import org.example.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -39,6 +42,18 @@ public class ProductService {
                 .build();
 
         productRepository.save(product);
+    }
+
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> new ProductDTO(
+                        product.getName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getCategory().getId() // ou outro campo necessário
+                ))
+                .collect(Collectors.toList());
     }
 
     public Product updateProductById(UUID id, ProductDTO productDTO) {
