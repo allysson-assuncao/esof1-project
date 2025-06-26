@@ -19,3 +19,9 @@ export const registerSchema = z.object({
     name: z.string().min(1, { message: 'O nome é obrigatório' }),
     role: z.enum([UserRoles.COOK.value, UserRoles.CASHIER.value, UserRoles.ADMIN.value], { message: 'O cargo do usuário é obrigatório' }),
 })
+
+export const workstationRegisterSchema = z.object({
+    name: z.string()
+        .min(1, {message: 'O nome é obrigatório'}),
+    categoryIds: z.array(z.string())
+})

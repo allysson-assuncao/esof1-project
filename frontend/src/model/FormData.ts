@@ -12,7 +12,6 @@ export interface RegisterFormData {
 }
 
 export interface WorkstationRegisterFormData {
-    id: string;
     name: string;
     categoryIds: string[];
 }

@@ -27,3 +27,7 @@ export const order = axios.create({
 export const category = axios.create({
     baseURL: `http://localhost:${port}/app/category`,
 });
+
+export const workstation = axios.create({
+    baseURL: `http://localhost:${port}/app/workstation`,
+});
