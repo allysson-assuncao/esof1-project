@@ -4,7 +4,19 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 
-export function AddOrderForm({className, onSubmit}: { className?: string; onSubmit?: (data: any) => void }) {
+interface AddOrderFormProps {
+  className?: string;
+  onSubmit?: (data: any) => void;
+  guestTabId?: number;
+  parentOrderId?: number | null;
+}
+
+export function AddOrderForm({
+  className,
+  onSubmit,
+  guestTabId,
+  parentOrderId,
+}: AddOrderFormProps) {
     const [productName, setProductName] = React.useState("");
     const [amount, setAmount] = React.useState(1);
 
