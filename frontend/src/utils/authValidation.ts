@@ -25,3 +25,9 @@ export const workstationRegisterSchema = z.object({
         .min(1, {message: 'O nome é obrigatório'}),
     categoryIds: z.array(z.string())
 })
+
+export const localTableRegisterSchema = z.object({
+    number: z.number()
+        .min(1, {message: 'O número da mesa deve ser maior que 0'})
+        .max(999, {message: 'O número da mesa deve ser menor que 1000'})
+})
