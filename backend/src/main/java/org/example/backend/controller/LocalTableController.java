@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.backend.dto.LocalTableDTO;
 import org.example.backend.dto.LocalTableGetDTO;
 import org.example.backend.dto.LocalTableRequestDTO;
@@ -25,6 +26,7 @@ public class LocalTableController {
     }
 
     @GetMapping("/{number}")
+    @Operation(summary = "findByNumber – Método que busca um registro por número na tabela local")
     public ResponseEntity<LocalTableGetDTO> findByNumber(@PathVariable int number) {
         var dto = localTableService.findByNumber(number);
         System.out.println("Teste");
