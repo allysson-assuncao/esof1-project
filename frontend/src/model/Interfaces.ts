@@ -100,3 +100,17 @@ export interface SimpleCategory {
     id: string;
     name: string;
 }
+
+export interface HierarchicalCategoryDTO {
+    id: string;
+    name: string;
+    subCategories: HierarchicalCategoryDTO[];
+}
+
+export interface ProductDTO {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    idCategory: string;
+}
