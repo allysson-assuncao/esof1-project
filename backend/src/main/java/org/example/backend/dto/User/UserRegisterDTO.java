@@ -1,4 +1,4 @@
-package org.example.backend.dto;
+package org.example.backend.dto.User;
 
 import jakarta.validation.constraints.*;
 import org.example.backend.model.enums.UserRole;

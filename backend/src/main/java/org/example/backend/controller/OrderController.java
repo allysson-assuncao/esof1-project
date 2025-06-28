@@ -1,9 +1,9 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.DetailedOrderDTO;
-import org.example.backend.dto.SimpleOrderDTO;
-import org.example.backend.dto.OrderDTO;
-import org.example.backend.dto.OrderRequestDTO;
+import org.example.backend.dto.Order.DetailedOrderDTO;
+import org.example.backend.dto.Order.SimpleOrderDTO;
+import org.example.backend.dto.Order.OrderDTO;
+import org.example.backend.dto.Order.OrderRequestDTO;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")

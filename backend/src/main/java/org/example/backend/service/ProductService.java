@@ -1,7 +1,7 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.ProductDTO;
-import org.example.backend.dto.SimpleCategoryDTO;
+import org.example.backend.dto.Product.ProductDTO;
+import org.example.backend.dto.Product.ProductByCategoryDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
@@ -74,5 +74,22 @@ public class ProductService {
         existingProduct.setCategory(category);
 
         return productRepository.save(existingProduct);
+    }
+
+    public List<ProductByCategoryDTO> getProductsByCategoryId(UUID categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new RuntimeException("Categoria não encontrada com ID: " + categoryId);
+        }
+
+        return productRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(product -> new ProductByCategoryDTO(
+                        product.getId(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getCategory().getId()
+                ))
+                .collect(Collectors.toList());
     }
 }

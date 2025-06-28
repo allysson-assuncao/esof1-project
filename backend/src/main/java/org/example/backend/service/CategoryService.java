@@ -1,7 +1,8 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.CategoryDTO;
-import org.example.backend.dto.SimpleCategoryDTO;
+import org.example.backend.dto.Category.CategoryDTO;
+import org.example.backend.dto.Category.HierarchicalCategoryDTO;
+import org.example.backend.dto.Category.SimpleCategoryDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Workstation;
 import org.example.backend.repository.CategoryRepository;
@@ -121,5 +122,29 @@ public class CategoryService {
 
     private SimpleCategoryDTO toSimpleCategoryDTO(Category category) {
         return new SimpleCategoryDTO(category.getId(), category.getName());
+    }
+
+    public List<HierarchicalCategoryDTO> getCategoryTree() {
+        // 1. Busca todas as categorias que não têm pai (as categorias principais)
+        List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
+
+        // 2. Mapeia cada categoria raiz para o DTO hierárquico
+        return rootCategories.stream()
+                .map(this::toHierarchicalCategoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private HierarchicalCategoryDTO toHierarchicalCategoryDTO(Category category) {
+        // Mapeia recursivamente as subcategorias
+        Set<HierarchicalCategoryDTO> subDtos = (category.getSubCategories() == null) ? Collections.emptySet() :
+                category.getSubCategories().stream()
+                        .map(this::toHierarchicalCategoryDTO)
+                        .collect(Collectors.toSet());
+
+        return new HierarchicalCategoryDTO(
+                category.getId(),
+                category.getName(),
+                subDtos
+        );
     }
 }

@@ -1,17 +1,16 @@
 package org.example.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.DetailedOrderDTO;
+import org.example.backend.dto.Order.DetailedOrderDTO;
 import jakarta.transaction.Transactional;
-import org.example.backend.dto.OrderDTO;
-import org.example.backend.dto.OrderRequestDTO;
-import org.example.backend.dto.SimpleOrderDTO;
+import org.example.backend.dto.Order.OrderDTO;
+import org.example.backend.dto.Order.OrderRequestDTO;
+import org.example.backend.dto.Order.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
-import org.example.backend.model.enums.ProductDestination;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
@@ -22,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import java.util.Optional;
 
 @Service
 public class OrderService {

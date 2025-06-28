@@ -1,8 +1,8 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.CategoryDTO;
-import org.example.backend.dto.SimpleCategoryDTO;
-import org.example.backend.model.Category;
+import org.example.backend.dto.Category.CategoryDTO;
+import org.example.backend.dto.Category.HierarchicalCategoryDTO;
+import org.example.backend.dto.Category.SimpleCategoryDTO;
 import org.example.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +46,9 @@ public class CategoryController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
+    @GetMapping("/structure")
+    public ResponseEntity<List<HierarchicalCategoryDTO>> getCategoryStructure() {
+        return ResponseEntity.ok(categoryService.getCategoryTree());
     }
 }

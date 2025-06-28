@@ -1,4 +1,4 @@
-package org.example.backend.dto;
+package org.example.backend.dto.Workstation;
 
 import java.util.List;
 import java.util.UUID;

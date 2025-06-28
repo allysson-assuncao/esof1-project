@@ -1,4 +1,4 @@
-package org.example.backend.dto;
+package org.example.backend.dto.LocalTable;
 
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.LocalTableStatus;

@@ -1,7 +1,7 @@
 package org.example.backend.service;
 
 import jakarta.persistence.criteria.Predicate;
-import org.example.backend.dto.GuestTabFilterDTO;
+import org.example.backend.dto.GuestTab.GuestTabFilterDTO;
 import org.example.backend.model.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
