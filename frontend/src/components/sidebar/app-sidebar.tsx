@@ -70,7 +70,7 @@ const data = {
                 },
                 {
                     title: "Cardápio",
-                    url: '/menu',
+                    url: '/dashboard/menu',
                 },
                 {
                     title: "Pedidos por Área",
