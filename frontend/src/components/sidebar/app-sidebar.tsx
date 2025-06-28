@@ -69,6 +69,10 @@ const data = {
                     url: '/dashboard/table/guest-tabs/',
                 },
                 {
+                    title: "Cardápio",
+                    url: '/menu',
+                },
+                {
                     title: "Pedidos por Área",
                     url: '/dashboard/table/workspace',
                 },
