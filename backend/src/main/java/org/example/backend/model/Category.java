@@ -36,7 +36,7 @@ public class Category {
     @JoinColumn(name = "parent_category_id")
     @JsonBackReference // Evita recursão infinita na serialização
     private Category parentCategory;
-
+    
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
     @JsonManagedReference // Serializa subcategorias normalmente
     private Set<Category> subCategories;
