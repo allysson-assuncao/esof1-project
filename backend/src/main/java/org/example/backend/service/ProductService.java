@@ -1,6 +1,7 @@
 package org.example.backend.service;
 
 import org.example.backend.dto.ProductDTO;
+import org.example.backend.dto.SimpleCategoryDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
@@ -8,7 +9,9 @@ import org.example.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -22,43 +25,43 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    // Todo...
-    public boolean registerProduct(ProductDTO productDTO) {
+    public void registerProduct(ProductDTO productDTO) {
         if (productRepository.existsByName(productDTO.name())) {
             throw new RuntimeException("Produto já existe com o nome: " + productDTO.name());
-        } else {
-            if (!productRepository.existsByName(productDTO.name())) {
-                try {
-                    // Busca categoria pelo nome (pode ser por ID, se preferir)
-                    Category category = categoryRepository.findById(productDTO.idCategory())
-                            .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
-
-                    Product product = new Product();
-                    product.setName(productDTO.name());
-                    product.setDescription(productDTO.description());
-                    product.setPrice(productDTO.price());
-                    product.setCategory(category);
-                    product.setActive(true);
-
-                    productRepository.save(product);
-                    return true;
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-            return false;
         }
+
+        Category category = categoryRepository.findById(productDTO.idCategory())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
+
+        Product product = Product.builder()
+                .name(productDTO.name())
+                .description(productDTO.description())
+                .price(productDTO.price())
+                .category(category)
+                .active(true)
+                .build();
+
+        productRepository.save(product);
+    }
+
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> new ProductDTO(
+                        product.getName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getCategory().getId() // ou outro campo necessário
+                ))
+                .collect(Collectors.toList());
     }
 
     public Product updateProductById(UUID id, ProductDTO productDTO) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
 
-        // Verifica se o nome novo já existe em outro produto
-        if (!existingProduct.getName().equals(productDTO.name())
-                && productRepository.existsByName(productDTO.name())) {
+        boolean nameChanged = !existingProduct.getName().equals(productDTO.name());
+        if (nameChanged && productRepository.existsByName(productDTO.name())) {
             throw new RuntimeException("Já existe outro produto com o nome: " + productDTO.name());
         }
 
@@ -72,5 +75,4 @@ public class ProductService {
 
         return productRepository.save(existingProduct);
     }
-
 }

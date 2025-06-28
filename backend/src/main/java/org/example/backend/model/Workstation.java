@@ -1,5 +1,7 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"users", "ordersQueue", "categories"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
 public class Workstation {
 
     @Id
@@ -33,10 +37,10 @@ public class Workstation {
     private Set<User> users;
 
     @OneToMany(mappedBy = "workstation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // para evitar recursão no JSON
     private List<Order> ordersQueue;
 
     @OneToMany(mappedBy = "workstation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // para evitar recursão no JSON
     private Set<Category> categories;
-
-
 }

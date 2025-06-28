@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -23,10 +24,10 @@ public class CategoryController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> create(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<String> create(@RequestBody CategoryDTO dto) {
         try {
-            Category created = categoryService.createCategory(dto);
-            return ResponseEntity.status(201).body(created);
+            categoryService.createCategory(dto);
+            return ResponseEntity.status(201).body("Categoria cadastrada com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -37,11 +38,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @PutMapping("/update/{name}")
-    public ResponseEntity<?> update(@PathVariable String name, @RequestBody CategoryDTO dto) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
         try {
-            Category updated = categoryService.updateCategory(name, dto);
-            return ResponseEntity.ok(updated);
+            categoryService.updateCategoryById(id, dto);
+            return ResponseEntity.ok("Categoria atualizada com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }

@@ -1,12 +1,14 @@
 package org.example.backend.controller;
 
 import org.example.backend.dto.ProductDTO;
+import org.example.backend.dto.SimpleCategoryDTO;
 import org.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,16 +25,23 @@ public class ProductController {
     @PostMapping("/register")
     public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(productService.registerProduct(productDTO));
+            productService.registerProduct(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Produto cadastrado com sucesso!");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    @GetMapping("/select-all")
+    public ResponseEntity<List<ProductDTO>> selectAll() {
+        return ResponseEntity.ok(productService.getAllProducts());
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateProductByName(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
         try {
-            return ResponseEntity.ok(productService.updateProductById(id, productDTO));
+            productService.updateProductById(id, productDTO);
+            return ResponseEntity.ok("Produto atualizado com sucesso!");
         } catch (RuntimeException e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("não encontrado")) {
@@ -41,5 +50,4 @@ public class ProductController {
             return ResponseEntity.badRequest().body(msg);
         }
     }
-
 }
