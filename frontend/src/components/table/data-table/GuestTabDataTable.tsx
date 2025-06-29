@@ -160,6 +160,49 @@ export function GuestTabDataTable<TValue>({
         label,
     }));
 
+    const addGuestTabButtonRow = (
+        <TableRow>
+            <TableCell colSpan={columns.length} className="text-center">
+                {isDesktop ? (
+                    <Dialog open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">Adicionar comanda</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Nova Comanda</DialogTitle>
+                                <DialogDescription>
+                                    Preencha os dados da nova comanda.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                        </DialogContent>
+                    </Dialog>
+                ) : (
+                    <Drawer open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline">Adicionar comanda</Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                            <DrawerHeader className="text-left">
+                                <DrawerTitle>Nova Comanda</DrawerTitle>
+                                <DrawerDescription>
+                                    Preencha os dados da nova comanda.
+                                </DrawerDescription>
+                            </DrawerHeader>
+                            <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                            <DrawerFooter className="pt-2">
+                                <DrawerClose asChild>
+                                    <Button variant="outline">Cancelar</Button>
+                                </DrawerClose>
+                            </DrawerFooter>
+                        </DrawerContent>
+                    </Drawer>
+                )}
+            </TableCell>
+        </TableRow>
+    );
+
     return (
         <div>
             {/* Filters */}
@@ -306,54 +349,17 @@ export function GuestTabDataTable<TValue>({
                                         )}
                                     </React.Fragment>
                                 ))}
-                                {/* Row to add Guest Tab */}
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center">
-                                        {isDesktop ? (
-                                            <Dialog open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline">Adicionar comanda</Button>
-                                                </DialogTrigger>
-                                                <DialogContent className="sm:max-w-[425px]">
-                                                    <DialogHeader>
-                                                        <DialogTitle>Nova Comanda</DialogTitle>
-                                                        <DialogDescription>
-                                                            Preencha os dados da nova comanda.
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-                                                    <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
-                                                </DialogContent>
-                                            </Dialog>
-                                        ) : (
-                                            <Drawer open={openAddGuestTab} onOpenChange={setOpenAddGuestTab}>
-                                                <DrawerTrigger asChild>
-                                                    <Button variant="outline">Adicionar comanda</Button>
-                                                </DrawerTrigger>
-                                                <DrawerContent>
-                                                    <DrawerHeader className="text-left">
-                                                        <DrawerTitle>Nova Comanda</DrawerTitle>
-                                                        <DrawerDescription>
-                                                            Preencha os dados da nova comanda.
-                                                        </DrawerDescription>
-                                                    </DrawerHeader>
-                                                    <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
-                                                    <DrawerFooter className="pt-2">
-                                                        <DrawerClose asChild>
-                                                            <Button variant="outline">Cancelar</Button>
-                                                        </DrawerClose>
-                                                    </DrawerFooter>
-                                                </DrawerContent>
-                                            </Drawer>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
+                                {addGuestTabButtonRow}
                             </>
                         ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Nenhum resultado.
-                                </TableCell>
-                            </TableRow>
+                            <>
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                                        Nenhum resultado.
+                                    </TableCell>
+                                </TableRow>
+                                {addGuestTabButtonRow}
+                            </>
                         )}
                     </TableBody>
                 </Table>
@@ -372,45 +378,49 @@ const getOrderColumns = (): ColumnDef<DisplayOrderItem>[] => [
     {
         id: "expander",
         header: () => null,
-        cell: ({ row }) => {
+        cell: ({row}) => {
             const canExpand = row.original.additionalOrders && row.original.additionalOrders.length > 0;
             return canExpand ? (
-                <button {...{ onClick: () => row.toggleExpanded(!row.getIsExpanded()) }}>
-                    {row.getIsExpanded() ? <ChevronDown /> : <ChevronRight />}
+                <button {...{onClick: () => row.toggleExpanded(!row.getIsExpanded())}}>
+                    {row.getIsExpanded() ? <ChevronDown/> : <ChevronRight/>}
                 </button>
             ) : <span className="inline-block w-4"></span>;
         },
         size: 20,
     },
-    { accessorKey: "productName", header: "Produto" },
-    { accessorKey: "amount", header: "Qtd.", cell: ({row}) => <div className="text-center">{row.original.amount}</div> },
+    {accessorKey: "productName", header: "Produto"},
+    {accessorKey: "amount", header: "Qtd.", cell: ({row}) => <div className="text-center">{row.original.amount}</div>},
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => OrderStatus[row.original.status as keyof typeof OrderStatus]?.label || row.original.status
+        cell: ({row}) => OrderStatus[row.original.status as keyof typeof OrderStatus]?.label || row.original.status
     },
     {
         accessorKey: "orderedTime",
         header: "Hora",
-        cell: ({ row }) => formatDateDisplay(row.original.orderedTime.toString())
+        cell: ({row}) => formatDateDisplay(row.original.orderedTime.toString())
     },
-    { accessorKey: "observation", header: "Observação", cell: ({ row }) => <p className="truncate max-w-xs">{row.original.observation || "-"}</p> },
+    {
+        accessorKey: "observation",
+        header: "Observação",
+        cell: ({row}) => <p className="truncate max-w-xs">{row.original.observation || "-"}</p>
+    },
     {
         accessorKey: "productUnitPrice",
         header: "Total Item",
-        cell: ({ row }) => {
-             const total = row.original.productUnitPrice * row.original.amount;
-             return <div className="text-right">R$ {total.toFixed(2)}</div>
+        cell: ({row}) => {
+            const total = row.original.productUnitPrice * row.original.amount;
+            return <div className="text-right">R$ {total.toFixed(2)}</div>
         }
     },
-    { accessorKey: "waiterName", header: "Garçom" },
+    {accessorKey: "waiterName", header: "Garçom"},
 ];
 
 const OrdersSubTable = ({
-    orders,
-    guestTabId,
-    parentOrderId = null
-}: {
+                            orders,
+                            guestTabId,
+                            parentOrderId = null
+                        }: {
     orders: DisplayOrderItem[],
     guestTabId: number,
     parentOrderId?: number | null
@@ -435,7 +445,8 @@ const OrdersSubTable = ({
                     {table.getHeaderGroups().map(headerGroup => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map(header => (
-                                <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? `${header.getSize()}px` : undefined }}>
+                                <TableHead key={header.id}
+                                           style={{width: header.getSize() !== 150 ? `${header.getSize()}px` : undefined}}>
                                     {flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>
                             ))}
