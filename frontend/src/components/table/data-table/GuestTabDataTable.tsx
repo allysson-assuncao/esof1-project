@@ -43,7 +43,6 @@ import {
     DrawerTitle,
     DrawerTrigger
 } from "@/components/ui/drawer";
-import useMediaQuery from "react-query/types/devtools/useMediaQuery";
 import {AddOrderForm} from "@/components/form/add/AddOrderForm";
 import {AddGuestTabForm} from "@/components/form/add/AddGuestTabForm";
 import {getExpandedRowModel} from "@tanstack/table-core";
