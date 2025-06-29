@@ -63,6 +63,7 @@ public class GuestTabController {
     ) {
         System.out.println(filterDto.toString());
         Page<GuestTabDTO> guestTabPage = this.guestTabService.getGuestTabByFilters(filterDto, page, size, orderBy, direction);
+        System.out.println(guestTabPage.getTotalElements());
         return ResponseEntity.ok(new FilteredPageDTO<>(guestTabPage.getContent(), guestTabPage.getTotalPages()));
     }
 
