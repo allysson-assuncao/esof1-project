@@ -1,7 +1,8 @@
 package org.example.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.*;
+import org.example.backend.dto.GuestTab.*;
+import org.example.backend.dto.Order.OrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service

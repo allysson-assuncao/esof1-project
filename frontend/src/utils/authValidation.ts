@@ -19,3 +19,15 @@ export const registerSchema = z.object({
     name: z.string().min(1, { message: 'O nome é obrigatório' }),
     role: z.enum([UserRoles.COOK.value, UserRoles.CASHIER.value, UserRoles.ADMIN.value], { message: 'O cargo do usuário é obrigatório' }),
 })
+
+export const workstationRegisterSchema = z.object({
+    name: z.string()
+        .min(1, {message: 'O nome é obrigatório'}),
+    categoryIds: z.array(z.string())
+})
+
+export const localTableRegisterSchema = z.object({
+    number: z.number()
+        .min(1, {message: 'O número da mesa deve ser maior que 0'})
+        .max(999, {message: 'O número da mesa deve ser menor que 1000'})
+})

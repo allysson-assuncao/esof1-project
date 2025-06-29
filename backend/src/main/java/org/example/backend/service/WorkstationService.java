@@ -1,6 +1,6 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.WorkstationRegisterDTO;
+import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Workstation;
 import org.example.backend.repository.CategoryRepository;

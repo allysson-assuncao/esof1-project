@@ -1,6 +1,8 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.*;
+import org.example.backend.dto.LocalTable.LocalTableDTO;
+import org.example.backend.dto.LocalTable.LocalTableGetDTO;
+import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.LocalTableStatus;
 import org.example.backend.repository.LocalTableRepository;
@@ -10,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

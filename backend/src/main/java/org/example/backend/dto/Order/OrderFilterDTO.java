@@ -1,4 +1,4 @@
-package org.example.backend.dto;
+package org.example.backend.dto.Order;
 
 import lombok.Builder;
 import org.example.backend.model.enums.GuestTabStatus;

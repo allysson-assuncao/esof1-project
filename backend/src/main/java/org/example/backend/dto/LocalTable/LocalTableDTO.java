@@ -1,4 +1,4 @@
-package org.example.backend.dto;
+package org.example.backend.dto.LocalTable;
 
 import lombok.Builder;
 import org.example.backend.model.enums.LocalTableStatus;

@@ -1,6 +1,5 @@
-package org.example.backend.dto;
+package org.example.backend.dto.GuestTab;
 import lombok.Builder;
-import org.example.backend.model.enums.GuestTabStatus;
 
 import java.time.LocalDateTime;
 

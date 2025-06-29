@@ -1,6 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.SimpleWaiterDTO;
+import org.example.backend.dto.Waiter.SimpleWaiterDTO;
 import org.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

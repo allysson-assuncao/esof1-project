@@ -2,8 +2,8 @@ package org.example.backend.controller;
 
 import jakarta.validation.Valid;
 import org.example.backend.dto.AuthResponseDTO;
-import org.example.backend.dto.UserLoginDTO;
-import org.example.backend.dto.UserRegisterDTO;
+import org.example.backend.dto.User.UserLoginDTO;
+import org.example.backend.dto.User.UserRegisterDTO;
 import org.example.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

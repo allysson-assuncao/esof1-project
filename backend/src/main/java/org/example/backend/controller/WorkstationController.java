@@ -1,7 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.WorkstationRegisterDTO;
-import org.example.backend.model.Workstation;
+import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.service.WorkstationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

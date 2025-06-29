@@ -1,9 +1,9 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.LocalTableDTO;
-import org.example.backend.dto.LocalTableGetDTO;
-import org.example.backend.dto.LocalTableRequestDTO;
-import org.example.backend.dto.LocalTableRequestDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import org.example.backend.dto.LocalTable.LocalTableDTO;
+import org.example.backend.dto.LocalTable.LocalTableGetDTO;
+import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.service.LocalTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,7 @@ public class LocalTableController {
     }
 
     @GetMapping("/{number}")
+    @Operation(summary = "findByNumber – Método que busca um registro por número na tabela local")
     public ResponseEntity<LocalTableGetDTO> findByNumber(@PathVariable int number) {
         var dto = localTableService.findByNumber(number);
         System.out.println("Teste");

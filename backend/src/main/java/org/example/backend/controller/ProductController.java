@@ -1,7 +1,8 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.ProductDTO;
-import org.example.backend.dto.SimpleCategoryDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import org.example.backend.dto.Product.ProductDTO;
+import org.example.backend.dto.Product.ProductByCategoryDTO;
 import org.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/app/product")
+@CrossOrigin(origins = "*")
 public class ProductController {
 
     private final ProductService productService;
@@ -48,6 +50,18 @@ public class ProductController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
             }
             return ResponseEntity.badRequest().body(msg);
+        }
+    }
+
+
+    @GetMapping("/by-category/{categoryId}")
+    @Operation(summary = "getProductsByCategory – Recebe o ID de uma categoria e retorna uma lista de todos os produtos")
+    public ResponseEntity<?> getProductsByCategory(@PathVariable UUID categoryId) {
+        try {
+            List<ProductByCategoryDTO> products = productService.getProductsByCategoryId(categoryId);
+            return ResponseEntity.ok(products);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }
