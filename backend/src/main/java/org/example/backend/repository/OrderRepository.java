@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     List<Order> findByGuestTabLocalTableId(UUID localTableId);
+    List<Order> findByGuestTabId(Long guestTabId);
     Optional<Order> findById(Long id);
     /*Optional<List<Order>> findByStatusAndProduct_Destination(OrderStatus status, ProductDestination destination);*/
 

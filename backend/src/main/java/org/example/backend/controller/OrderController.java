@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.DetailedOrderDTO;
 import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
@@ -31,6 +32,16 @@ public class OrderController {
         return this.orderService.registerOrder(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("Pedido registrado com sucesso") :
                 ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
+    }
+
+    @GetMapping("/queue")
+    public ResponseEntity<List<DetailedOrderDTO>> getQueue() {
+        return ResponseEntity.ok(this.orderService.getQueue());
+    }
+
+    @GetMapping("/by-tab/{guestTabId}")
+    public ResponseEntity<List<DetailedOrderDTO>> selectOrderByGuestTabId(@PathVariable Long guestTabId) {
+        return ResponseEntity.ok(this.orderService.selectOrdersByGuestTabId(guestTabId));
     }
 
     @GetMapping("/select-all/{localTableID}")

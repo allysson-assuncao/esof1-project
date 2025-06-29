@@ -47,7 +47,7 @@ public class GuestTabService {
                 ));
 
         GuestTab guestTab = GuestTab.builder()
-                .clientName(request.guestName())
+                .guestName(request.guestName())
                 .localTable(table)
                 .status(GuestTabStatus.OPEN)
                 .timeOpened(LocalDateTime.now())
@@ -57,12 +57,36 @@ public class GuestTabService {
         return true;
     }
 
+    @Transactional
+    public String closeTabById(Long id){
+        GuestTab tab = guestTabRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        StringBuilder output = new StringBuilder();
+        double accum = 0.0;
+        List<Order> orders = tab.getOrders();
+        output.append(tab.getGuestName());
+        output.append("\n");
+        output.append("Nome         Quantidade          Preço\n");
+        for (Order it: orders) {
+            output.append(it.getProduct().getName());
+            output.append("         ");
+            output.append(it.getAmount());
+            output.append("         R$");
+            output.append(it.getProduct().getPrice());
+            output.append("\n");
+            accum += it.getProduct().getPrice();
+        }
+        output.append("\n" + "Preço total: R$ " + accum);
+        tab.setStatus(GuestTabStatus.CLOSED);
+        return output.toString();
+    }
+
     //Retorna todas as GuestTabs
     @Transactional
     public List<GuestTabGetDTO> getGuestTabs() {
         return guestTabRepository.findAll().stream().map(x -> new GuestTabGetDTO(
                 x.getId(),
-                x.getClientName(),
+                x.getGuestName(),
+                x.getStatus().name(),
                 x.getTimeOpened(),
                 x.getLocalTable().getNumber())).toList();
     }
@@ -72,14 +96,19 @@ public class GuestTabService {
     public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
         List<GuestTabGetDTO> result = guestTabRepository.findByLocalTable(
                 localTableRepository.findByNumber(tableNumber).stream().findFirst().orElse(null)
-        ).stream().map(x -> new GuestTabGetDTO(
-                x.getId(),
-                x.getClientName(),
-                x.getTimeOpened(),
-                x.getLocalTable().getNumber()
-        )).toList();
+        ).stream().map(this::convertGuestTabToGetDTO).collect(Collectors.toList());
 
         return result;
+    }
+
+    public GuestTabGetDTO convertGuestTabToGetDTO(GuestTab guestTab) {
+        return GuestTabGetDTO.builder()
+                .id(guestTab.getId())
+                .tableNumber(guestTab.getLocalTable().getNumber())
+                .name(guestTab.getGuestName())
+                .status(guestTab.getStatus().name())
+                .timeOpened(guestTab.getTimeOpened())
+                .build();
     }
 
     /*public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
@@ -100,7 +129,7 @@ public class GuestTabService {
         if (guestTab == null) return null;
         return SimpleGuestTabDTO.builder()
                 .id(guestTab.getId())
-                .clientName(guestTab.getClientName())
+                .clientName(guestTab.getGuestName())
                 .build();
     }
 

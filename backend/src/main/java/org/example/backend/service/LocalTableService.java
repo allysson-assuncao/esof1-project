@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,10 +52,13 @@ public class LocalTableService {
     }
 
     public List<LocalTableDTO> getGridTables() {
-        return this.localTableRepository.findAll()
+        List<LocalTableDTO> gridTables = this.localTableRepository.findAll()
                 .stream()
                 .map(this::convertToLocalTableDTO)
                 .collect(Collectors.toList());
+
+        Collections.sort(gridTables);
+        return  gridTables;
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
