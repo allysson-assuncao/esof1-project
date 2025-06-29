@@ -176,7 +176,7 @@ export function GuestTabDataTable<TValue>({
                             </DialogHeader>
                             <AddGuestTabForm
                                 localTableId={localTableId}
-                                onSubmit={() => setOpenAddGuestTab(false)}/>
+                            />
                         </DialogContent>
                     </Dialog>
                 ) : (
@@ -193,7 +193,7 @@ export function GuestTabDataTable<TValue>({
                             </DrawerHeader>
                             <AddGuestTabForm
                                 localTableId={localTableId}
-                                onSubmit={() => setOpenAddGuestTab(false)}/>
+                            />
                             <DrawerFooter className="pt-2">
                                 <DrawerClose asChild>
                                     <Button variant="outline">Cancelar</Button>
