@@ -1,6 +1,6 @@
 package org.example.backend.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.example.backend.dto.OrderDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.DetailedOrderDTO;
@@ -11,15 +11,12 @@ import org.example.backend.model.Order;
 import org.example.backend.model.Product;
 import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
-import org.example.backend.model.enums.ProductDestination;
-import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
