@@ -174,7 +174,9 @@ export function GuestTabDataTable<TValue>({
                                     Preencha os dados da nova comanda.
                                 </DialogDescription>
                             </DialogHeader>
-                            <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                            <AddGuestTabForm
+                                localTableId={localTableId}
+                                onSubmit={() => setOpenAddGuestTab(false)}/>
                         </DialogContent>
                     </Dialog>
                 ) : (
@@ -189,7 +191,9 @@ export function GuestTabDataTable<TValue>({
                                     Preencha os dados da nova comanda.
                                 </DrawerDescription>
                             </DrawerHeader>
-                            <AddGuestTabForm onSubmit={() => setOpenAddGuestTab(false)}/>
+                            <AddGuestTabForm
+                                localTableId={localTableId}
+                                onSubmit={() => setOpenAddGuestTab(false)}/>
                             <DrawerFooter className="pt-2">
                                 <DrawerClose asChild>
                                     <Button variant="outline">Cancelar</Button>

@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -45,9 +44,9 @@ public class GuestTabService {
     //Registra nova guest tab
     @Transactional
     public boolean registerGuestTab(GuestTabRequestDTO request) {
-        LocalTable table = localTableRepository.findByNumber(request.tableNumber())
+        LocalTable table = localTableRepository.findById(request.localTableId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Table number " + request.tableNumber() + " not found."
+                        "Table number " + request.localTableId() + " not found."
                 ));
 
         GuestTab guestTab = GuestTab.builder()
@@ -115,7 +114,7 @@ public class GuestTabService {
                 .build();
     }
 
-    /*public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableNumber) {
+    /*public List<GuestTabGetDTO> getGuestTabsByTableNumber(int tableId) {
         return guestTabRepository.get.stream().map(x -> new GuestTabGetDTO(
                 x.getId(),
                 x.getName(),

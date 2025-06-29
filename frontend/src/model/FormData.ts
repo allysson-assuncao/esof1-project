@@ -1,3 +1,5 @@
+import {UUID} from "node:crypto";
+
 export interface LoginFormData {
     email: string;
     password: string;
@@ -18,4 +20,9 @@ export interface WorkstationRegisterFormData {
 
 export interface LocalTableRegisterFormData {
     number: number;
+}
+
+export interface GuestTabRegisterFormData {
+    localTableId: string;
+    guestName: string;
 }

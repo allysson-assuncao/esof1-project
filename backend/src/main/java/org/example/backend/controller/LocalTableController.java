@@ -24,6 +24,12 @@ public class LocalTableController {
         this.localTableService = localTableService;
     }
 
+    @GetMapping("/select-all")
+    public ResponseEntity<List<LocalTableDTO>> getGridTables() {
+        List<LocalTableDTO> tables = localTableService.getGridTables();
+        return ResponseEntity.ok(tables);
+    }
+
     @GetMapping("/{number}")
     @Operation(summary = "findByNumber – Método que busca um registro por número na tabela local")
     public ResponseEntity<LocalTableGetDTO> findByNumber(@PathVariable int number) {
@@ -46,10 +52,6 @@ public class LocalTableController {
         }
     }
 
-    @GetMapping("/select-all")
-    public ResponseEntity<List<LocalTableDTO>> getGridTables() {
-        List<LocalTableDTO> tables = localTableService.getGridTables();
-        return ResponseEntity.ok(tables);
-    }
+
 
 }

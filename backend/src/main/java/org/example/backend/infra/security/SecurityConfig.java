@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/app/guest-tab/**").permitAll()
                         .requestMatchers("/app/product/**").permitAll()
                         .requestMatchers("/app/category/**").permitAll()
+                        .requestMatchers("app/table/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
