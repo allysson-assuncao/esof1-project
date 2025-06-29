@@ -1,9 +1,9 @@
 package org.example.backend.service;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.example.backend.dto.OrderDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.DetailedOrderDTO;
+import org.example.backend.dto.OrderDTO;
 import org.example.backend.dto.OrderRequestDTO;
 import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import java.util.Optional;
 
 @Service
 public class OrderService {

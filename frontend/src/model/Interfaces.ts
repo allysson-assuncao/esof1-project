@@ -95,3 +95,8 @@ export interface SimpleWaiter {
     id: string;
     userName: string;
 }
+
+export interface SimpleCategory {
+    id: string;
+    name: string;
+}

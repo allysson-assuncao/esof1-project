@@ -1,7 +1,9 @@
 package org.example.backend.repository;
 
 import org.example.backend.model.Category;
+import org.example.backend.model.Workstation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

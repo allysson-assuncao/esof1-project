@@ -23,3 +23,7 @@ export const guestTab = axios.create({
 export const order = axios.create({
     baseURL: `http://localhost:${port}/app/order`,
 });
+
+export const category = axios.create({
+    baseURL: `http://localhost:${port}/app/category`,
+});

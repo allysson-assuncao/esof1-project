@@ -50,7 +50,6 @@ public class Product {
     @JsonIgnore
     private List<Order> orders;
 
-    @Column(name = "destination")
-    private ProductDestination destination;
+
 
 }
