@@ -2,10 +2,6 @@ package org.example.backend.service;
 
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.DetailedOrderDTO;
-import org.example.backend.dto.OrderDTO;
-import org.example.backend.dto.OrderRequestDTO;
-import org.example.backend.dto.SimpleOrderDTO;
 import org.example.backend.dto.Order.DetailedOrderDTO;
 import org.example.backend.dto.Order.OrderDTO;
 import org.example.backend.dto.Order.OrderRequestDTO;
