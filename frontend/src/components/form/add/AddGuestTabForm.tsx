@@ -14,11 +14,14 @@ import {registerGuestTab} from "@/services/guestTabService";
 import {Form, FormControl, FormField, FormItem} from "@/components/ui/form";
 import {icons} from "lucide-react";
 import {Icons} from "@/public/icons";
+import {useRouter} from "next/navigation";
 
 
 
 export function AddGuestTabForm({ className, onSubmit, localTableId }: { className?: string; onSubmit?: (data: any) => void; localTableId: string }) {
+    const router = useRouter();
     const [guestName, setGuestName] = React.useState("");
+
 
     const form = useForm<GuestTabRegisterFormData>({
         resolver: zodResolver(guestTabRegisterSchema),
@@ -32,8 +35,8 @@ export function AddGuestTabForm({ className, onSubmit, localTableId }: { classNa
         console.log('Mutation called', data);
         return registerGuestTab(data);
     }, {
-
         onSuccess: (data) => {
+            window.location.reload()
             toast.success("Comanda cadastrada com sucesso!", {
                 description: `Cliente: ${data.guestName}!`,
             })
