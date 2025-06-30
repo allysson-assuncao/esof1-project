@@ -59,7 +59,7 @@ const RegisterForm = () => {
     const mutation = useMutation(registerRequest, {
         onSuccess: (data) => {
             dispatch(logout())
-            dispatch(signup({ username: data.username, token: data.token, role: data.role }))
+            dispatch(signup({username: data.username, token: data.token, role: data.role}))
             router.push('dashboard/home')
 
             toast.success("Usuário cadastrado com sucesso!", {
@@ -162,21 +162,14 @@ const RegisterForm = () => {
                                                     <SelectContent>
                                                         <SelectGroup>
                                                             <SelectLabel>Você é: </SelectLabel>
-                                                            <SelectItem
-                                                                value={UserRoles.COOK.value}
-                                                            >
-                                                                {UserRoles.COOK.label}
-                                                            </SelectItem>
-                                                            <SelectItem
-                                                                value={UserRoles.CASHIER.value}
-                                                            >
-                                                                {UserRoles.CASHIER.label}
-                                                            </SelectItem>
-                                                            <SelectItem
-                                                                value={UserRoles.ADMIN.value}
-                                                            >
-                                                                {UserRoles.ADMIN.label}
-                                                            </SelectItem>
+                                                            {Object.values(UserRoles).map((role) => (
+                                                                <SelectItem
+                                                                    key={role.value}
+                                                                    value={role.value}
+                                                                >
+                                                                    {role.label}
+                                                                </SelectItem>
+                                                            ))}
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>

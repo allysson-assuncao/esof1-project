@@ -27,6 +27,7 @@ const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
             toast.error("Não autorizado!", {
                 description: `Faça login com uma das seguintes permissões: ${requiredRoles.toLowerCase()} para acessar essa página`,
             })
+            console.log("Cargo do usuário atual: " + userRole + " =! " + roles)
             // Loading component maybe?
             router.push('/login');
         }

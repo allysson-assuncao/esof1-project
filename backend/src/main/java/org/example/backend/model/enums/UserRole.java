@@ -7,11 +7,11 @@ public enum UserRole {
 
     ADMIN("admin"),
     CASHIER("caixa"),
-    COOK("cozinheiro"),
     WAITER("garçom"),
+    COOK("cozinheiro"),
     BARMAN("barista");
 
-    private final String role;
+    private String role;
 
     UserRole(String role) {
         this.role = role;
