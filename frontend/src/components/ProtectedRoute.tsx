@@ -17,18 +17,18 @@ const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
     useEffect(() => {
         if (!isAuthenticated) {
             setIsLoading(true);
-            router.push('/login');
             toast.error("Não autenticado!", {
                 description: 'Faça login para ter acesso a essa página',
             })
+            router.push('/login');
         } else if (roles && !roles.includes(userRole as UserRole)) {
             setIsLoading(true);
-            router.push('/login');
             const requiredRoles = roles.map(role => UserRoles[role].label).join(', ')
             toast.error("Não autorizado!", {
                 description: `Faça login com uma das seguintes permissões: ${requiredRoles.toLowerCase()} para acessar essa página`,
             })
-            // Send back to the last route and show a waring snackbar or smth
+            // Loading component maybe?
+            router.push('/login');
         }
     }, [isAuthenticated, roles, userRole, router]);
 

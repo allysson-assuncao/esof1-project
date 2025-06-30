@@ -9,8 +9,9 @@ export type OrderStatus = keyof typeof OrderStatus;
 export const UserRoles = {
     ADMIN: {value: 'ADMIN', label: 'Administrador'},
     CASHIER: {value: 'CASHIER', label: 'Caixa'},
-    COOK: {value: 'COOK', label: 'Cozinheiroz'},
+    COOK: {value: 'COOK', label: 'Cozinheiro'},
     WAITER: {value: 'WAITER', label: 'Garçom'},
+        BARMAN: {value: 'BARMAN', label: 'Barista'},
 } as const
 
 export const GuestTabStatus = {

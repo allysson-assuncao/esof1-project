@@ -2,11 +2,12 @@ import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {SidebarProvider} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/sidebar/app-sidebar";
+import {UserRoles} from "@/model/Interfaces";
 
 export default function DashboardLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
 
     return (
-        <ProtectedRoute>
+        <ProtectedRoute roles={[UserRoles.ADMIN.value]}>
             <div>
                 <SidebarProvider>
                     <AppSidebar />

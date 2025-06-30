@@ -8,9 +8,10 @@ public enum UserRole {
     ADMIN("admin"),
     CASHIER("caixa"),
     COOK("cozinheiro"),
-    WAITER("garçom");
+    WAITER("garçom"),
+    BARMAN("barista");
 
-    private String role;
+    private final String role;
 
     UserRole(String role) {
         this.role = role;
