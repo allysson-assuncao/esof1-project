@@ -52,7 +52,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role == UserRole.ADMIN)
+        if (this.role == UserRole.ADMIN)
             return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
                     new SimpleGrantedAuthority("ROLE_CASHIER"),
                     new SimpleGrantedAuthority("ROLE_WAITER"),
@@ -60,9 +60,12 @@ public class User implements UserDetails {
         else if (this.role == UserRole.CASHIER)
             return List.of(new SimpleGrantedAuthority("ROLE_CASHIER"),
                     new SimpleGrantedAuthority("ROLE_WAITER"),
+                    new SimpleGrantedAuthority("ROLE_COOK"),
                     new SimpleGrantedAuthority("ROLE_BARMAN"));
         else if (this.role == UserRole.WAITER)
             return List.of(new SimpleGrantedAuthority("ROLE_WAITER"));
+        else if (this.role == UserRole.COOK)
+            return List.of(new SimpleGrantedAuthority("ROLE_COOK"));
         else
             return List.of(new SimpleGrantedAuthority("ROLE_BARMAN"));
     }
