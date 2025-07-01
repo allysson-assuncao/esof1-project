@@ -77,7 +77,18 @@ public class CategoryService {
         Set<CategoryDTO> subcategoriesDto = new HashSet<>();
 
         for(String it: subcategoryNames) {
-            subcategoriesDto.add(convertToDTO(categoryRepository.findByName(it).orElse(null)));
+            subcategoriesDto.add(convertToDTO(
+                    categoryRepository.findByName(it)
+                            .orElse(Category.builder()
+                                    .name(it)
+                                    .parentCategory(parentCategory)
+                                    .isMultiple(parentCategory.isMultiple())
+                                    .subCategories(null)
+                                    .workstation(parentCategory.getWorkstation())
+                                    .build()
+                            )
+                    )
+            );
         }
 
         for (CategoryDTO subDto : subcategoriesDto) {
@@ -95,6 +106,7 @@ public class CategoryService {
             } else {
                 Category newSub = buildCategoryFromDTO(subDto, parentCategory);
                 parentCategory.getSubCategories().add(newSub);
+                categoryRepository.save(newSub);
             }
         }
     }
@@ -117,11 +129,16 @@ public class CategoryService {
     }
 
     private CategoryDTO convertToDTO(Category category){
+        UUID workstationId = null;
+        if(category.getWorkstation() != null){
+             workstationId = category.getWorkstation().getId();
+        }
+
         return CategoryDTO.builder()
                 .name(category.getName())
                 .isMultiple(category.isMultiple())
                 .subcategories(category.getSubCategories().stream().map(x -> new String(x.getName())).collect(Collectors.toSet()))
-                .workstationId(category.getWorkstation().getId())
+                .workstationId(workstationId)
                 .build();
     }
 
