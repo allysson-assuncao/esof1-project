@@ -56,6 +56,7 @@ public class User implements UserDetails {
             return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
                     new SimpleGrantedAuthority("ROLE_CASHIER"),
                     new SimpleGrantedAuthority("ROLE_WAITER"),
+                    new SimpleGrantedAuthority("ROLE_COOK"),
                     new SimpleGrantedAuthority("ROLE_BARMAN"));
         else if (this.role == UserRole.CASHIER)
             return List.of(new SimpleGrantedAuthority("ROLE_CASHIER"),
