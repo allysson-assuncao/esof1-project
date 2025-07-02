@@ -25,6 +25,7 @@ public class ProductController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "registerProduct – Endpoint para cadastro de novos produtos")
     public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
         try {
             productService.registerProduct(productDTO);
@@ -35,12 +36,14 @@ public class ProductController {
     }
 
     @GetMapping("/select-all")
+    @Operation(summary = "selectAll – Exibe todos os produtos da base de dados")
     public ResponseEntity<List<ProductDTO>> selectAll() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProductByName(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
+    @Operation(summary = "updateProductById – Recebe o ID de um produto e abre body para edição das informações do produto")
+    public ResponseEntity<?> updateProductById(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
         try {
             productService.updateProductById(id, productDTO);
             return ResponseEntity.ok("Produto atualizado com sucesso!");

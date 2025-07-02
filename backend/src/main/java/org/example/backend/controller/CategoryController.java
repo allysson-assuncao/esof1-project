@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.backend.dto.Category.CategoryDTO;
 import org.example.backend.dto.Category.HierarchicalCategoryDTO;
 import org.example.backend.dto.Category.SimpleCategoryDTO;
@@ -24,6 +25,7 @@ public class CategoryController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "create – Endpoint para cadastro de novas categorias")
     public ResponseEntity<String> create(@RequestBody CategoryDTO dto) {
         try {
             categoryService.createCategory(dto);
@@ -34,11 +36,13 @@ public class CategoryController {
     }
 
     @GetMapping("/select-all")
+    @Operation(summary = "selectAll – Exibe todas as categorias da base de dados")
     public ResponseEntity<List<SimpleCategoryDTO>> selectAll() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @PutMapping("/update/{id}")
+    @Operation(summary = "update – Recebe o ID de um categoria e abre body para edição das informações da categoria")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
         try {
             categoryService.updateCategoryById(id, dto);
@@ -48,6 +52,7 @@ public class CategoryController {
         }
     }
     @GetMapping("/structure")
+    @Operation(summary = "getCategoryStructure – busca apenas as categorias raiz e, para cada uma, monta a árvore de subcategorias recursivamente")
     public ResponseEntity<List<HierarchicalCategoryDTO>> getCategoryStructure() {
         return ResponseEntity.ok(categoryService.getCategoryTree());
     }
