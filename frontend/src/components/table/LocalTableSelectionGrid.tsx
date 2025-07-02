@@ -10,10 +10,14 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {useRouter} from "next/navigation";
 
 const statusStyles: Record<LocalTableStatus, string> = {
-    FREE: "bg-green-100 border-green-400 hover:bg-green-200",
-    OCCUPIED: "bg-red-100 border-red-400 hover:bg-red-200",
-    RESERVED: "bg-gray-200 border-gray-400 hover:bg-gray-300",
+    FREE: "border-emerald-500/80 hover:bg-emerald-500/10 dark:border-emerald-400/70 dark:hover:bg-emerald-400/10",
+
+    OCCUPIED: "bg-destructive/5 border-destructive/50 hover:bg-destructive/10",
+
+    RESERVED: "bg-muted/60 border-muted-foreground/30 hover:bg-muted",
 };
+
+
 
 export function LocalTableSelectionGrid() {
     const router = useRouter();
@@ -60,11 +64,11 @@ export function LocalTableSelectionGrid() {
         <div className="container w-full mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-center">Selecione uma Mesa</h1>
             <div
-                className="grid grid-cols-1 lg:grid-cols-2 3xl:grid-cols-3 gap-4 md:gap-8 p-4 md:p-8 justify-items-stretch items-start w-full mt-20">
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 md:p-8 w-full">
                 {tables?.map((table: LocalTable) => (
                     <Card
                         key={table.id}
-                        className={`w-full md:max-w-[700px] lg:max-w-[900px] mx-auto ${statusStyles[table.status] || statusStyles.RESERVED}`}
+                        className={`w-full mx-auto border-2 transition-all duration-300 ease-in-out cursor-pointer hover:shadow-lg hover:-translate-y-1 ${statusStyles[table.status] || statusStyles.RESERVED}`}
                         onClick={() => router.push('/dashboard/table/guest-tabs/' + table.id)}
                     >
                         <CardHeader className="space-y-1">
