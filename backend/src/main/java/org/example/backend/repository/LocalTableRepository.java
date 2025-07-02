@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -19,6 +18,7 @@ public interface LocalTableRepository extends JpaRepository<LocalTable, UUID> {
     void insertLocalTable(@Param("number") int number);
 
     Optional<LocalTable> findByNumber(int number);
+    Optional<LocalTable> findById(UUID id);
 
     @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.localTable.id = :tableId AND gt.timeOpened >= :startOfDay AND gt.timeOpened <= :endOfDay")
     int findGuestTabCountTodayById(@Param("tableId") UUID tableId,

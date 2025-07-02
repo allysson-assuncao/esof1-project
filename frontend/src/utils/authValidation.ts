@@ -31,3 +31,8 @@ export const localTableRegisterSchema = z.object({
         .min(1, {message: 'O número da mesa deve ser maior que 0'})
         .max(999, {message: 'O número da mesa deve ser menor que 1000'})
 })
+
+export const guestTabRegisterSchema = z.object({
+    guestName: z.string()
+        .min(1, {message: 'Nome do cliente é obrigatório'})
+})

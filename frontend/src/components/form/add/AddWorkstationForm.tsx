@@ -86,7 +86,7 @@ export function AddWorkstationForm({className, onSubmit}: { className?: string; 
                                         <FormItem>
                                             <FormLabel>Nome da estação</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Cozinha..." {...field} />
+                                                <Input placeholder="Ex.: Cozinha, Bar..." {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

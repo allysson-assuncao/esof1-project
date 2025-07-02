@@ -1,6 +1,5 @@
 import React from "react";
 import {useRouter} from "next/navigation";
-import {useDispatch} from "react-redux";
 import {useForm} from "react-hook-form";
 import {LocalTableRegisterFormData} from "@/model/FormData";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -17,7 +16,6 @@ import {Icons} from "@/public/icons";
 
 export function AddLocalTableForm({className, onSubmit}: {className?: string, onSubmit?: (data: unknown) => void}) {
     const router = useRouter()
-    const dispatch = useDispatch();
 
     const form = useForm<LocalTableRegisterFormData>({
         resolver: zodResolver(localTableRegisterSchema),

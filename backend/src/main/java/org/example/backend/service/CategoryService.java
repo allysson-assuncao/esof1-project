@@ -70,24 +70,44 @@ public class CategoryService {
         category.setWorkstation(workstation);
     }
 
-    private void updateSubcategories(Category parentCategory, Set<CategoryDTO> subcategoriesDto) {
-        if (subcategoriesDto == null) return;
+    private void updateSubcategories(Category parentCategory, Set<String> subcategoryNames) {
+        if (subcategoryNames == null) return;
+
+
+        Set<CategoryDTO> subcategoriesDto = new HashSet<>();
+
+        for(String it: subcategoryNames) {
+            Category tempCategory = categoryRepository.findByName(it)
+                    .orElse(Category.builder()
+                            .name(it)
+                            .parentCategory(parentCategory)
+                            .isMultiple(parentCategory.isMultiple())
+                            .subCategories(null)
+                            .workstation(parentCategory.getWorkstation())
+                            .build()
+                    );
+            System.out.println(tempCategory.getName());
+            subcategoriesDto.add(convertToDTO(tempCategory));
+
+        }
+
 
         for (CategoryDTO subDto : subcategoriesDto) {
             if (subDto == null || subDto.name() == null) continue;
 
-            Category existingSub = parentCategory.getSubCategories().stream()
-                    .filter(c -> c.getName().equalsIgnoreCase(subDto.name()))
-                    .findFirst()
+            Category existingSub = categoryRepository
+                    .findByName(subDto.name())
                     .orElse(null);
 
             if (existingSub != null) {
-                if (existingSub.isMultiple() != subDto.isMultiple()) {
-                    existingSub.setMultiple(subDto.isMultiple());
-                }
+                existingSub.setMultiple(subDto.isMultiple());
+                existingSub.setWorkstation(workstationRepository.findById(subDto.workstationId()).orElse(null));
+                existingSub.setParentCategory(parentCategory);
+                categoryRepository.save(existingSub);
             } else {
                 Category newSub = buildCategoryFromDTO(subDto, parentCategory);
                 parentCategory.getSubCategories().add(newSub);
+                categoryRepository.save(newSub);
             }
         }
     }
@@ -97,12 +117,36 @@ public class CategoryService {
 
         if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
             Set<Category> subCats = dto.subcategories().stream()
-                    .map(subDto -> saveCategory(subDto, category))
+                    .map(subDto -> saveCategory(
+                            convertToDTO(
+                                    categoryRepository.findByName(subDto).orElseThrow()), category
+                            )
+                    )
                     .collect(Collectors.toSet());
             category.setSubCategories(subCats);
         }
 
         return categoryRepository.save(category);
+    }
+
+    private CategoryDTO convertToDTO(Category category){
+        UUID workstationId = null;
+        if(category.getWorkstation() != null){
+             workstationId = category.getWorkstation().getId();
+        }
+
+        Set<String> subs = new HashSet<>();
+
+        if(category.getSubCategories() != null){
+            subs = category.getSubCategories().stream().map(x -> new String(x.getName())).collect(Collectors.toSet());
+        }
+
+        return CategoryDTO.builder()
+                .name(category.getName())
+                .isMultiple(category.isMultiple())
+                .subcategories(subs)
+                .workstationId(workstationId)
+                .build();
     }
 
     private Category buildCategoryFromDTO(CategoryDTO dto, Category parent) {
