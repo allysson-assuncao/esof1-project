@@ -116,12 +116,20 @@ public class CategoryService {
         Category category = buildCategoryFromDTO(dto, parent);
 
         if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
+            categoryRepository.save(category);
             Set<Category> subCats = dto.subcategories().stream()
                     .map(subDto -> saveCategory(
                             convertToDTO(
-                                    categoryRepository.findByName(subDto).orElseThrow()), category
-                            )
-                    )
+                                    categoryRepository.findByName(subDto).orElse(Category.builder()
+                                            .name(subDto)
+                                            .parentCategory(category)
+                                            .isMultiple(category.isMultiple())
+                                            .subCategories(null)
+                                            .workstation(category.getWorkstation())
+                                            .build()
+                                    )
+                            ), category
+                    ))
                     .collect(Collectors.toSet());
             category.setSubCategories(subCats);
         }
