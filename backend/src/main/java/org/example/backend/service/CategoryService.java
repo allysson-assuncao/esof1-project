@@ -77,32 +77,33 @@ public class CategoryService {
         Set<CategoryDTO> subcategoriesDto = new HashSet<>();
 
         for(String it: subcategoryNames) {
-            subcategoriesDto.add(convertToDTO(
-                    categoryRepository.findByName(it)
-                            .orElse(Category.builder()
-                                    .name(it)
-                                    .parentCategory(parentCategory)
-                                    .isMultiple(parentCategory.isMultiple())
-                                    .subCategories(null)
-                                    .workstation(parentCategory.getWorkstation())
-                                    .build()
-                            )
-                    )
-            );
+            Category tempCategory = categoryRepository.findByName(it)
+                    .orElse(Category.builder()
+                            .name(it)
+                            .parentCategory(parentCategory)
+                            .isMultiple(parentCategory.isMultiple())
+                            .subCategories(null)
+                            .workstation(parentCategory.getWorkstation())
+                            .build()
+                    );
+            System.out.println(tempCategory.getName());
+            subcategoriesDto.add(convertToDTO(tempCategory));
+
         }
+
 
         for (CategoryDTO subDto : subcategoriesDto) {
             if (subDto == null || subDto.name() == null) continue;
 
-            Category existingSub = parentCategory.getSubCategories().stream()
-                    .filter(c -> c.getName().equalsIgnoreCase(subDto.name()))
-                    .findFirst()
+            Category existingSub = categoryRepository
+                    .findByName(subDto.name())
                     .orElse(null);
 
             if (existingSub != null) {
-                if (existingSub.isMultiple() != subDto.isMultiple()) {
-                    existingSub.setMultiple(subDto.isMultiple());
-                }
+                existingSub.setMultiple(subDto.isMultiple());
+                existingSub.setWorkstation(workstationRepository.findById(subDto.workstationId()).orElse(null));
+                existingSub.setParentCategory(parentCategory);
+                categoryRepository.save(existingSub);
             } else {
                 Category newSub = buildCategoryFromDTO(subDto, parentCategory);
                 parentCategory.getSubCategories().add(newSub);
@@ -134,10 +135,16 @@ public class CategoryService {
              workstationId = category.getWorkstation().getId();
         }
 
+        Set<String> subs = new HashSet<>();
+
+        if(category.getSubCategories() != null){
+            subs = category.getSubCategories().stream().map(x -> new String(x.getName())).collect(Collectors.toSet());
+        }
+
         return CategoryDTO.builder()
                 .name(category.getName())
                 .isMultiple(category.isMultiple())
-                .subcategories(category.getSubCategories().stream().map(x -> new String(x.getName())).collect(Collectors.toSet()))
+                .subcategories(subs)
                 .workstationId(workstationId)
                 .build();
     }
