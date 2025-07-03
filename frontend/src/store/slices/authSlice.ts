@@ -16,8 +16,9 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        login: (state, action: PayloadAction<{ username: string; token: string; role: string }>) => {
+        login: (state, action: PayloadAction<{ username: string; email: string; role: string; token: string; }>) => {
             state.username = action.payload.username;
+            state.email = action.payload.email;
             state.token = action.payload.token;
             state.role = action.payload.role;
             state.isAuthenticated = true;
@@ -25,8 +26,9 @@ export const authSlice = createSlice({
             localStorage.setItem('token', action.payload.token);
             localStorage.setItem('role', action.payload.role);
         },
-        signup(state, action: PayloadAction<{ username: string, token: string, role: string }>) {
+        signup(state, action: PayloadAction<{ username: string; email: string; role: string; token: string; }>) {
             state.username = action.payload.username;
+            state.email = action.payload.email;
             state.token = action.payload.token;
             state.role = action.payload.role;
             state.isAuthenticated = true;

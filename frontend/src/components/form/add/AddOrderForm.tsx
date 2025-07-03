@@ -65,6 +65,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
 
     const onSubmit = (data: RegisterOrdersFormData) => {
         if (!waiterEmail) {
+            console.log(waiterEmail)
             toast.error("Não foi possível identificar o garçom. Faça login novamente.");
             return;
         }
