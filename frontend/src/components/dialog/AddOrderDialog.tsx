@@ -1,5 +1,4 @@
 import React from "react";
-import useMediaQuery from "react-query/types/devtools/useMediaQuery";
 import {AddOrderDialogProps} from "@/model/Props";
 import {
     Dialog,
@@ -22,7 +21,7 @@ import {AddOrderForm} from "@/components/form/add/AddOrderForm";
 
 export function AddOrderDialog({guestTabId, parentOrderId = null, buttonText}: AddOrderDialogProps) {
     const [open, setOpen] = React.useState(false);
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const isDesktop =/* useMediaQuery("(min-width: 768px)")*/ true;
 
     const title = parentOrderId ? "Adicionar Itens Adicionais" : "Adicionar Novo Pedido";
     const description = "Preencha os dados dos itens abaixo. Você pode adicionar vários de uma vez.";
