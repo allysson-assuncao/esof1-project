@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.example.backend.dto.Product.ProductDTO;
 import org.example.backend.dto.Product.ProductByCategoryDTO;
+import org.example.backend.dto.Product.SimpleProductDTO;
 import org.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,13 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> selectAll() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
+
+    @GetMapping("/select-all-simple")
+    @Operation(summary = "selectAllSimple – Exibe todos os produtos da base de dados de forma simplificada, para seleção em pedidos")
+    public ResponseEntity<List<SimpleProductDTO>> selectAllSimple() {
+        return ResponseEntity.ok(productService.getAllSimpleProducts());
+    }
+
 
     @PutMapping("/update/{id}")
     @Operation(summary = "updateProductById – Recebe o ID de um produto e abre body para edição das informações do produto")
