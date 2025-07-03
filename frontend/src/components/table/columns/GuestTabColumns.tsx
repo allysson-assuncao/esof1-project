@@ -4,6 +4,7 @@ import {ColumnDef} from '@tanstack/react-table'
 import {DisplayGuestTabItem, GuestTabStatus} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {DataTableColumnHeader} from "@/components/ui/data-table";
+import {formatDateDisplay} from "@/utils/operations/date-convertion";
 
 export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     // DrillDown
@@ -36,6 +37,15 @@ export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
         cell: ({row}) => {
             return GuestTabStatus[row.original.status as keyof typeof GuestTabStatus]?.label || row.original.status || "-";
         },
+    },
+    {
+        accessorKey: "guestName",
+        header: ({column}) => <DataTableColumnHeader column={column} title="Nome do Cliente"/>,
+    },
+    {
+        accessorKey: 'timeOpened',
+        header: 'Hora',
+        cell: ({ row }) => formatDateDisplay(row.original.timeOpened)
     },
     {
         accessorKey: "totalPrice",

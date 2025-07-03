@@ -77,8 +77,8 @@ export interface DisplayGuestTabItem {
     id: number;
     status: GuestTabStatus | null;
     guestName: string;
-    timeOpened: Date | null;
-    timeClosed: Date | null;
+    timeOpened: string;
+    timeClosed: string;
     orderGroups: DisplayOrderGroup[];
     totalPrice: number;
     waiterName?: string;
