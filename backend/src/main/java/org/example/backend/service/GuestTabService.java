@@ -192,7 +192,7 @@ public class GuestTabService {
         return GuestTabDTO.builder()
                 .id(guestTab.getId())
                 .status(guestTab.getStatus())
-                .name(guestTab.getGuestName())
+                .guestName(guestTab.getGuestName())
                 .timeOpened(guestTab.getTimeOpened())
                 .timeClosed(guestTab.getTimeClosed())
                 .orderGroups(orderGroupDTOs)

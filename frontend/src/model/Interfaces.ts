@@ -76,6 +76,7 @@ export interface DisplayOrderGroup {
 export interface DisplayGuestTabItem {
     id: number;
     status: GuestTabStatus | null;
+    guestName: string;
     timeOpened: Date | null;
     timeClosed: Date | null;
     orderGroups: DisplayOrderGroup[];
