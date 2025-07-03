@@ -339,10 +339,21 @@ export function GuestTabDataTable<TValue>({
                                         {row.getIsExpanded() && (
                                             <TableRow>
                                                 <TableCell colSpan={row.getVisibleCells().length} className="p-0">
-                                                    <OrderGroupsSubTable
-                                                        orderGroups={row.original.orderGroups}
-                                                        guestTabId={row.original.id}
-                                                    />
+                                                    {row.original.orderGroups && row.original.orderGroups.length > 0 ? (
+                                                        <>
+                                                            <OrderGroupsSubTable
+                                                                orderGroups={row.original.orderGroups}
+                                                                guestTabId={row.original.id}
+                                                            />
+                                                            <div className="p-4 pl-12 text-center">
+                                                                Adicionar grupo
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <div className="p-6 text-center">
+                                                            Adicionar grupo
+                                                        </div>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         )}

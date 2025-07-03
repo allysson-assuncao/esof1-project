@@ -3,6 +3,7 @@ package org.example.backend.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.DrillDownOrderDTO;
 import org.example.backend.dto.GuestTab.*;
+import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.dto.Order.OrderGroupDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
@@ -10,6 +11,7 @@ import org.example.backend.model.Order;
 import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
+import org.example.backend.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,14 +34,16 @@ public class GuestTabService {
     private final GuestTabRepository guestTabRepository;
     private final GuestTabSpecificationService guestTabSpecificationService;
     private final LocalTableRepository localTableRepository;
+    private final OrderRepository orderRepository;
 
     @Autowired
     public GuestTabService(GuestTabRepository guestTapRepository,
                            GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository) {
+                           LocalTableRepository localTableRepository, OrderRepository orderRepository) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
         this.localTableRepository = localTableRepository;
+        this.orderRepository = orderRepository;
     }
 
     //Registra nova guest tab
@@ -142,52 +146,56 @@ public class GuestTabService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
         Page<GuestTab> guestTabPage = this.guestTabRepository.findAll(specification, pageable);
 
-        return guestTabPage.map(this::convertToGuestTabDTOWithNestedOrders);
-    }
-
-    private GuestTabDTO convertToGuestTabDTOWithNestedOrders(GuestTab guestTab) {
-        if (guestTab == null) return null;
-
-        List<Order> allOrders = new ArrayList<>(guestTab.getOrders());
-
-        Map<Long, List<Order>> subOrdersByParentId = allOrders.stream()
-                .filter(order -> order.getParentOrder() != null)
-                .collect(Collectors.groupingBy(order -> order.getParentOrder().getId()));
-
-        List<Order> topLevelOrders = allOrders.stream()
-                .filter(order -> order.getParentOrder() == null)
+        List<Long> guestTabIdsOnPage = guestTabPage.getContent().stream()
+                .map(GuestTab::getId)
                 .toList();
 
-        Map<LocalDateTime, List<Order>> ordersGroupedByTime = topLevelOrders.stream()
-                .collect(Collectors.groupingBy(Order::getOrderedTime));
+        if (guestTabIdsOnPage.isEmpty()) {
+            return guestTabPage.map(gt -> convertToGuestTabDTOWithNestedOrders(gt, Collections.emptyList()));
+        }
+
+        List<FlatOrderDTO> flatOrders = this.orderRepository.findFlatOrderDTOsByGuestTabIds(guestTabIdsOnPage);
+
+        Map<Long, List<FlatOrderDTO>> ordersByGuestTabId = flatOrders.stream()
+                .collect(Collectors.groupingBy(FlatOrderDTO::guestTabId));
+
+        return guestTabPage.map(guestTab ->
+                convertToGuestTabDTOWithNestedOrders(guestTab, ordersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()))
+        );
+    }
+
+    private GuestTabDTO convertToGuestTabDTOWithNestedOrders(GuestTab guestTab, List<FlatOrderDTO> flatOrders) {
+        if (guestTab == null) return null;
+
+        Map<Long, List<FlatOrderDTO>> subOrdersByParentId = flatOrders.stream()
+                .filter(order -> order.parentOrderId() != null)
+                .collect(Collectors.groupingBy(FlatOrderDTO::parentOrderId));
+
+        List<FlatOrderDTO> topLevelOrders = flatOrders.stream()
+                .filter(order -> order.parentOrderId() == null)
+                .toList();
+
+        Map<LocalDateTime, List<FlatOrderDTO>> ordersGroupedByTime = topLevelOrders.stream()
+                .collect(Collectors.groupingBy(FlatOrderDTO::orderedTime));
 
         Set<OrderGroupDTO> orderGroupDTOs = ordersGroupedByTime.entrySet().stream()
                 .map(entry -> {
                     LocalDateTime groupTime = entry.getKey();
-                    List<Order> ordersInGroup = entry.getValue();
+                    List<FlatOrderDTO> ordersInGroup = entry.getValue();
 
                     Set<DrillDownOrderDTO> drillDownOrders = ordersInGroup.stream()
-                            .map(order -> convertToDrillDownOrderDTO(order, subOrdersByParentId))
+                            .map(flatOrder -> convertToDrillDownOrderDTO(flatOrder, subOrdersByParentId))
                             .collect(Collectors.toSet());
 
                     double groupTotalPrice = drillDownOrders.stream()
                             .mapToDouble(this::calculateOrderTotal)
                             .sum();
 
-                    return OrderGroupDTO.builder()
-                            .representativeTime(groupTime)
-                            .groupTotalPrice(groupTotalPrice)
-                            .numberOfItems(drillDownOrders.size())
-                            .orders(drillDownOrders)
-                            .build();
+                    return new OrderGroupDTO(groupTime, groupTotalPrice, drillDownOrders.size(), drillDownOrders);
                 })
                 .collect(Collectors.toSet());
 
-        double totalGuestTabPrice = orderGroupDTOs.stream()
-                .mapToDouble(OrderGroupDTO::groupTotalPrice)
-                .sum();
-
-        int localTableNumber = guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0;
+        double totalGuestTabPrice = orderGroupDTOs.stream().mapToDouble(OrderGroupDTO::groupTotalPrice).sum();
 
         return GuestTabDTO.builder()
                 .id(guestTab.getId())
@@ -197,33 +205,27 @@ public class GuestTabService {
                 .timeClosed(guestTab.getTimeClosed())
                 .orderGroups(orderGroupDTOs)
                 .totalPrice(totalGuestTabPrice)
-                .localTableNumber(localTableNumber)
+                .localTableNumber(guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0)
                 .build();
     }
 
-    private DrillDownOrderDTO convertToDrillDownOrderDTO(Order order, Map<Long, List<Order>> subOrdersMap) {
-        if (order == null) return null;
+    private DrillDownOrderDTO convertToDrillDownOrderDTO(FlatOrderDTO flatOrder, Map<Long, List<FlatOrderDTO>> subOrdersMap) {
+        if (flatOrder == null) return null;
 
-        List<Order> children = subOrdersMap.getOrDefault(order.getId(), Collections.emptyList());
-
-        Set<DrillDownOrderDTO> additionalOrderDTOs = children.stream()
+        Set<DrillDownOrderDTO> additionalOrderDTOs = subOrdersMap.getOrDefault(flatOrder.id(), Collections.emptyList()).stream()
                 .map(child -> convertToDrillDownOrderDTO(child, subOrdersMap))
                 .collect(Collectors.toSet());
 
-        String productName = order.getProduct() != null ? order.getProduct().getName() : null;
-        double productUnitPrice = order.getProduct() != null ? order.getProduct().getPrice() : 0.0;
-        String waiterName = order.getWaiter() != null ? order.getWaiter().getName() : null;
-
         return DrillDownOrderDTO.builder()
-                .id(order.getId())
-                .amount(order.getAmount())
-                .status(order.getStatus())
-                .observation(order.getObservation())
-                .orderedTime(order.getOrderedTime())
+                .id(flatOrder.id())
+                .amount(flatOrder.amount())
+                .status(flatOrder.status())
+                .observation(flatOrder.observation())
+                .orderedTime(flatOrder.orderedTime())
                 .additionalOrders(additionalOrderDTOs)
-                .productName(productName)
-                .productUnitPrice(productUnitPrice)
-                .waiterName(waiterName)
+                .productName(flatOrder.productName())
+                .productUnitPrice(flatOrder.productUnitPrice())
+                .waiterName(flatOrder.waiterName())
                 .build();
     }
 

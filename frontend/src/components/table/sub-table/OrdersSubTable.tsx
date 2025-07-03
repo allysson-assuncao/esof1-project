@@ -67,10 +67,10 @@ const getOrderColumns = (): ColumnDef<DisplayOrderItem>[] => [
 ];
 
 export const OrdersSubTable = ({
-                            orders,
-                            guestTabId,
-                            parentOrderId = null
-                        }: {
+                                   orders,
+                                   guestTabId,
+                                   parentOrderId = null
+                               }: {
     orders: DisplayOrderItem[],
     guestTabId: number,
     parentOrderId?: number | null
@@ -89,7 +89,7 @@ export const OrdersSubTable = ({
     });
 
     return (
-        <div className="p-4 bg-muted/50 pl-6">
+        <div className="p-4 bg-muted/40 pl-6">
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map(headerGroup => (
@@ -127,54 +127,56 @@ export const OrdersSubTable = ({
                         </React.Fragment>
                     ))}
 
-                    <TableRow>
-                        <TableCell colSpan={columns.length} className="text-center">
-                            {isDesktop ? (
-                                <Dialog open={openAddOrder} onOpenChange={setOpenAddOrder}>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline">Adicionar pedido</Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                            <DialogTitle>Novo Pedido</DialogTitle>
-                                            <DialogDescription>
-                                                Preencha os dados do novo pedido.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <AddOrderForm
-                                            guestTabId={guestTabId}
-                                            parentOrderId={parentOrderId}
-                                            onSubmit={() => setOpenAddOrder(false)}
-                                        />
-                                    </DialogContent>
-                                </Dialog>
-                            ) : (
-                                <Drawer open={openAddOrder} onOpenChange={setOpenAddOrder}>
-                                    <DrawerTrigger asChild>
-                                        <Button variant="outline">Adicionar pedido</Button>
-                                    </DrawerTrigger>
-                                    <DrawerContent>
-                                        <DrawerHeader className="text-left">
-                                            <DrawerTitle>Novo Pedido</DrawerTitle>
-                                            <DrawerDescription>
-                                                Preencha os dados do novo pedido.
-                                            </DrawerDescription>
-                                        </DrawerHeader>
-                                        <AddOrderForm
-                                            guestTabId={guestTabId}
-                                            parentOrderId={parentOrderId}
-                                            onSubmit={() => setOpenAddOrder(false)}
-                                        />
-                                        <DrawerFooter className="pt-2">
-                                            <DrawerClose asChild>
-                                                <Button variant="outline">Cancelar</Button>
-                                            </DrawerClose>
-                                        </DrawerFooter>
-                                    </DrawerContent>
-                                </Drawer>
-                            )}
-                        </TableCell>
-                    </TableRow>
+                    {parentOrderId !== null && (
+                        <TableRow>
+                            <TableCell colSpan={columns.length} className="text-center">
+                                {isDesktop ? (
+                                    <Dialog open={openAddOrder} onOpenChange={setOpenAddOrder}>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">Adicionar pedido</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>Novo Pedido</DialogTitle>
+                                                <DialogDescription>
+                                                    Preencha os dados do novo pedido.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <AddOrderForm
+                                                guestTabId={guestTabId}
+                                                parentOrderId={parentOrderId}
+                                                onSubmit={() => setOpenAddOrder(false)}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
+                                ) : (
+                                    <Drawer open={openAddOrder} onOpenChange={setOpenAddOrder}>
+                                        <DrawerTrigger asChild>
+                                            <Button variant="outline">Adicionar pedido</Button>
+                                        </DrawerTrigger>
+                                        <DrawerContent>
+                                            <DrawerHeader className="text-left">
+                                                <DrawerTitle>Novo Pedido</DrawerTitle>
+                                                <DrawerDescription>
+                                                    Preencha os dados do novo pedido.
+                                                </DrawerDescription>
+                                            </DrawerHeader>
+                                            <AddOrderForm
+                                                guestTabId={guestTabId}
+                                                parentOrderId={parentOrderId}
+                                                onSubmit={() => setOpenAddOrder(false)}
+                                            />
+                                            <DrawerFooter className="pt-2">
+                                                <DrawerClose asChild>
+                                                    <Button variant="outline">Cancelar</Button>
+                                                </DrawerClose>
+                                            </DrawerFooter>
+                                        </DrawerContent>
+                                    </Drawer>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
             </Table>
         </div>

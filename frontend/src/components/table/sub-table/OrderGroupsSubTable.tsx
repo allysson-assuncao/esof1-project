@@ -52,7 +52,7 @@ export const OrderGroupsSubTable = ({ orderGroups, guestTabId }: { orderGroups: 
     });
 
     return (
-        <div className="p-4 bg-muted/70 pl-12">
+        <div className="p-4 bg-muted/20 pl-12">
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map(headerGroup => (
