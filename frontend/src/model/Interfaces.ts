@@ -9,8 +9,9 @@ export type OrderStatus = keyof typeof OrderStatus;
 export const UserRoles = {
     ADMIN: {value: 'ADMIN', label: 'Administrador'},
     CASHIER: {value: 'CASHIER', label: 'Caixa'},
-    COOK: {value: 'COOK', label: 'Cozinheiroz'},
     WAITER: {value: 'WAITER', label: 'Garçom'},
+    COOK: {value: 'COOK', label: 'Cozinheiro'},
+    BARMAN: {value: 'BARMAN', label: 'Barista'},
 } as const
 
 export const GuestTabStatus = {
@@ -76,10 +77,10 @@ export interface DisplayGuestTabItem {
 }
 
 export interface LocalTable {
-  id: string;
-  number: number;
-  status: LocalTableStatus;
-  guestTabCountToday: number;
+    id: string;
+    number: number;
+    status: LocalTableStatus;
+    guestTabCountToday: number;
 }
 
 export interface SimpleGuestTab {

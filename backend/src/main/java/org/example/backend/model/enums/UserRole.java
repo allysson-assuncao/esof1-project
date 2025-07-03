@@ -7,8 +7,9 @@ public enum UserRole {
 
     ADMIN("admin"),
     CASHIER("caixa"),
+    WAITER("garçom"),
     COOK("cozinheiro"),
-    WAITER("garçom");
+    BARMAN("barista");
 
     private String role;
 

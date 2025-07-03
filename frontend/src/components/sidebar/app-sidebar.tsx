@@ -27,7 +27,7 @@ const data = {
     user: {
         name: "Hub Restaurantes",
         email: "hub.restaurantes@gmail.com",
-        avatar: "/avatars/hub_rest.jpg",
+        avatar: "/avatars/rest_hub.jpg",
     },
     navMain: [
         {
@@ -37,20 +37,20 @@ const data = {
             isActive: true,
             items: [
                 {
-                    title: "Cadastro de Produtos",
-                    url: '/dashboard/register/product',
+                    title: "Produtos",
+                    url: '/dashboard/manage/product',
                 },
                 {
-                    title: "Cadastro de Categorias",
-                    url: '/dashboard/register/category',
+                    title: "Categorias",
+                    url: '/dashboard/manage/category',
                 },
                 {
-                    title: "Cadastro de Destinos",
-                    url: '/dashboard/register/workstation',
+                    title: "Destinos",
+                    url: '/dashboard/manage/workstation',
                 },
                 {
-                    title: "Cadastro de Mesas",
-                    url: '/dashboard/register/table',
+                    title: "Mesas",
+                    url: '/dashboard/manage/table',
                 },
             ],
         },
