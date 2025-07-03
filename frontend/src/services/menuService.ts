@@ -3,7 +3,6 @@
 import { category, product } from "./index";
 import { HierarchicalCategoryDTO, ProductDTO } from "@/model/Interfaces";
 
-
 export const fetchMenuStructure = async (): Promise<HierarchicalCategoryDTO[]> => {
 
     const response = await category.get('/structure');

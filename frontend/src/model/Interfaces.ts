@@ -110,6 +110,11 @@ export interface SimpleCategory {
     name: string;
 }
 
+export interface SimpleProduct {
+    id: string;
+    name: string;
+}
+
 export interface HierarchicalCategoryDTO {
     id: string;
     name: string;

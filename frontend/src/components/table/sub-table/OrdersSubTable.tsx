@@ -5,24 +5,7 @@ import {formatDateDisplay} from "@/utils/operations/date-convertion";
 import React from "react";
 import {getExpandedRowModel} from "@tanstack/table-core";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {AddOrderForm} from "@/components/form/add/AddOrderForm";
-import {
-    Drawer, DrawerClose,
-    DrawerContent,
-    DrawerDescription, DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger
-} from "@/components/ui/drawer";
+import {AddOrderDialog} from "@/components/dialog/AddOrderDialog";
 
 const getOrderColumns = (): ColumnDef<DisplayOrderItem>[] => [
     {
@@ -76,9 +59,6 @@ export const OrdersSubTable = ({
     parentOrderId?: number | null
 }) => {
 
-    const [openAddOrder, setOpenAddOrder] = React.useState(false);
-    const isDesktop = true;
-
     const columns = React.useMemo(() => getOrderColumns(), []);
 
     const table = useReactTable({
@@ -128,53 +108,13 @@ export const OrdersSubTable = ({
                     ))}
 
                     {parentOrderId !== null && (
-                        /*Adicionar pedido (adicional)*/
                         <TableRow>
                             <TableCell colSpan={columns.length} className="text-center">
-                                {isDesktop ? (
-                                    <Dialog open={openAddOrder} onOpenChange={setOpenAddOrder}>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline">Adicionar pedido</Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[425px]">
-                                            <DialogHeader>
-                                                <DialogTitle>Novo Pedido</DialogTitle>
-                                                <DialogDescription>
-                                                    Preencha os dados do novo pedido.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <AddOrderForm
-                                                guestTabId={guestTabId}
-                                                parentOrderId={parentOrderId}
-                                                onSubmit={() => setOpenAddOrder(false)}
-                                            />
-                                        </DialogContent>
-                                    </Dialog>
-                                ) : (
-                                    <Drawer open={openAddOrder} onOpenChange={setOpenAddOrder}>
-                                        <DrawerTrigger asChild>
-                                            <Button variant="outline">Adicionar pedido</Button>
-                                        </DrawerTrigger>
-                                        <DrawerContent>
-                                            <DrawerHeader className="text-left">
-                                                <DrawerTitle>Novo Pedido</DrawerTitle>
-                                                <DrawerDescription>
-                                                    Preencha os dados do novo pedido.
-                                                </DrawerDescription>
-                                            </DrawerHeader>
-                                            <AddOrderForm
-                                                guestTabId={guestTabId}
-                                                parentOrderId={parentOrderId}
-                                                onSubmit={() => setOpenAddOrder(false)}
-                                            />
-                                            <DrawerFooter className="pt-2">
-                                                <DrawerClose asChild>
-                                                    <Button variant="outline">Cancelar</Button>
-                                                </DrawerClose>
-                                            </DrawerFooter>
-                                        </DrawerContent>
-                                    </Drawer>
-                                )}
+                                <AddOrderDialog
+                                    guestTabId={guestTabId}
+                                    parentOrderId={parentOrderId}
+                                    buttonText="Adicionar Item Adicional"
+                                />
                             </TableCell>
                         </TableRow>
                     )}

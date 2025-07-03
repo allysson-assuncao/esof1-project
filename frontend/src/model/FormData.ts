@@ -24,3 +24,16 @@ export interface GuestTabRegisterFormData {
     localTableId: string;
     guestName: string;
 }
+
+export interface RegisterOrderItemDTO {
+  productId: string;
+  amount: number;
+  observation?: string;
+}
+
+export interface RegisterOrdersFormData {
+  guestTabId: number;
+  parentOrderId: number | null;
+  waiterEmail: string;
+  orders: RegisterOrderItemDTO[];
+}

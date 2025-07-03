@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/drawer";
 import {AddGuestTabForm} from "@/components/form/add/AddGuestTabForm";
 import {OrderGroupsSubTable} from "@/components/table/sub-table/OrderGroupsSubTable";
+import {AddOrderDialog} from "@/components/dialog/AddOrderDialog";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -346,12 +347,22 @@ export function GuestTabDataTable<TValue>({
                                                                 guestTabId={row.original.id}
                                                             />
                                                             <div className="p-4 pl-12 text-center">
-                                                                Adicionar pedido (grupo)
+                                                                <div className="p-4 pl-12 text-center">
+                                                                    <AddOrderDialog
+                                                                        guestTabId={row.original.id}
+                                                                        buttonText="Adicionar Novo Pedido"
+                                                                    />
+                                                                </div>
                                                             </div>
                                                         </>
                                                     ) : (
                                                         <div className="p-6 text-center">
-                                                            Adicionar pedido (grupo)
+                                                            <div className="p-4 pl-12 text-center">
+                                                                <AddOrderDialog
+                                                                    guestTabId={row.original.id}
+                                                                    buttonText="Adicionar Novo Pedido"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </TableCell>
