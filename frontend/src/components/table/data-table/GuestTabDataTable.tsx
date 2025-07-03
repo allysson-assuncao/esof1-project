@@ -346,12 +346,12 @@ export function GuestTabDataTable<TValue>({
                                                                 guestTabId={row.original.id}
                                                             />
                                                             <div className="p-4 pl-12 text-center">
-                                                                Adicionar grupo
+                                                                Adicionar pedido (grupo)
                                                             </div>
                                                         </>
                                                     ) : (
                                                         <div className="p-6 text-center">
-                                                            Adicionar grupo
+                                                            Adicionar pedido (grupo)
                                                         </div>
                                                     )}
                                                 </TableCell>

@@ -1,5 +1,3 @@
-import {UUID} from "node:crypto";
-
 export interface LoginFormData {
     email: string;
     password: string;

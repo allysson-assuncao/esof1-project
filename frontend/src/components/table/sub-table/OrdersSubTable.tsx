@@ -128,6 +128,7 @@ export const OrdersSubTable = ({
                     ))}
 
                     {parentOrderId !== null && (
+                        /*Adicionar pedido (adicional)*/
                         <TableRow>
                             <TableCell colSpan={columns.length} className="text-center">
                                 {isDesktop ? (
