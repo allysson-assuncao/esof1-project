@@ -66,12 +66,19 @@ export interface DisplayOrderItem {
     waiterName: string;
 }
 
+export interface DisplayOrderGroup {
+    representativeTime: string;
+    groupTotalPrice: number;
+    numberOfItems: number;
+    orders: DisplayOrderItem[];
+}
+
 export interface DisplayGuestTabItem {
     id: number;
     status: GuestTabStatus | null;
     timeOpened: Date | null;
     timeClosed: Date | null;
-    orders: DisplayOrderItem[];
+    orderGroups: DisplayOrderGroup[];
     totalPrice: number;
     waiterName?: string;
 }

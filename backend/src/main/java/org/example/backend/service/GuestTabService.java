@@ -3,6 +3,7 @@ package org.example.backend.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.DrillDownOrderDTO;
 import org.example.backend.dto.GuestTab.*;
+import org.example.backend.dto.Order.OrderGroupDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
@@ -61,7 +62,7 @@ public class GuestTabService {
     }
 
     @Transactional
-    public String closeTabById(Long id){
+    public String closeTabById(Long id) {
         GuestTab tab = guestTabRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
         StringBuilder output = new StringBuilder();
         double accum = 0.0;
@@ -69,7 +70,7 @@ public class GuestTabService {
         output.append(tab.getGuestName());
         output.append("\n");
         output.append("Nome         Quantidade          Preço\n");
-        for (Order it: orders) {
+        for (Order it : orders) {
             output.append(it.getProduct().getName());
             output.append("         ");
             output.append(it.getAmount());
@@ -153,13 +154,37 @@ public class GuestTabService {
                 .filter(order -> order.getParentOrder() != null)
                 .collect(Collectors.groupingBy(order -> order.getParentOrder().getId()));
 
-        Set<DrillDownOrderDTO> topLevelOrderDTOs = allOrders.stream()
+        List<Order> topLevelOrders = allOrders.stream()
                 .filter(order -> order.getParentOrder() == null)
-                .map(parentOrder -> convertToDrillDownOrderDTO(parentOrder, subOrdersByParentId))
+                .toList();
+
+        Map<LocalDateTime, List<Order>> ordersGroupedByTime = topLevelOrders.stream()
+                .collect(Collectors.groupingBy(Order::getOrderedTime));
+
+        Set<OrderGroupDTO> orderGroupDTOs = ordersGroupedByTime.entrySet().stream()
+                .map(entry -> {
+                    LocalDateTime groupTime = entry.getKey();
+                    List<Order> ordersInGroup = entry.getValue();
+
+                    Set<DrillDownOrderDTO> drillDownOrders = ordersInGroup.stream()
+                            .map(order -> convertToDrillDownOrderDTO(order, subOrdersByParentId))
+                            .collect(Collectors.toSet());
+
+                    double groupTotalPrice = drillDownOrders.stream()
+                            .mapToDouble(this::calculateOrderTotal)
+                            .sum();
+
+                    return OrderGroupDTO.builder()
+                            .representativeTime(groupTime)
+                            .groupTotalPrice(groupTotalPrice)
+                            .numberOfItems(drillDownOrders.size())
+                            .orders(drillDownOrders)
+                            .build();
+                })
                 .collect(Collectors.toSet());
 
-        double totalPrice = topLevelOrderDTOs.stream()
-                .mapToDouble(this::calculateOrderTotal)
+        double totalGuestTabPrice = orderGroupDTOs.stream()
+                .mapToDouble(OrderGroupDTO::groupTotalPrice)
                 .sum();
 
         int localTableNumber = guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0;
@@ -167,10 +192,11 @@ public class GuestTabService {
         return GuestTabDTO.builder()
                 .id(guestTab.getId())
                 .status(guestTab.getStatus())
+                .name(guestTab.getGuestName())
                 .timeOpened(guestTab.getTimeOpened())
                 .timeClosed(guestTab.getTimeClosed())
-                .orders(topLevelOrderDTOs)
-                .totalPrice(totalPrice)
+                .orderGroups(orderGroupDTOs)
+                .totalPrice(totalGuestTabPrice)
                 .localTableNumber(localTableNumber)
                 .build();
     }

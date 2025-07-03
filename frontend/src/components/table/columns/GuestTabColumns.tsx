@@ -50,6 +50,6 @@ export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     },
     {
         header: "Qtd. Pedidos",
-        cell: ({row}) => row.original.orders.length,
+        cell: ({row}) => row.original.orderGroups.length,
     },
 ]
