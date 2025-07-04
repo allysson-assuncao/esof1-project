@@ -36,3 +36,12 @@ export const guestTabRegisterSchema = z.object({
     guestName: z.string()
         .min(1, {message: 'Nome do cliente é obrigatório'})
 })
+
+export const categoryRegisterSchema = z.object({
+    name: z.string().min(1, "Nome é obrigatório"),
+    isMultiple: z.boolean(),
+    subcategories: z.array(z.string().min(1, "Subcategoria não pode ser vazia")),
+    workstationId: z.string().uuid("ID da estação inválido"),
+});
+
+export type CategoryFormData = z.infer<typeof categoryRegisterSchema>;

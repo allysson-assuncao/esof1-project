@@ -37,3 +37,10 @@ export interface RegisterOrdersFormData {
   waiterEmail: string;
   orders: RegisterOrderItemDTO[];
 }
+
+export type CategoryFormData = {
+    name: string;
+    isMultiple: boolean;
+    subcategories: string[];
+    workstationId: string;
+};

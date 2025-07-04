@@ -1,12 +1,13 @@
 "use client";
 
+import {RegisterCategory} from "@/components/category/RegisterCategory";
 
-const RegisterProductPage = () => {
+const RegisterCategoryPage = () => {
     return (
         <div className="h-full">
-            Pagina de cadastro de categoria
+            <RegisterCategory/>
         </div>
     );
 };
 
-export default RegisterProductPage;
+export default RegisterCategoryPage;
