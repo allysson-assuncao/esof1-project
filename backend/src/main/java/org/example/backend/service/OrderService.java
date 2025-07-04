@@ -1,11 +1,8 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.Order.*;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.Order.DetailedOrderDTO;
-import org.example.backend.dto.Order.OrderDTO;
-import org.example.backend.dto.Order.OrderRequestDTO;
-import org.example.backend.dto.Order.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
 import org.example.backend.model.Product;
@@ -58,8 +55,6 @@ public class OrderService {
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
 
-        Product product = productRepository.findById(request.productId())
-                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         Order parent = null;
         if (request.parentOrderId() != null) {
@@ -67,18 +62,20 @@ public class OrderService {
                     .orElse(null);
         }
 
-        Order order = Order.builder()
-                .amount(request.amount())
-                .observation(request.observation())
-                .status(OrderStatus.IN_PREPARE)
-                .orderedTime(LocalDateTime.now())
-                .parentOrder(parent)
-                .guestTab(guestTab)
-                .product(product)
-                .waiter(waiter)
-                .build();
+        for(OrderItemDTO item: request.items()){
+            Order order = Order.builder()
+                    .amount(item.amount())
+                    .observation(item.observation())
+                    .status(OrderStatus.SENT)
+                    .orderedTime(LocalDateTime.now())
+                    .parentOrder(parent)
+                    .guestTab(guestTab)
+                    .product(productRepository.findById(item.productId()).orElseThrow())
+                    .waiter(waiter)
+                    .build();
 
-        orderRepository.save(order);
+            orderRepository.save(order);
+        }
 
         return true;
     }

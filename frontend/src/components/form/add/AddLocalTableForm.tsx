@@ -56,9 +56,9 @@ export function AddLocalTableForm({className, onSubmit}: {className?: string, on
 
     return (
         <div className="flex flex-col items-center mt-10 space-y-8 md:space-y-6">
-            <Card className="w-full md:max-w-[700px] lg:max-w-[900px] mx-auto">
+            <Card className="w-full md:max-w-[467px] lg:max-w-[600px] mx-auto">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl">Nova mesa</CardTitle>
+                    <CardTitle className="text-2xl">Cadastrar nova mesa</CardTitle>
                     <CardDescription>
                         Informe o número da mesa que será cadastrada
                     </CardDescription>

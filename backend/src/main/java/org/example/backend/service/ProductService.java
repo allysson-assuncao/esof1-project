@@ -1,6 +1,6 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.Product.ProductDTO;
+import org.example.backend.dto.Product.ProductRegisterDTO;
 import org.example.backend.dto.Product.ProductByCategoryDTO;
 import org.example.backend.dto.Product.SimpleProductDTO;
 import org.example.backend.model.Category;
@@ -26,18 +26,18 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public void registerProduct(ProductDTO productDTO) {
-        if (productRepository.existsByName(productDTO.name())) {
-            throw new RuntimeException("Produto já existe com o nome: " + productDTO.name());
+    public void registerProduct(ProductRegisterDTO productRegisterDTO) {
+        if (productRepository.existsByName(productRegisterDTO.name())) {
+            throw new RuntimeException("Produto com o nome " + productRegisterDTO.name() + "já existe");
         }
 
-        Category category = categoryRepository.findById(productDTO.idCategory())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
+        Category category = categoryRepository.findById(productRegisterDTO.idCategory())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productRegisterDTO.idCategory()));
 
         Product product = Product.builder()
-                .name(productDTO.name())
-                .description(productDTO.description())
-                .price(productDTO.price())
+                .name(productRegisterDTO.name())
+                .description(productRegisterDTO.description())
+                .price(productRegisterDTO.price())
                 .category(category)
                 .active(true)
                 .build();
@@ -45,10 +45,10 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductRegisterDTO> getAllProducts() {
         return productRepository.findAll()
                 .stream()
-                .map(product -> new ProductDTO(
+                .map(product -> new ProductRegisterDTO(
                         product.getName(),
                         product.getDescription(),
                         product.getPrice(),
@@ -57,21 +57,21 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public Product updateProductById(UUID id, ProductDTO productDTO) {
+    public Product updateProductById(UUID id, ProductRegisterDTO productRegisterDTO) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
 
-        boolean nameChanged = !existingProduct.getName().equals(productDTO.name());
-        if (nameChanged && productRepository.existsByName(productDTO.name())) {
-            throw new RuntimeException("Já existe outro produto com o nome: " + productDTO.name());
+        boolean nameChanged = !existingProduct.getName().equals(productRegisterDTO.name());
+        if (nameChanged && productRepository.existsByName(productRegisterDTO.name())) {
+            throw new RuntimeException("Já existe outro produto com o nome: " + productRegisterDTO.name());
         }
 
-        Category category = categoryRepository.findById(productDTO.idCategory())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productDTO.idCategory()));
+        Category category = categoryRepository.findById(productRegisterDTO.idCategory())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productRegisterDTO.idCategory()));
 
-        existingProduct.setName(productDTO.name());
-        existingProduct.setDescription(productDTO.description());
-        existingProduct.setPrice(productDTO.price());
+        existingProduct.setName(productRegisterDTO.name());
+        existingProduct.setDescription(productRegisterDTO.description());
+        existingProduct.setPrice(productRegisterDTO.price());
         existingProduct.setCategory(category);
 
         return productRepository.save(existingProduct);
