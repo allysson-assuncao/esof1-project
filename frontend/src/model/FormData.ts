@@ -42,7 +42,7 @@ export interface RegisterOrdersFormData {
   guestTabId: number;
   parentOrderId: number | null;
   waiterEmail: string;
-  orders: RegisterOrderItemDTO[];
+  items: RegisterOrderItemDTO[];
 }
 
 export type CategoryFormData = {

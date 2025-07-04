@@ -33,14 +33,14 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
     const form = useForm<RegisterOrdersFormData>({
         resolver: zodResolver(registerOrdersFormSchema),
         defaultValues: {
-            orders: [{productId: '', amount: 1, observation: ''}],
+            items: [{productId: '', amount: 1, observation: ''}],
         },
         mode: 'onBlur',
     });
 
     const {fields, append, remove} = useFieldArray({
         control: form.control,
-        name: "orders",
+        name: "items",
     });
 
     const mutation = useMutation({
@@ -74,7 +74,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
             guestTabId,
             parentOrderId,
             waiterEmail: waiterEmail,
-            orders: data.orders.map(order => ({
+            items: data.items.map(order => ({
                 productId: order.productId,
                 amount: order.amount,
                 observation: order.observation,
@@ -86,7 +86,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
     const handleAddMore = async () => {
         // Check first item before adding the next
         const lastIndex = fields.length - 1;
-        const result = await form.trigger(`orders.${lastIndex}`);
+        const result = await form.trigger(`items.${lastIndex}`);
         if (result) {
             append({productId: '', amount: 1, observation: ''});
             setActiveAccordionItem(`item-${lastIndex + 1}`);
@@ -112,7 +112,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
                     onValueChange={setActiveAccordionItem}
                 >
                     {fields.map((field, index) => {
-                        const productValue = form.watch(`orders.${index}.productId`);
+                        const productValue = form.watch(`items.${index}.productId`);
                         const selectedProduct = products?.find(p => p.id === productValue);
                         const triggerText = selectedProduct
                             ? `Pedido ${index + 1}: ${selectedProduct.name}`
@@ -125,7 +125,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
                                     <div className="grid gap-4 p-1">
                                         <FormField
                                             control={form.control}
-                                            name={`orders.${index}.productId`}
+                                            name={`items.${index}.productId`}
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Produto</FormLabel>
@@ -149,7 +149,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
                                         />
                                         <FormField
                                             control={form.control}
-                                            name={`orders.${index}.amount`}
+                                            name={`items.${index}.amount`}
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Quantidade</FormLabel>
@@ -166,7 +166,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
                                         />
                                         <FormField
                                             control={form.control}
-                                            name={`orders.${index}.observation`}
+                                            name={`items.${index}.observation`}
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Observação</FormLabel>

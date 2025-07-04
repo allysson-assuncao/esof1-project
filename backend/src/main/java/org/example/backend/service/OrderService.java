@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
-import org.example.backend.model.Product;
 import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
@@ -49,7 +48,7 @@ public class OrderService {
     // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
     @Transactional
     public boolean registerOrder(OrderRequestDTO request) {
-        User waiter = userRepository.findByEmail(request.userEmail())
+        User waiter = userRepository.findByEmail(request.waiterEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
 
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
@@ -62,12 +61,14 @@ public class OrderService {
                     .orElse(null);
         }
 
+        LocalDateTime now = LocalDateTime.now();
+
         for(OrderItemDTO item: request.items()){
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
                     .status(OrderStatus.SENT)
-                    .orderedTime(LocalDateTime.now())
+                    .orderedTime(now)
                     .parentOrder(parent)
                     .guestTab(guestTab)
                     .product(productRepository.findById(item.productId()).orElseThrow())
