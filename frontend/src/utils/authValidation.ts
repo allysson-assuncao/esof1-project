@@ -33,7 +33,7 @@ export const productRegisterSchema = z.object({
     price: z.number()
         .min(0.01)
         .max(99999.99),
-    categoryId: z.string().nonempty('Escolha uma categoria'),
+    idCategory: z.string().nonempty('Escolha uma categoria'),
 })
 
 export const localTableRegisterSchema = z.object({

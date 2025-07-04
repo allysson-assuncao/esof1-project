@@ -14,6 +14,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {registerProduct} from "@/services/productService";
 import {ProductRegisterFormData} from "@/model/FormData";
 import {Icons} from "@/public/icons";
+import {Textarea} from "@/components/ui/textarea";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 export function AddProductForm({className, onSubmit}: { className?: string; onSubmit?: (data: unknown) => void }) {
 
@@ -44,14 +46,14 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
         ["simpleCategories"], fetchSimpleCategories
     );
 
-    const mutation = useMutation((data: any)=> {
+    const mutation = useMutation((data: any) => {
         console.log('mutation called')
         return registerProduct(data);
     }, {
         onSuccess: (data) => {
 
             toast.success("Produto cadastrado com sucesso!", {
-                description: `${data.productName}!`,
+                /*description: `${data.productName}!`,*/
             })
         },
 
@@ -72,7 +74,7 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
         // Convert priceInput (string) to float for backend
         const normalized = priceInput.replace(/\./g, '').replace(',', '.');
         const price = parseFloat(normalized);
-        const submitData = { ...data, price };
+        const submitData = {...data, price};
         if (onSubmit) {
             onSubmit(submitData);
         } else {
@@ -80,7 +82,7 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
         }
     }
 
-    return(
+    return (
         <div className="flex flex-col items-center mt-10 space-y-8 md:space-y-6">
             <Card className="w-full md:max-w-[467px] lg:max-w-[600px] mx-auto">
                 <CardHeader className="space-y-1">
@@ -110,32 +112,27 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
                                 <FormField
                                     control={form.control}
                                     name="idCategory"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Categoria</FormLabel>
                                             <FormControl>
-                                                {isLoading ? (
-                                                    <div className="flex items-center justify-center p-4 border rounded-md bg-muted/50">
-                                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                                                        Carregando categorias...
-                                                    </div>
-                                                ) : error ? (
-                                                    <div className="flex items-center justify-center p-4 border rounded-md text-destructive bg-destructive/10">
-                                                        Erro ao carregar categorias
-                                                    </div>
-                                                ) : (
-                                                    <select
-                                                        className="w-full border rounded-md p-2"
-                                                        {...field}
-                                                    >
-                                                        <option value="">Selecione uma categoria...</option>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                    disabled={isLoading}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder={isLoading ? "Carregando..." : "Selecione uma categoria..."}/>
+                                                    </SelectTrigger>
+                                                    <SelectContent>
                                                         {simpleCategories?.map((category) => (
-                                                            <option key={category.id} value={category.id}>
+                                                            <SelectItem key={category.id} value={category.id}>
                                                                 {category.name}
-                                                            </option>
+                                                            </SelectItem>
                                                         ))}
-                                                    </select>
-                                                )}
+                                                    </SelectContent>
+                                                </Select>
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
@@ -145,19 +142,20 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
                                 <FormField
                                     control={form.control}
                                     name="price"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Preço</FormLabel>
                                             <FormControl>
                                                 <>
                                                     <input
                                                         type="hidden"
-                                                        {...form.register('price', { valueAsNumber: true })}
+                                                        {...form.register('price', {valueAsNumber: true})}
                                                         value={field.value}
                                                     />
                                                     <div className="flex items-center w-32">
-                                                        <span className="px-2 py-1 bg-muted border border-r-0 rounded-l-md text-gray-700">R$</span>
-                                                        <input
+                                                        <span
+                                                            className="px-2 py-1 bg-muted border border-r-0 rounded-l-md text-gray-700">R$</span>
+                                                        <Input
                                                             type="text"
                                                             inputMode="numeric"
                                                             pattern="[0-9,\.]*"
@@ -174,7 +172,7 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
                                                                 setPriceInput(formatted);
                                                                 // Update form value as number
                                                                 const asNumber = parseFloat(`${parseInt(reais, 10)}.${cents}`);
-                                                                form.setValue('price', asNumber, { shouldValidate: true });
+                                                                form.setValue('price', asNumber, {shouldValidate: true});
                                                             }}
                                                         />
                                                     </div>
@@ -188,11 +186,11 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
                                 <FormField
                                     control={form.control}
                                     name="description"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Descrição</FormLabel>
                                             <FormControl>
-                                                <textarea
+                                                <Textarea
                                                     className="w-full border rounded-md p-2 min-h-[120px] resize-vertical"
                                                     placeholder="Descreva o produto..."
                                                     {...field}
@@ -209,7 +207,8 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
                                         type="submit"
                                         disabled={mutation.isLoading}
                                     >
-                                        {mutation.isLoading ? <Icons.spinner className="animate-spin"/> : 'Cadastrar Produto'}
+                                        {mutation.isLoading ?
+                                            <Icons.spinner className="animate-spin"/> : 'Cadastrar Produto'}
                                     </Button>
                                 </div>
                             </div>
