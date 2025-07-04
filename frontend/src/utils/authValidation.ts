@@ -26,6 +26,16 @@ export const workstationRegisterSchema = z.object({
     categoryIds: z.array(z.string())
 })
 
+export const productRegisterSchema = z.object({
+    name: z.string()
+        .min(3, {message: 'O nome é obrigatório e deve ter pelo menos 3 caracteres'}),
+    description: z.string(),
+    price: z.number()
+        .min(0.01)
+        .max(99999.99),
+    categoryId: z.string().nonempty('Escolha uma categoria'),
+})
+
 export const localTableRegisterSchema = z.object({
     number: z.number()
         .min(1, {message: 'O número da mesa deve ser maior que 0'})

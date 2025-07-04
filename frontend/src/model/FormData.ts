@@ -16,6 +16,13 @@ export interface WorkstationRegisterFormData {
     categoryIds: string[];
 }
 
+export interface ProductRegisterFormData {
+    name: string;
+    description: string;
+    price: number;
+    idCategory: string;
+}
+
 export interface LocalTableRegisterFormData {
     number: number;
 }
