@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.Workstation.SimpleWorkstationDTO;
 import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Workstation;
@@ -45,5 +46,11 @@ public class WorkstationService {
         return true;
     }
 
+    public List<SimpleWorkstationDTO> getAllWorkstations() {
+        return workstationRepository.findAll()
+                .stream()
+                .map(SimpleWorkstationDTO::fromEntity)
+                .toList();
+    }
 
 }
