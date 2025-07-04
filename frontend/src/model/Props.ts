@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import {UserRole} from "@/model/Interfaces";
+import {DisplayOrderItem, UserRole} from "@/model/Interfaces";
 
 export interface ProtectedRouteProps {
     children: ReactNode;
@@ -16,4 +16,9 @@ export interface AddOrderDialogProps {
     guestTabId: number;
     parentOrderId?: number | null;
     buttonText: string;
+}
+
+export interface AdditionalOrdersContainerProps {
+  guestTabId: number;
+  parentOrder: DisplayOrderItem;
 }

@@ -18,7 +18,7 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/co
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Icons} from "@/public/icons";
 import {Textarea} from "@/components/ui/textarea";
-import {fetchSimpleProducts} from "@/services/productService";
+import {fetchSimpleProductsIfAdditional} from "@/services/productService";
 
 export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFormProps) {
     const queryClient = useQueryClient();
@@ -26,8 +26,8 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
     const [activeAccordionItem, setActiveAccordionItem] = useState<string>("item-0");
 
     const {data: products, isLoading: isLoadingProducts} = useQuery<SimpleProduct[]>(
-        ['simpleProducts'],
-        fetchSimpleProducts
+        ['simpleProducts', parentOrderId],
+        () => fetchSimpleProductsIfAdditional(parentOrderId != null)
     );
 
     const form = useForm<RegisterOrdersFormData>({
@@ -115,8 +115,8 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
                         const productValue = form.watch(`items.${index}.productId`);
                         const selectedProduct = products?.find(p => p.id === productValue);
                         const triggerText = selectedProduct
-                            ? `Pedido ${index + 1}: ${selectedProduct.name}`
-                            : `Pedido ${index + 1}`;
+                            ? parentOrderId ? `Adicional ${index + 1}: ${selectedProduct.name}` : `Pedido ${index + 1}: ${selectedProduct.name}`
+                            : parentOrderId ? `Adicional ${index + 1}` : `Pedido ${index + 1}`;
 
                         return (
                             <AccordionItem value={`item-${index}`} key={field.id}>
@@ -193,10 +193,10 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
 
                 <div className="flex flex-col sm:flex-row gap-2">
                     <Button type="button" variant="outline" onClick={handleAddMore} className="w-full">
-                        Adicionar mais um pedido
+                        {parentOrderId ? 'Adicionar mais um adicional' : 'Adicionar mais um item'}
                     </Button>
                     <Button type="submit" disabled={mutation.isLoading} className="w-full">
-                        {mutation.isLoading ? <Icons.spinner className="animate-spin"/> : 'Salvar Pedidos'}
+                        {mutation.isLoading ? <Icons.spinner className="animate-spin"/> : parentOrderId ? 'Salvar Adicionais' : 'Salvar Itens do Pedido'}
                     </Button>
                 </div>
             </form>

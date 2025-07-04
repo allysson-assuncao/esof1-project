@@ -103,4 +103,14 @@ public class ProductService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public List<SimpleProductDTO> selectAllSimpleIfAdditional() {
+        return productRepository.findByCategoryName("Adicional")
+                .stream()
+                .map(product -> new SimpleProductDTO(
+                        product.getId(),
+                        product.getName()
+                ))
+                .collect(Collectors.toList());
+    }
 }

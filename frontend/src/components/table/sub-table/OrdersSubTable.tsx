@@ -2,18 +2,31 @@ import {ColumnDef, flexRender, getCoreRowModel, useReactTable} from "@tanstack/r
 import {DisplayOrderItem, OrderStatus} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
-import React from "react";
+import React, {useEffect} from "react";
 import {getExpandedRowModel} from "@tanstack/table-core";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {AddOrderDialog} from "@/components/dialog/AddOrderDialog";
+import {AdditionalOrdersContainer} from "@/components/container/AdditionalOrdersContainer";
 
-const getOrderColumns = (): ColumnDef<DisplayOrderItem>[] => [
+const getOrderColumns = (parentOrderId: number | null): ColumnDef<DisplayOrderItem>[] => [
     {
         id: "expander",
         header: () => null,
         cell: ({row}) => {
-            const canExpand = row.original.additionalOrders && row.original.additionalOrders.length > 0;
-            return canExpand ? (
+            // Um item principal (onde a tabela pai tem parentOrderId nulo) SEMPRE pode ser expandido
+            // para mostrar o contêiner de adicionais.
+            const isMainOrderItem = parentOrderId === null;
+            if (isMainOrderItem) {
+                return (
+                    <button {...{onClick: () => row.toggleExpanded(!row.getIsExpanded())}}>
+                        {row.getIsExpanded() ? <ChevronDown/> : <ChevronRight/>}
+                    </button>
+                );
+            }
+
+            // Um item adicional só pode ser expandido se ele mesmo tiver filhos.
+            const canExpandAdditional = row.original.additionalOrders && row.original.additionalOrders.length > 0;
+            return canExpandAdditional ? (
                 <button {...{onClick: () => row.toggleExpanded(!row.getIsExpanded())}}>
                     {row.getIsExpanded() ? <ChevronDown/> : <ChevronRight/>}
                 </button>
@@ -59,7 +72,7 @@ export const OrdersSubTable = ({
     parentOrderId?: number | null
 }) => {
 
-    const columns = React.useMemo(() => getOrderColumns(), []);
+    const columns = React.useMemo(() => getOrderColumns(parentOrderId), [parentOrderId]);
 
     const table = useReactTable({
         data: orders,
@@ -67,6 +80,10 @@ export const OrdersSubTable = ({
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
     });
+
+    useEffect(() => {
+        console.log(`[useEffect] A instância da tabela mudou. O parentOrderId AGORA é:`, parentOrderId);
+    }, [parentOrderId]);
 
     return (
         <div className="p-4 bg-muted/40 pl-6">
@@ -96,28 +113,15 @@ export const OrdersSubTable = ({
                             {row.getIsExpanded() && (
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="p-0">
-                                        <OrdersSubTable
-                                            orders={row.original.additionalOrders}
+                                        <AdditionalOrdersContainer
                                             guestTabId={guestTabId}
-                                            parentOrderId={row.original.id}
+                                            parentOrder={row.original}
                                         />
                                     </TableCell>
                                 </TableRow>
                             )}
                         </React.Fragment>
                     ))}
-
-                    {parentOrderId !== null && (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center">
-                                <AddOrderDialog
-                                    guestTabId={guestTabId}
-                                    parentOrderId={parentOrderId}
-                                    buttonText="Adicionar Item Adicional"
-                                />
-                            </TableCell>
-                        </TableRow>
-                    )}
                 </TableBody>
             </Table>
         </div>

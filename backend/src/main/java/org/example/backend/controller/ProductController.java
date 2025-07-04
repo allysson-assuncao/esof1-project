@@ -48,6 +48,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllSimpleProducts());
     }
 
+    @GetMapping("/select-all-simple/{isAdditional}")
+    @Operation(summary = "selectAllSimple – Exibe todos os produtos da base de dados de forma simplificada, se for para pedidos adicionais, apenas produtos da categoria adicional")
+    public ResponseEntity<List<SimpleProductDTO>> selectAllSimpleIfAdditional(@PathVariable boolean isAdditional) {
+        return ResponseEntity.ok(isAdditional ? productService.selectAllSimpleIfAdditional() : productService.getAllSimpleProducts());
+    }
 
     @PutMapping("/update/{id}")
     @Operation(summary = "updateProductById – Recebe o ID de um produto e abre body para edição das informações do produto")
