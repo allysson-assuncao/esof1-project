@@ -1,5 +1,3 @@
-import {UUID} from "node:crypto";
-
 export interface LoginFormData {
     email: string;
     password: string;
@@ -26,3 +24,23 @@ export interface GuestTabRegisterFormData {
     localTableId: string;
     guestName: string;
 }
+
+export interface RegisterOrderItemDTO {
+  productId: string;
+  amount: number;
+  observation?: string;
+}
+
+export interface RegisterOrdersFormData {
+  guestTabId: number;
+  parentOrderId: number | null;
+  waiterEmail: string;
+  orders: RegisterOrderItemDTO[];
+}
+
+export type CategoryFormData = {
+    name: string;
+    isMultiple: boolean;
+    subcategories: string[];
+    workstationId: string;
+};

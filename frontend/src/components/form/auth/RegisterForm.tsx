@@ -59,7 +59,7 @@ const RegisterForm = () => {
     const mutation = useMutation(registerRequest, {
         onSuccess: (data) => {
             dispatch(logout())
-            dispatch(signup({username: data.username, token: data.token, role: data.role}))
+            dispatch(signup({username: data.username, email: data.email, role: data.role, token: data.token}))
             router.push('dashboard/home')
 
             toast.success("Usuário cadastrado com sucesso!", {

@@ -33,7 +33,7 @@ const LoginForm = () => {
     const mutation = useMutation(loginRequest, {
         onSuccess: (data) => {
             dispatch(logout())
-            dispatch(login({username: data.username, token: data.token, role: data.role}))
+            dispatch(login({username: data.username, email: data.email, role: data.role, token: data.token}))
             router.push('dashboard/home')
 
             toast.success("Login realizado com sucesso!", {

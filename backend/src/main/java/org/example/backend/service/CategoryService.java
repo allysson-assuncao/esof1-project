@@ -199,4 +199,14 @@ public class CategoryService {
                 subDtos
         );
     }
+
+    public List<SimpleCategoryDTO> getRootCategories() {
+        // Busca todas as categorias que não têm pai
+        List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
+
+        // Mapeia para o DTO simples
+        return rootCategories.stream()
+                .map(this::toSimpleCategoryDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -32,7 +32,11 @@ public class AuthService {
         User user = this.userRepository.findByEmail(userLoginDTO.email()).orElseThrow(() -> new EntityNotFoundException("Usuário com email " + userLoginDTO.email() + " não encontrado"));
         if (this.passwordEncoder.matches(userLoginDTO.password(), user.getPassword())) {
             String token = this.tokenService.generateToken(user);
-            return Optional.of(new AuthResponseDTO(user.getUsername(), token, user.getRole()));
+            return Optional.of(AuthResponseDTO.builder()
+                    .username(userLoginDTO.email())
+                    .email(user.getEmail())
+                    .role(user.getRole())
+                    .token(token).build());
         }
         return Optional.empty();
     }
@@ -55,7 +59,11 @@ public class AuthService {
         this.userRepository.save(newUser);
 
         String token = this.tokenService.generateToken(newUser);
-        return Optional.of(new AuthResponseDTO(newUser.getUsername(), token, newUser.getRole()));
+        return Optional.of(AuthResponseDTO.builder()
+                    .username(userRegisterDTO.email())
+                    .email(newUser.getEmail())
+                    .role(newUser.getRole())
+                    .token(token).build());
     }
 
 }

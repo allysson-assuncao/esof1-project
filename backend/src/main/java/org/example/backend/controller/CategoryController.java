@@ -51,9 +51,15 @@ public class CategoryController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
     @GetMapping("/structure")
     @Operation(summary = "getCategoryStructure – busca apenas as categorias raiz e, para cada uma, monta a árvore de subcategorias recursivamente")
     public ResponseEntity<List<HierarchicalCategoryDTO>> getCategoryStructure() {
         return ResponseEntity.ok(categoryService.getCategoryTree());
+    }
+
+    @GetMapping("/select-root")
+    public List<SimpleCategoryDTO> getRootCategories() {
+        return categoryService.getRootCategories();
     }
 }

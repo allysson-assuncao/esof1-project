@@ -58,8 +58,8 @@ public class GuestTabController {
             @RequestBody GuestTabFilterDTO filterDto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "startTime") String orderBy,
-            @RequestParam(defaultValue = "DESC") Sort.Direction direction
+            @RequestParam(defaultValue = "timeOpened") String orderBy,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
         System.out.println(filterDto.toString());
         Page<GuestTabDTO> guestTabPage = this.guestTabService.getGuestTabByFilters(filterDto, page, size, orderBy, direction);

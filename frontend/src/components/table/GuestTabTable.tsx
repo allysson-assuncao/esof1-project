@@ -37,7 +37,8 @@ const GuestTabTable = ({localTableId} : { localTableId: string}) => {
                     filter: selectedFilters,
                     page: page,
                     size: pageSize,
-                    direction: 'DESC',
+                    orderBy: 'timeOpened',
+                    direction: 'ASC',
                 })
                 setTotalPages(res.totalPages)
                 setCachedPages((prev) => ({...prev, [page]: res.content}))

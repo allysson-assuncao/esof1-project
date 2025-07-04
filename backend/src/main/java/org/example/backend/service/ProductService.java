@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.Product.ProductDTO;
 import org.example.backend.dto.Product.ProductByCategoryDTO;
+import org.example.backend.dto.Product.SimpleProductDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
@@ -89,6 +90,16 @@ public class ProductService {
                         product.getDescription(),
                         product.getPrice(),
                         product.getCategory().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<SimpleProductDTO> getAllSimpleProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> new SimpleProductDTO(
+                        product.getId(),
+                        product.getName()
                 ))
                 .collect(Collectors.toList());
     }
