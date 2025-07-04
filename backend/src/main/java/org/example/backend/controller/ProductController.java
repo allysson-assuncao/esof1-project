@@ -1,7 +1,7 @@
 package org.example.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.example.backend.dto.Product.ProductDTO;
+import org.example.backend.dto.Product.ProductRegisterDTO;
 import org.example.backend.dto.Product.ProductByCategoryDTO;
 import org.example.backend.dto.Product.SimpleProductDTO;
 import org.example.backend.service.ProductService;
@@ -27,7 +27,7 @@ public class ProductController {
 
     @PostMapping("/register")
     @Operation(summary = "registerProduct – Endpoint para cadastro de novos produtos")
-    public ResponseEntity<?> registerProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<?> registerProduct(@RequestBody ProductRegisterDTO productDTO) {
         try {
             productService.registerProduct(productDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body("Produto cadastrado com sucesso!");
@@ -38,7 +38,7 @@ public class ProductController {
 
     @GetMapping("/select-all")
     @Operation(summary = "selectAll – Exibe todos os produtos da base de dados")
-    public ResponseEntity<List<ProductDTO>> selectAll() {
+    public ResponseEntity<List<ProductRegisterDTO>> selectAll() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
@@ -48,10 +48,15 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllSimpleProducts());
     }
 
+    @GetMapping("/select-all-simple/{isAdditional}")
+    @Operation(summary = "selectAllSimple – Exibe todos os produtos da base de dados de forma simplificada, se for para pedidos adicionais, apenas produtos da categoria adicional")
+    public ResponseEntity<List<SimpleProductDTO>> selectAllSimpleIfAdditional(@PathVariable boolean isAdditional) {
+        return ResponseEntity.ok(isAdditional ? productService.selectAllSimpleIfAdditional() : productService.getAllSimpleProducts());
+    }
 
     @PutMapping("/update/{id}")
     @Operation(summary = "updateProductById – Recebe o ID de um produto e abre body para edição das informações do produto")
-    public ResponseEntity<?> updateProductById(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
+    public ResponseEntity<?> updateProductById(@PathVariable UUID id, @RequestBody ProductRegisterDTO productDTO) {
         try {
             productService.updateProductById(id, productDTO);
             return ResponseEntity.ok("Produto atualizado com sucesso!");

@@ -16,6 +16,13 @@ export interface WorkstationRegisterFormData {
     categoryIds: string[];
 }
 
+export interface ProductRegisterFormData {
+    name: string;
+    description: string;
+    price: number;
+    idCategory: string;
+}
+
 export interface LocalTableRegisterFormData {
     number: number;
 }
@@ -35,7 +42,7 @@ export interface RegisterOrdersFormData {
   guestTabId: number;
   parentOrderId: number | null;
   waiterEmail: string;
-  orders: RegisterOrderItemDTO[];
+  items: RegisterOrderItemDTO[];
 }
 
 export type CategoryFormData = {

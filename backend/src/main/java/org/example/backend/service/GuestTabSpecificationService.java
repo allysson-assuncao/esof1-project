@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.example.backend.dto.GuestTab.GuestTabFilterDTO;
 import org.example.backend.model.*;
+import org.example.backend.model.enums.GuestTabStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +53,16 @@ public class GuestTabSpecificationService {
                 );
             }
 
-            if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
+            /*if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
                 predicates.add(root.get("status").in(filterDto.guestTabStatuses()));
-            }
+            }*/
+
+            predicates.add(
+                    criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("status"), GuestTabStatus.OPEN),
+                            criteriaBuilder.isNull(root.get("id"))
+                    )
+            );
 
             if (filterDto.orderStatuses() != null && !filterDto.orderStatuses().isEmpty()) {
                 predicates.add(

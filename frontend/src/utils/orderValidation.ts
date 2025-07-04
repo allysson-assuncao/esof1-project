@@ -7,6 +7,6 @@ export const registerOrderItemSchema = z.object({
 });
 
 export const registerOrdersFormSchema = z.object({
-  orders: z.array(registerOrderItemSchema)
+  items: z.array(registerOrderItemSchema)
     .min(1, { message: "É necessário adicionar pelo menos um pedido." }),
 });

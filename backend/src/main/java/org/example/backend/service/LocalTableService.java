@@ -59,21 +59,19 @@ public class LocalTableService {
                 .collect(Collectors.toList());
 
         Collections.sort(gridTables);
-        return  gridTables;
+        return gridTables;
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
         if (localTable == null) return null;
 
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
-        int guestTabCountToday = this.localTableRepository.findGuestTabCountTodayById(localTable.getId(), startOfDay, endOfDay);
+        int guestTabCountOpen = this.localTableRepository.findOpenGuestTabCountById(localTable.getId());
 
         return LocalTableDTO.builder()
                 .id(localTable.getId())
                 .number(localTable.getNumber())
                 .status(localTable.getStatus())
-                .guestTabCountToday(guestTabCountToday)
+                .guestTabCountToday(guestTabCountOpen)
                 .build();
     }
 

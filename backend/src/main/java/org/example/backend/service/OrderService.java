@@ -1,14 +1,10 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.Order.*;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.dto.Order.DetailedOrderDTO;
-import org.example.backend.dto.Order.OrderDTO;
-import org.example.backend.dto.Order.OrderRequestDTO;
-import org.example.backend.dto.Order.SimpleOrderDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.Order;
-import org.example.backend.model.Product;
 import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
@@ -52,14 +48,12 @@ public class OrderService {
     // Test Product id: 408da554-1205-45df-8608-54f5fad1d365
     @Transactional
     public boolean registerOrder(OrderRequestDTO request) {
-        User waiter = userRepository.findByEmail(request.userEmail())
+        User waiter = userRepository.findByEmail(request.waiterEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
 
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
 
-        Product product = productRepository.findById(request.productId())
-                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         Order parent = null;
         if (request.parentOrderId() != null) {
@@ -67,18 +61,22 @@ public class OrderService {
                     .orElse(null);
         }
 
-        Order order = Order.builder()
-                .amount(request.amount())
-                .observation(request.observation())
-                .status(OrderStatus.IN_PREPARE)
-                .orderedTime(LocalDateTime.now())
-                .parentOrder(parent)
-                .guestTab(guestTab)
-                .product(product)
-                .waiter(waiter)
-                .build();
+        LocalDateTime now = LocalDateTime.now();
 
-        orderRepository.save(order);
+        for(OrderItemDTO item: request.items()){
+            Order order = Order.builder()
+                    .amount(item.amount())
+                    .observation(item.observation())
+                    .status(OrderStatus.SENT)
+                    .orderedTime(now)
+                    .parentOrder(parent)
+                    .guestTab(guestTab)
+                    .product(productRepository.findById(item.productId()).orElseThrow())
+                    .waiter(waiter)
+                    .build();
+
+            orderRepository.save(order);
+        }
 
         return true;
     }

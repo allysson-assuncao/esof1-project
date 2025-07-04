@@ -1,17 +1,13 @@
-import React, {useState} from "react";
-import {cn} from "@/lib/utils";
-import {Label} from "@/components/ui/label";
+import React from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {MultiSelect} from "@/components/ui/multi-select";
 import {useMutation, useQuery} from "react-query";
 import {SimpleCategory} from "@/model/Interfaces";
 import {fetchSimpleCategories} from "@/services/categoryService";
-import {useRouter} from "next/navigation";
-import {useDispatch} from "react-redux";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {registerSchema, workstationRegisterSchema} from "@/utils/authValidation";
+import {workstationRegisterSchema} from "@/utils/authValidation";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
@@ -21,9 +17,6 @@ import {WorkstationRegisterFormData} from "@/model/FormData";
 import {Icons} from "@/public/icons";
 
 export function AddWorkstationForm({className, onSubmit}: { className?: string; onSubmit?: (data: unknown) => void }) {
-    const router = useRouter();
-    const dispatch = useDispatch();
-
     const form = useForm<WorkstationRegisterFormData>({
         resolver: zodResolver(workstationRegisterSchema),
         defaultValues: {
@@ -39,8 +32,6 @@ export function AddWorkstationForm({className, onSubmit}: { className?: string; 
 
     const mutation = useMutation(registerRequest, {
         onSuccess: (data) => {
-            router.push('/dashboard/table/grid')
-
             toast.success("Estação cadastrada com sucesso!", {
                 description: `${data.workstationName}!`,
             })
@@ -68,7 +59,7 @@ export function AddWorkstationForm({className, onSubmit}: { className?: string; 
 
     return(
         <div className="flex flex-col items-center mt-10 space-y-8 md:space-y-6">
-            <Card className="w-full md:max-w-[700px] lg:max-w-[900px] mx-auto">
+            <Card className="w-full md:max-w-[467px] lg:max-w-[600px] mx-auto">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl">Nova estação de trabalho</CardTitle>
                     <CardDescription>
