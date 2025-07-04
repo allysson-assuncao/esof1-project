@@ -8,7 +8,7 @@ import {AxiosError} from "axios";
 
 import {categoryRegisterSchema} from "@/utils/authValidation";
 import {CategoryFormData} from "@/model/FormData";
-import {fetchSimpleCategories, registerCategoryService} from "@/services/categoryService";
+import {fetchRootCategories, fetchSimpleCategories, registerCategoryService} from "@/services/categoryService";
 import {
     Card, CardHeader, CardTitle, CardDescription, CardContent
 } from "@/components/ui/card";
@@ -70,7 +70,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
         else mutation.mutate(data);
     };
 
-    const { data: categories = [] } = useQuery("categories", fetchSimpleCategories);
+    const { data: rootCategories = [] } = useQuery("root-categories", fetchRootCategories);
     const { data: workstations = [] } = useQuery("workstations", fetchWorkstations);
 
     return (
@@ -184,7 +184,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                         >
                                                             <SelectTrigger className="w-[40px]" />
                                                             <SelectContent>
-                                                                {categories.map((cat) => (
+                                                                {rootCategories.map((cat) => (
                                                                     <SelectItem key={cat.id} value={cat.name}>
                                                                         {cat.name}
                                                                     </SelectItem>

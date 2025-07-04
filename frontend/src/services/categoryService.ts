@@ -66,3 +66,12 @@ export const fetchSimpleCategories = async (): Promise<SimpleCategory[]> => {
         throw new Error("Não foi possível carregar as categorias.");
     }
 };
+
+export const fetchRootCategories = async (): Promise<SimpleCategory[]> => {
+    const response = await category.get("/select-root", {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+    return response.data;
+};
