@@ -146,10 +146,10 @@ export function GuestTabDataTable<TValue>({
             label: tab.userName,
         })) ?? [];
 
-    const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
+    /*const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
         value,
         label,
-    }));
+    }));*/
 
     const orderStatusOptions = Object.entries(OrderStatus).map(([, {value, label}]) => ({
         value,
@@ -225,7 +225,7 @@ export function GuestTabDataTable<TValue>({
                     animation={2}
                     maxCount={3}
                 />
-                <MultiSelect
+                {/*<MultiSelect
                     options={guestTabStatusOptions}
                     onValueChange={(selectedValues) => setSelectedFilters({
                         ...selectedFilters,
@@ -235,7 +235,7 @@ export function GuestTabDataTable<TValue>({
                     placeholder="Selecione o status da comanda"
                     animation={2}
                     maxCount={3}
-                />
+                />*/}
                 <MultiSelect
                     options={orderStatusOptions}
                     onValueChange={(selectedValues) => setSelectedFilters({
