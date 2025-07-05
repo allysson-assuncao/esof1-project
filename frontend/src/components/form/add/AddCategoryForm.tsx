@@ -8,7 +8,7 @@ import {AxiosError} from "axios";
 
 import {categoryRegisterSchema} from "@/utils/authValidation";
 import {CategoryFormData} from "@/model/FormData";
-import {fetchRootCategories, fetchSimpleCategories, registerCategoryService} from "@/services/categoryService";
+import {fetchRootCategories, registerCategoryService} from "@/services/categoryService";
 import {
     Card, CardHeader, CardTitle, CardDescription, CardContent
 } from "@/components/ui/card";
@@ -22,7 +22,7 @@ import {Icons} from "@/public/icons";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {fetchWorkstations} from "@/services/workstationService";
 
-export function AddCategoryForm({className, onSubmit}: {className?: string, onSubmit?: (data: unknown) => void}) {
+export function AddCategoryForm({onSubmit}: { className?: string, onSubmit?: (data: unknown) => void }) {
     const router = useRouter();
     const queryClient = useQueryClient();
 
@@ -52,15 +52,22 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
             });
         },
         onError: (error: unknown) => {
+            let errorMessage = "Ocorreu um erro inesperado. Tente novamente.";
+
             if (error instanceof AxiosError) {
-                toast.error("Erro ao cadastrar", {
-                    description: error.response?.data?.message || "Erro inesperado.",
-                });
-            } else {
-                toast.error("Erro ao cadastrar", {
-                    description: "Erro inesperado.",
-                });
+                const responseData = error.response?.data;
+
+                if (typeof responseData === 'string' && responseData) {
+                    errorMessage = responseData;
+                } else if (responseData && typeof responseData === 'object' && 'message' in responseData) {
+                    errorMessage = (responseData as any).message;
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
             }
+            toast.error("Erro ao cadastrar categoria", {
+                description: errorMessage,
+            });
         },
     });
 
@@ -70,8 +77,8 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
         else mutation.mutate(data);
     };
 
-    const { data: rootCategories = [] } = useQuery("root-categories", fetchRootCategories);
-    const { data: workstations = [] } = useQuery("workstations", fetchWorkstations);
+    const {data: rootCategories = []} = useQuery("root-categories", fetchRootCategories);
+    const {data: workstations = []} = useQuery("workstations", fetchWorkstations);
 
     return (
         <div className="flex flex-col items-center mt-10 space-y-8 md:space-y-6">
@@ -92,13 +99,13 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                         <FormField
                                             control={form.control}
                                             name="name"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Nome</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="Ex: Bebidas" {...field} />
                                                     </FormControl>
-                                                    <FormMessage />
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
@@ -108,7 +115,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                     <FormField
                                         control={form.control}
                                         name="isMultiple"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem className="flex items-center gap-2 mt-6">
                                                 <FormLabel className="text-base m-0">Múltipla seleção</FormLabel>
                                                 <FormControl className="p-0 m-0">
@@ -129,7 +136,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                 <FormField
                                     control={form.control}
                                     name="workstationId"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Estação de trabalho</FormLabel>
                                             <FormControl>
@@ -139,7 +146,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                     className="w-full max-w-[300px]"
                                                 >
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Selecione uma estação" />
+                                                        <SelectValue placeholder="Selecione uma estação"/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {workstations.map((ws) => (
@@ -150,7 +157,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
@@ -167,7 +174,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                 key={field.id}
                                                 control={form.control}
                                                 name={inputName}
-                                                render={({ field }) => (
+                                                render={({field}) => (
                                                     <FormItem className="flex items-end gap-3">
                                                         <FormControl className="flex-shrink-0 w-[250px]">
                                                             <Input
@@ -182,7 +189,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                             value=""
                                                             onValueChange={(val) => form.setValue(inputName, val)}
                                                         >
-                                                            <SelectTrigger className="w-[40px]" />
+                                                            <SelectTrigger className="w-[40px]"/>
                                                             <SelectContent>
                                                                 {rootCategories.map((cat) => (
                                                                     <SelectItem key={cat.id} value={cat.name}>
@@ -202,7 +209,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                             ✕
                                                         </Button>
 
-                                                        <FormMessage />
+                                                        <FormMessage/>
                                                     </FormItem>
                                                 )}
                                             />
@@ -228,7 +235,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                         disabled={mutation.isLoading}
                                     >
                                         {mutation.isLoading
-                                            ? <Icons.spinner className="animate-spin" />
+                                            ? <Icons.spinner className="animate-spin"/>
                                             : "Cadastrar Categoria"}
                                     </Button>
                                 </div>

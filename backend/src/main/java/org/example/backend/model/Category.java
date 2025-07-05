@@ -49,4 +49,7 @@ public class Category {
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
 
+    public Category(String name) {
+        this.name = name;
+    }
 }
