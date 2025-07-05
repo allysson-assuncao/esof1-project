@@ -14,3 +14,12 @@ export const fetchWorkstations = async () => {
     });
     return response.data;
 };
+
+export const fetchSimpleWorkstationsByEmployee = async () => {
+    const response = await workstation.get("/select-all-by-employee", {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+    });
+    return response.data;
+};

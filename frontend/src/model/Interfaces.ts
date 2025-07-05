@@ -6,6 +6,8 @@ export type LocalTableStatus = keyof typeof LocalTableStatus;
 
 export type OrderStatus = keyof typeof OrderStatus;
 
+export type OrderKanbanStatus = keyof typeof OrderKanbanStatus;
+
 export const UserRoles = {
     ADMIN: {value: 'ADMIN', label: 'Administrador'},
     CASHIER: {value: 'CASHIER', label: 'Caixa'},
@@ -27,9 +29,17 @@ export const LocalTableStatus = {
 } as const
 
 export const OrderStatus = {
+    SENT: {value: 'SENT', label: 'Enviado'},
     IN_PREPARE: {value: 'IN_PREPARE', label: 'Em Preparo'},
     READY: {value: 'READY', label: 'Pronta'},
+    DELIVERED: {value: 'DELIVERED', label: 'Entregue'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
+} as const
+
+export const OrderKanbanStatus = {
+    SENT: {value: 'SENT', label: 'Enviado'},
+    IN_PREPARE: {value: 'IN_PREPARE', label: 'Em Preparo'},
+    READY: {value: 'READY', label: 'Pronta'},
 } as const
 
 export interface GuestTabFilters {
@@ -115,6 +125,11 @@ export interface SimpleProduct {
     name: string;
 }
 
+export interface SimpleWorkstation {
+    id: string;
+    name: string;
+}
+
 export interface HierarchicalCategoryDTO {
     id: string;
     name: string;
@@ -127,4 +142,27 @@ export interface ProductDTO {
     description: string;
     price: number;
     idCategory: string;
+}
+
+export interface OrderKanban {
+    id: number;
+    productName: string;
+    amount: number;
+    observation?: string;
+    orderedTime: string;
+    status: OrderStatus;
+    additionalOrders: OrderKanban[];
+    workstationId: string;
+}
+
+export interface KanbanOrderResultsFilter {
+    workstationIds: string[],
+}
+
+export interface FetchKanbanOrderResultsParams {
+    filter: KanbanOrderResultsFilter;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    direction?: 'ASC' | 'DESC';
 }
