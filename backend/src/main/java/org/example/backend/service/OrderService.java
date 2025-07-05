@@ -63,7 +63,7 @@ public class OrderService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        for(OrderItemDTO item: request.items()){
+        for (OrderItemDTO item : request.items()) {
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
@@ -82,7 +82,7 @@ public class OrderService {
     }
 
 
-    public List<DetailedOrderDTO> selectOrdersByGuestTabId (Long guestTabId) {
+    public List<DetailedOrderDTO> selectOrdersByGuestTabId(Long guestTabId) {
         return orderRepository.findByGuestTabId(guestTabId).stream()
                 .map(this::convertToDetailedOrderDTO)
                 .collect(Collectors.toList());
@@ -122,6 +122,17 @@ public class OrderService {
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(OrderDTO::new).toList();
+    }
+
+    @Transactional
+    public void advanceStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+        OrderStatus currentStatus = order.getStatus();
+        LocalDateTime orderTime = order.getOrderedTime();
+    }
+
+    @Transactional
+    public void regressStatus(Long orderId) {
     }
 
     /*@Transactional

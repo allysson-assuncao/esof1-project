@@ -30,6 +30,18 @@ public class OrderController {
                 ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
     }
 
+    @PostMapping("/{orderId}/advance")
+    public ResponseEntity<Void> advanceOrderStatus(@PathVariable Long orderId) {
+        orderService.advanceStatus(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/regress")
+    public ResponseEntity<Void> regressOrderStatus(@PathVariable Long orderId) {
+        orderService.regressStatus(orderId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/queue")
     public ResponseEntity<List<DetailedOrderDTO>> getQueue() {
         return ResponseEntity.ok(this.orderService.getQueue());
@@ -50,15 +62,6 @@ public class OrderController {
         return this.orderService.getAllOrders();
     }
 
-    /*@GetMapping("/get/in-prepare/bar")
-    public List<OrderDTO> getOrdersInPrepareAndBar() {
-        return this.orderService.getOrdersInPrepareAndBar();
-    }
-
-    @GetMapping("/get/in-prepare/kitchen")
-    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
-        return this.orderService.getOrdersInPrepareAndKitchen();
-    }*/
 
     /*@PostMapping("/filter")
     public ResponseEntity<OrderKanbanResponseDTO> getKanbanData(
