@@ -171,7 +171,7 @@ export function AddCategoryForm({className, onSubmit}: {className?: string, onSu
                                                     <FormItem className="flex items-end gap-3">
                                                         <FormControl className="flex-shrink-0 w-[250px]">
                                                             <Input
-                                                                placeholder={`Ex.: Bar`}
+                                                                placeholder={`Ex.: Drink`}
                                                                 {...field}
                                                                 onChange={(e) => field.onChange(e.target.value)}
                                                                 value={field.value || ""}
