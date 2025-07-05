@@ -1,8 +1,11 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,15 +64,16 @@ public class OrderController {
     }*/
 
     /*@PostMapping("/filter")
-    public ResponseEntity<OrderKanbanResponseDTO> getKanbanData(
+    public ResponseEntity<FilteredPageDTO<OrderKanbanResponseDTO>> getFilteredKanbanOrders(
             @RequestBody OrderKanbanFilterDTO filterDTO,
+            @RequestParam OrderStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size,
             @RequestParam(defaultValue = "orderedTime") String orderBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
-        OrderKanbanResponseDTO response = this.orderService.getOrdersForKanban(filterDTO, page, size, orderBy, direction);
-        return ResponseEntity.ok(response);
+        Page<OrderKanbanResponseDTO> resultPage = orderService.getFilteredKanbanOrders(filterDTO, status, page, size, orderBy, direction);
+        return ResponseEntity.ok(new FilteredPageDTO<>(resultPage.getContent(), resultPage.getTotalPages()));
     }*/
 
 }

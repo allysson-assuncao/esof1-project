@@ -1,6 +1,11 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.model.GuestTab;
@@ -15,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -63,7 +70,7 @@ public class OrderService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        for(OrderItemDTO item: request.items()){
+        for (OrderItemDTO item : request.items()) {
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
@@ -82,7 +89,7 @@ public class OrderService {
     }
 
 
-    public List<DetailedOrderDTO> selectOrdersByGuestTabId (Long guestTabId) {
+    public List<DetailedOrderDTO> selectOrdersByGuestTabId(Long guestTabId) {
         return orderRepository.findByGuestTabId(guestTabId).stream()
                 .map(this::convertToDetailedOrderDTO)
                 .collect(Collectors.toList());
@@ -123,6 +130,48 @@ public class OrderService {
         return orderRepository.findAll().stream()
                 .map(OrderDTO::new).toList();
     }
+
+    /*@Transactional(readOnly = true)
+    public OrderKanbanResponseDTO getFilteredKanbanOrders(OrderKanbanFilterDTO filterDTO, int page, int size, String orderBy, Sort.Direction direction) {
+
+        Map<OrderStatus, FilteredPageDTO<OrderKanbanResponseDTO>> columns = new EnumMap<>(OrderStatus.class);
+
+        List<OrderStatus> kanbanStatuses = List.of(OrderStatus.SENT, OrderStatus.IN_PREPARE, OrderStatus.READY);
+
+        for (OrderStatus status : kanbanStatuses) {
+            Specification<Order> spec = specificationService.getKanbanSpecification(filterDTO, status);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
+
+            Page<Order> orderPage = this.orderRepository.findAll(spec, pageable);
+
+            Page<OrderCardDTO> dtoPage = orderPage.map(this::toOrderCardDTO);
+
+            columns.put(status, new FilteredPageDTO<>(dtoPage.getContent(), dtoPage.getTotalPages(), dtoPage.getTotalElements()));
+        }
+
+        return new OrderKanbanResponseDTO(columns);
+    }
+
+    private OrderCardDTO toOrderCardDTO(Order order) {
+        if (order == null) {
+            return null;
+        }
+
+        List<OrderCardDTO> additionalOrdersDTOs = order.getAdditionalOrders().stream()
+                .map(this::toOrderCardDTO) // Chamada recursiva para mapear os filhos
+                .collect(Collectors.toList());
+
+        return OrderCardDTO.builder()
+                .id(order.getId())
+                .productName(order.getProduct().getName()) // Assumindo que Product está carregado
+                .amount(order.getAmount())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .status(order.getStatus())
+                .workstationId(order.getWorkstation().getId())
+                .additionalOrders(additionalOrdersDTOs)
+                .build();
+    }*/
 
     /*@Transactional
     public List<OrderDTO> getOrdersInPrepareAndBar() {
