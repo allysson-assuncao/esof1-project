@@ -32,6 +32,15 @@ public class Order {
     @Column(name = "ordered_time", nullable = false)
     private LocalDateTime orderedTime;
 
+    @Column(name = "preparation_time", nullable = false)
+    private LocalDateTime preparationTime;
+
+    @Column(name = "ready_time", nullable = false)
+    private LocalDateTime readyTime;
+
+    @Column(name = "closed_time", nullable = false)
+    private LocalDateTime closedTime; // delivered or canceled, this treats both
+
     @OneToMany(mappedBy = "parentOrder", cascade = CascadeType.ALL)
     private Set<Order> additionalOrders;
 

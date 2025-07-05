@@ -3,6 +3,7 @@ package org.example.backend.service;
 import org.example.backend.dto.Workstation.SimpleWorkstationDTO;
 import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.model.Category;
+import org.example.backend.model.User;
 import org.example.backend.model.Workstation;
 import org.example.backend.repository.CategoryRepository;
 import org.example.backend.repository.WorkstationRepository;
@@ -10,11 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkstationService {
-    private WorkstationRepository workstationRepository;
-    private CategoryRepository categoryRepository;
+    private final WorkstationRepository workstationRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
     public WorkstationService(WorkstationRepository workstationRepository, CategoryRepository categoryRepository) {
@@ -51,6 +53,21 @@ public class WorkstationService {
                 .stream()
                 .map(SimpleWorkstationDTO::fromEntity)
                 .toList();
+    }
+
+    public List<SimpleWorkstationDTO> getAllWorkstationsByEmployee(User user) {
+        Set<Workstation> userWorkstations = user.getWorkstations();
+        List<Workstation> workstations;
+
+        if (userWorkstations != null && !userWorkstations.isEmpty()) {
+            workstations = new ArrayList<>(userWorkstations);
+        } else {
+            workstations = workstationRepository.findAll();
+        }
+
+        return workstations.stream()
+                .map(SimpleWorkstationDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
 }
