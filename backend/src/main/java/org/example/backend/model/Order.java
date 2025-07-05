@@ -8,6 +8,12 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Table(name = "orders")
+@NamedEntityGraph(
+        name = "Order.withAdditionalOrders",
+        attributeNodes = {
+                @NamedAttributeNode("additionalOrders")
+        }
+)
 @Entity
 @Data
 @Builder
@@ -29,16 +35,16 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(name = "ordered_time", nullable = false)
+    @Column(name = "ordered_time")
     private LocalDateTime orderedTime;
 
-    @Column(name = "preparation_time", nullable = false)
+    @Column(name = "preparation_time")
     private LocalDateTime preparationTime;
 
-    @Column(name = "ready_time", nullable = false)
+    @Column(name = "ready_time")
     private LocalDateTime readyTime;
 
-    @Column(name = "closed_time", nullable = false)
+    @Column(name = "closed_time")
     private LocalDateTime closedTime; // delivered or canceled, this treats both
 
     @OneToMany(mappedBy = "parentOrder", cascade = CascadeType.ALL)

@@ -7,5 +7,4 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface WorkstationRepository extends JpaRepository<Workstation, UUID> {
-    Set<Workstation> findAllBy(UUID userId);
 }

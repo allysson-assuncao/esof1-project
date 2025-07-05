@@ -1,11 +1,9 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.Order.DetailedOrderDTO;
-import org.example.backend.dto.Order.SimpleOrderDTO;
-import org.example.backend.dto.Order.OrderDTO;
-import org.example.backend.dto.Order.OrderRequestDTO;
+import org.example.backend.dto.Order.*;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +58,18 @@ public class OrderController {
     @GetMapping("/get/in-prepare/kitchen")
     public List<OrderDTO> getOrdersInPrepareAndKitchen() {
         return this.orderService.getOrdersInPrepareAndKitchen();
+    }*/
+
+    /*@PostMapping("/filter")
+    public ResponseEntity<OrderKanbanResponseDTO> getKanbanData(
+            @RequestBody OrderKanbanFilterDTO filterDTO,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "orderedTime") String orderBy,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction
+    ) {
+        OrderKanbanResponseDTO response = this.orderService.getOrdersForKanban(filterDTO, page, size, orderBy, direction);
+        return ResponseEntity.ok(response);
     }*/
 
 }
