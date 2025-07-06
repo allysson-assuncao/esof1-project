@@ -10,13 +10,13 @@ export const fetchSimpleProducts = async () => {
     return response.data;
 };
 
-export const fetchSimpleProductsIfAdditional = async (isAdditional: boolean) => {
-    const response = await product.get(`/select-all-simple/${isAdditional}`, {
+export const fetchSimpleProductsIfAdditional = async (parentId: number) => {
+    const response = await product.get(`/select-all-simple/${parentId}`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
     });
-    console.log(isAdditional);
+    console.log(response.data);
     return response.data;
 };
 
