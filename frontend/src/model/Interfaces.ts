@@ -152,7 +152,7 @@ export interface OrderKanban {
     orderedTime: string;
     status: OrderStatus;
     additionalOrders: OrderKanban[];
-    workstationId: string;
+    workstationName: string;
 }
 
 export interface KanbanOrderResultsFilter {

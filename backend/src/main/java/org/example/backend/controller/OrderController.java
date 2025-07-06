@@ -63,17 +63,16 @@ public class OrderController {
         return this.orderService.getOrdersInPrepareAndKitchen();
     }*/
 
-    /*@PostMapping("/filter")
-    public ResponseEntity<FilteredPageDTO<OrderKanbanResponseDTO>> getFilteredKanbanOrders(
-            @RequestBody OrderKanbanFilterDTO filterDTO,
-            @RequestParam OrderStatus status,
+    @PostMapping("/filter-kanban")
+    public ResponseEntity<KanbanOrdersDTO> getKanbanData(
+            @RequestBody OrderKanbanFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "orderedTime") String orderBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
-        Page<OrderKanbanResponseDTO> resultPage = orderService.getFilteredKanbanOrders(filterDTO, status, page, size, orderBy, direction);
-        return ResponseEntity.ok(new FilteredPageDTO<>(resultPage.getContent(), resultPage.getTotalPages()));
-    }*/
+        KanbanOrdersDTO kanbanData = this.orderService.getOrdersForKanban(filter, page, size, orderBy, direction);
+        return ResponseEntity.ok(kanbanData);
+    }
 
 }

@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,9 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.EnumMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -131,47 +131,47 @@ public class OrderService {
                 .map(OrderDTO::new).toList();
     }
 
-    /*@Transactional(readOnly = true)
-    public OrderKanbanResponseDTO getFilteredKanbanOrders(OrderKanbanFilterDTO filterDTO, int page, int size, String orderBy, Sort.Direction direction) {
+    @Transactional(readOnly = true)
+    public KanbanOrdersDTO getOrdersForKanban(OrderKanbanFilterDTO filter, int page, int size, String orderBy, Sort.Direction direction) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
 
-        Map<OrderStatus, FilteredPageDTO<OrderKanbanResponseDTO>> columns = new EnumMap<>(OrderStatus.class);
+        FilteredPageDTO<FilteredOrderKanbanDTO> sentOrders = findOrdersByStatus(filter, OrderStatus.SENT, pageable);
+        FilteredPageDTO<FilteredOrderKanbanDTO> inPrepareOrders = findOrdersByStatus(filter, OrderStatus.IN_PREPARE, pageable);
+        FilteredPageDTO<FilteredOrderKanbanDTO> readyOrders = findOrdersByStatus(filter, OrderStatus.READY, pageable);
 
-        List<OrderStatus> kanbanStatuses = List.of(OrderStatus.SENT, OrderStatus.IN_PREPARE, OrderStatus.READY);
-
-        for (OrderStatus status : kanbanStatuses) {
-            Specification<Order> spec = specificationService.getKanbanSpecification(filterDTO, status);
-            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
-
-            Page<Order> orderPage = this.orderRepository.findAll(spec, pageable);
-
-            Page<OrderCardDTO> dtoPage = orderPage.map(this::toOrderCardDTO);
-
-            columns.put(status, new FilteredPageDTO<>(dtoPage.getContent(), dtoPage.getTotalPages(), dtoPage.getTotalElements()));
-        }
-
-        return new OrderKanbanResponseDTO(columns);
+        return KanbanOrdersDTO.builder()
+                .sentOrders(sentOrders)
+                .inPrepareOrders(inPrepareOrders)
+                .readyOrders(readyOrders)
+                .build();
     }
 
-    private OrderCardDTO toOrderCardDTO(Order order) {
-        if (order == null) {
-            return null;
-        }
+    private FilteredPageDTO<FilteredOrderKanbanDTO> findOrdersByStatus(OrderKanbanFilterDTO filter, OrderStatus status, Pageable pageable) {
+        Specification<Order> spec = orderSpecificationService.getOrderKanbanSpecification(filter, status);
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
 
-        List<OrderCardDTO> additionalOrdersDTOs = order.getAdditionalOrders().stream()
-                .map(this::toOrderCardDTO) // Chamada recursiva para mapear os filhos
-                .collect(Collectors.toList());
+        Page<FilteredOrderKanbanDTO> dtoPage = orderPage.map(this::mapOrderToDto);
+        return new FilteredPageDTO<>(dtoPage.getContent(), dtoPage.getTotalPages()/*, dtoPage.getTotalElements()*/);
+    }
 
-        return OrderCardDTO.builder()
+    private FilteredOrderKanbanDTO mapOrderToDto(Order order) {
+        return FilteredOrderKanbanDTO.builder()
                 .id(order.getId())
-                .productName(order.getProduct().getName()) // Assumindo que Product está carregado
+                .productName(order.getProduct().getName()) // Assumindo que Product tem um getName()
                 .amount(order.getAmount())
                 .observation(order.getObservation())
                 .orderedTime(order.getOrderedTime())
                 .status(order.getStatus())
-                .workstationId(order.getWorkstation().getId())
-                .additionalOrders(additionalOrdersDTOs)
+                .workstationName(order.getWorkstation() != null ? order.getWorkstation().getName() : "N/A") // Assumindo getName()
+                .additionalOrders(
+                        order.getAdditionalOrders() != null ?
+                                order.getAdditionalOrders().stream()
+                                        .map(this::mapOrderToDto)
+                                        .collect(Collectors.toList())
+                                : Collections.emptyList()
+                )
                 .build();
-    }*/
+    }
 
     /*@Transactional
     public List<OrderDTO> getOrdersInPrepareAndBar() {
