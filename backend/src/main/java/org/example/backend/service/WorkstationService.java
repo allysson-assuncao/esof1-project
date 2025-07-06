@@ -9,6 +9,7 @@ import org.example.backend.repository.CategoryRepository;
 import org.example.backend.repository.WorkstationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ public class WorkstationService {
                 .toList();
     }
 
+    @Transactional
     public List<SimpleWorkstationDTO> getAllWorkstationsByEmployee(User user) {
         Set<Workstation> userWorkstations = user.getWorkstations();
         List<Workstation> workstations;
