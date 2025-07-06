@@ -20,14 +20,14 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findByCategoryId(UUID categoryId);
 
-    @Query("SELECT p FROM Product p " +
-            "WHERE SIZE(p.category.subCategories) = 0 " +
-            "AND SIZE(p.orders) > 0")
+    List<Product> findByCategory_SubCategoriesIsEmptyAndOrdersIsNotEmpty();
+
+    List<Product> findByCategory_SubCategoriesIsNotEmptyAndOrdersIsNotEmpty();
+
+    @Query("SELECT p FROM Product p JOIN p.category c WHERE c.subCategories IS EMPTY")
     List<Product> findProductsWithCategoryWithoutSubcategoriesAndWithOrders();
 
-    @Query("SELECT p FROM Product p " +
-            "WHERE SIZE(p.category.subCategories) > 0 " +
-            "AND SIZE(p.orders) > 0")
+    @Query("SELECT p FROM Product p JOIN p.category c WHERE c.subCategories IS NOT EMPTY")
     List<Product> findProductsWithCategoryWithSubcategoriesAndWithOrders();
 
 }
