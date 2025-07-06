@@ -74,7 +74,7 @@ const data = {
                 },
                 {
                     title: "Pedidos por Área",
-                    url: '/dashboard/table/workspace',
+                    url: '/dashboard/table/orders-by-workstation',
                 },
             ],
         },

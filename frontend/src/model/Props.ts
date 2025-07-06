@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import {DisplayOrderItem, UserRole} from "@/model/Interfaces";
+import {DisplayOrderItem, OrderStatus, UserRole} from "@/model/Interfaces";
 
 export interface ProtectedRouteProps {
     children: ReactNode;
@@ -21,4 +21,9 @@ export interface AddOrderDialogProps {
 export interface AdditionalOrdersContainerProps {
   guestTabId: number;
   parentOrder: DisplayOrderItem;
+}
+
+export interface MakeOrderColumnsProps {
+    onAdvanceStatus: (orderId: number, newStatus: OrderStatus) => void;
+    onRevertStatus: (orderId: number, newStatus: OrderStatus) => void;
 }

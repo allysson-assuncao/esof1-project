@@ -166,3 +166,15 @@ export interface FetchKanbanOrderResultsParams {
     orderBy?: string;
     direction?: 'ASC' | 'DESC';
 }
+
+export interface FilteredPage<T> {
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+}
+
+export interface KanbanOrders {
+    sent: FilteredPage<OrderKanban>;
+    inPrepare: FilteredPage<OrderKanban>;
+    ready: FilteredPage<OrderKanban>;
+}

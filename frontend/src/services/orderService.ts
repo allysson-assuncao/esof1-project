@@ -1,6 +1,6 @@
 import {order} from "@/services/index";
 import {RegisterOrdersFormData} from "@/model/FormData";
-import {FetchKanbanOrderResultsParams, OrderStatus} from "@/model/Interfaces";
+import {FetchKanbanOrderResultsParams, KanbanOrders, OrderStatus} from "@/model/Interfaces";
 
 export const registerOrdersRequest = async (data: RegisterOrdersFormData) => {
     const response = await order.post(`/register`, data, {
@@ -23,7 +23,7 @@ export const fetchSimpleOrders = async (localTableId: string) => {
     return response.data;
 };
 
-export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderResultsParams) => {
+export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderResultsParams): Promise<KanbanOrders> => {
     const response = await order.post(`/filter`, params.filter, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -42,5 +42,10 @@ export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderRe
 
 export const nextOrderStatus = async ({ orderId, currentStatus }: { orderId: number; currentStatus: OrderStatus }) => {
     const response = await order.get(`/order/${orderId}/next-status/${currentStatus}`);
+    return response.data;
+};
+
+export const previousOrderStatus = async ({ orderId, currentStatus }: { orderId: number; currentStatus: OrderStatus }) => {
+    const response = await order.get(`/order/${orderId}/previous-status/${currentStatus}`);
     return response.data;
 };

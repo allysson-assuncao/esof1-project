@@ -157,12 +157,12 @@ public class OrderService {
     private FilteredOrderKanbanDTO mapOrderToDto(Order order) {
         return FilteredOrderKanbanDTO.builder()
                 .id(order.getId())
-                .productName(order.getProduct().getName()) // Assumindo que Product tem um getName()
+                .productName(order.getProduct().getName())
                 .amount(order.getAmount())
                 .observation(order.getObservation())
                 .orderedTime(order.getOrderedTime())
                 .status(order.getStatus())
-                .workstationName(order.getWorkstation() != null ? order.getWorkstation().getName() : "N/A") // Assumindo getName()
+                .workstationName(order.getWorkstation() != null ? order.getWorkstation().getName() : "N/A")
                 .additionalOrders(
                         order.getAdditionalOrders() != null ?
                                 order.getAdditionalOrders().stream()
