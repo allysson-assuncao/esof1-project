@@ -65,10 +65,6 @@ const data = {
                     url: '/dashboard/table/grid',
                 },
                 {
-                    title: "Lista de Comandas",
-                    url: '/dashboard/table/guest-tabs/',
-                },
-                {
                     title: "Cardápio",
                     url: '/dashboard/menu',
                 },

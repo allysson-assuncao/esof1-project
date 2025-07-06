@@ -105,7 +105,7 @@ public class ProductService {
     }
 
     public List<SimpleProductDTO> selectAllSimpleIfAdditional() {
-        return productRepository.findByCategoryName("Adicional")
+        return productRepository.findByCategoryParentName("Adicional")
                 .stream()
                 .map(product -> new SimpleProductDTO(
                         product.getId(),
