@@ -24,7 +24,7 @@ export const fetchSimpleOrders = async (localTableId: string) => {
 };
 
 export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderResultsParams): Promise<KanbanOrders> => {
-    const response = await order.post(`/filter`, params.filter, {
+    const response = await order.post(`/filter-kanban`, params.filter, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'ngrok-skip-browser-warning': '69420',
@@ -37,6 +37,7 @@ export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderRe
         },
     })
     console.log(params.filter)
+    console.log(response.data)
     return response.data
 }
 

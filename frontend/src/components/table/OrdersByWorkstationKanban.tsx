@@ -118,7 +118,7 @@ export const OrdersByWorkstationKanban = () => {
     const inPrepareOrders = useMemo(() => data?.pages.flatMap(page => page.inPrepare.content) ?? [], [data]);
     const readyOrders = useMemo(() => data?.pages.flatMap(page => page.ready.content) ?? [], [data]);
 
-    if (isLoadingOrders && !data) return <div>Carregando Pedidos...</div>;
+    if (isLoadingOrders) return <div>Carregando Pedidos...</div>;
     if (error) return <div>Erro carregando os dados</div>
 
     const kanbanQueues = [

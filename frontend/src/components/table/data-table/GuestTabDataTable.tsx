@@ -14,7 +14,7 @@ import {
     DisplayGuestTabItem,
     SimpleGuestTab,
     GuestTabFilters,
-    GuestTabStatus, OrderStatus, SimpleOrder, SimpleWaiter
+    OrderStatus, SimpleOrder, SimpleWaiter
 } from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";

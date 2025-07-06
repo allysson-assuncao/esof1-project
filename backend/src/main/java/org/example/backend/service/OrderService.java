@@ -136,6 +136,7 @@ public class OrderService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
 
         FilteredPageDTO<FilteredOrderKanbanDTO> sentOrders = findOrdersByStatus(filter, OrderStatus.SENT, pageable);
+        System.out.println(sentOrders);
         FilteredPageDTO<FilteredOrderKanbanDTO> inPrepareOrders = findOrdersByStatus(filter, OrderStatus.IN_PREPARE, pageable);
         FilteredPageDTO<FilteredOrderKanbanDTO> readyOrders = findOrdersByStatus(filter, OrderStatus.READY, pageable);
 

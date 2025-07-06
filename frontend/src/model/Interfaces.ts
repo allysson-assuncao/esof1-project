@@ -170,7 +170,6 @@ export interface FetchKanbanOrderResultsParams {
 export interface FilteredPage<T> {
     content: T[];
     totalPages: number;
-    totalElements: number;
 }
 
 export interface KanbanOrders {
