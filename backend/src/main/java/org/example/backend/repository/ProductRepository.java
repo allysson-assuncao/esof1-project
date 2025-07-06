@@ -33,11 +33,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
                 JOIN cat.subCategories subCat
                 WHERE o.id = :parentOrderId
             )
-            OR p.category.id = (
-                SELECT prod.category.id FROM Order o
-                JOIN o.product prod
-                WHERE o.id = :parentOrderId
-            )
             """)
     List<Product> findProductsFromParentOrderCategoryAndSubcategories(@Param("parentOrderId") Long parentOrderId);
 
