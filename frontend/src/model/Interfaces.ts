@@ -173,7 +173,7 @@ export interface FilteredPage<T> {
 }
 
 export interface KanbanOrders {
-    sent: FilteredPage<OrderKanban>;
-    inPrepare: FilteredPage<OrderKanban>;
-    ready: FilteredPage<OrderKanban>;
+    sentOrders: FilteredPage<OrderKanban>;
+    inPrepareOrders: FilteredPage<OrderKanban>;
+    readyOrders: FilteredPage<OrderKanban>;
 }

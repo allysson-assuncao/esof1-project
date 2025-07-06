@@ -71,7 +71,9 @@ public class OrderController {
             @RequestParam(defaultValue = "orderedTime") String orderBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
+        System.out.println(filter);
         KanbanOrdersDTO kanbanData = this.orderService.getOrdersForKanban(filter, page, size, orderBy, direction);
+        System.out.println(kanbanData);
         return ResponseEntity.ok(kanbanData);
     }
 

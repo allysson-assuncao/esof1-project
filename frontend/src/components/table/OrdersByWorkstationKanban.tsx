@@ -14,6 +14,7 @@ import {toast} from "sonner";
 import {AxiosError} from "axios";
 import {OrdersByWorkstationDataTable} from "@/components/table/data-table/OrdersByWorkstationDataTable";
 import {makeOrderKanbanColumns} from "@/components/table/columns/OrdersByWorkstationColumns";
+import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
 
 export const OrdersByWorkstationKanban = () => {
     const [selectedFilters, setSelectedFilters] = useState<KanbanOrderResultsFilter>({
@@ -45,9 +46,9 @@ export const OrdersByWorkstationKanban = () => {
         }),
         getNextPageParam: (lastPage, allPages) => {
             const nextPage = allPages.length;
-            const hasMore = lastPage.sent.totalPages > nextPage ||
-                lastPage.inPrepare.totalPages > nextPage ||
-                lastPage.ready.totalPages > nextPage;
+            const hasMore = lastPage.sentOrders.totalPages > nextPage ||
+                lastPage.inPrepareOrders.totalPages > nextPage ||
+                lastPage.readyOrders.totalPages > nextPage;
             return hasMore ? nextPage : undefined;
         },
         enabled: !isLoadingWorkstations,
@@ -114,11 +115,11 @@ export const OrdersByWorkstationKanban = () => {
         []
     );
 
-    const sentOrders = useMemo(() => data?.pages.flatMap(page => page.sent.content) ?? [], [data]);
-    const inPrepareOrders = useMemo(() => data?.pages.flatMap(page => page.inPrepare.content) ?? [], [data]);
-    const readyOrders = useMemo(() => data?.pages.flatMap(page => page.ready.content) ?? [], [data]);
+    const sentOrders = useMemo(() => data?.pages.flatMap(page => page.sentOrders.content) ?? [], [data]);
+    const inPrepareOrders = useMemo(() => data?.pages.flatMap(page => page.inPrepareOrders.content) ?? [], [data]);
+    const readyOrders = useMemo(() => data?.pages.flatMap(page => page.readyOrders.content) ?? [], [data]);
 
-    if (isLoadingOrders) return <div>Carregando Pedidos...</div>;
+    if (isLoadingOrders) return <DataTableSkeleton />
     if (error) return <div>Erro carregando os dados</div>
 
     const kanbanQueues = [
