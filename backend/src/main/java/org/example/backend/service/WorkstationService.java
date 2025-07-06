@@ -26,11 +26,11 @@ public class WorkstationService {
     }
 
     public boolean registerWorkstation(WorkstationRegisterDTO workstationRegisterDTO) {
-        if(workstationRegisterDTO == null) return false;
+        if (workstationRegisterDTO == null) return false;
 
         Set<Category> categories = new HashSet<>();
-        for(UUID it: workstationRegisterDTO.categoryIds()){
-            categories.add(categoryRepository.findById(it).orElseThrow());
+        for (UUID it : workstationRegisterDTO.categoryIds()) {
+            categories.add(this.categoryRepository.findById(it).orElseThrow());
         }
 
         Workstation workstation = Workstation.builder()
@@ -40,31 +40,31 @@ public class WorkstationService {
                 .ordersQueue(new ArrayList<>())
                 .build();
 
-        workstationRepository.save(workstation);
-        for(Category it: categories){
+        this.workstationRepository.save(workstation);
+        for (Category it : categories) {
             it.setWorkstation(workstation);
-            categoryRepository.save(it);
+            this.categoryRepository.save(it);
         }
 
         return true;
     }
 
     public List<SimpleWorkstationDTO> getAllWorkstations() {
-        return workstationRepository.findAll()
+        return this.workstationRepository.findAll()
                 .stream()
                 .map(SimpleWorkstationDTO::fromEntity)
                 .toList();
     }
 
-    @Transactional
     public List<SimpleWorkstationDTO> getAllWorkstationsByEmployee(User user) {
-        Set<Workstation> userWorkstations = user.getWorkstations();
+        List<Workstation> userWorkstations = this.workstationRepository.findWorkstationsByUserId(user.getId());
+
         List<Workstation> workstations;
 
-        if (userWorkstations != null && !userWorkstations.isEmpty()) {
-            workstations = new ArrayList<>(userWorkstations);
+        if (!userWorkstations.isEmpty()) {
+            workstations = userWorkstations;
         } else {
-            workstations = workstationRepository.findAll();
+            workstations = this.workstationRepository.findAll();
         }
 
         return workstations.stream()
