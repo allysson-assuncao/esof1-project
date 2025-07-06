@@ -104,8 +104,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<SimpleProductDTO> selectAllSimpleIfAdditional() {
-        return productRepository.findByCategoryParentName("Adicional")
+    public List<SimpleProductDTO> selectAllSimpleIfAdditional(boolean isAdditional) {
+        List<Product> products = isAdditional
+                ? productRepository.findProductsWithCategoryWithoutSubcategoriesAndWithOrders()
+                : productRepository.findProductsWithCategoryWithSubcategoriesAndWithOrders();
+
+        return products
                 .stream()
                 .map(product -> new SimpleProductDTO(
                         product.getId(),
@@ -113,4 +117,5 @@ public class ProductService {
                 ))
                 .collect(Collectors.toList());
     }
+
 }

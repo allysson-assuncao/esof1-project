@@ -20,8 +20,14 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findByCategoryId(UUID categoryId);
 
-    List<Product> findByCategoryName(String categoryName);
+    @Query("SELECT p FROM Product p " +
+            "WHERE SIZE(p.category.subCategories) = 0 " +
+            "AND SIZE(p.orders) > 0")
+    List<Product> findProductsWithCategoryWithoutSubcategoriesAndWithOrders();
 
-    @Query("SELECT p FROM Product p WHERE p.category.parentCategory.name = :parentCategoryName")
-    List<Product> findByCategoryParentName(@Param("parentCategoryName") String parentCategoryName);
+    @Query("SELECT p FROM Product p " +
+            "WHERE SIZE(p.category.subCategories) > 0 " +
+            "AND SIZE(p.orders) > 0")
+    List<Product> findProductsWithCategoryWithSubcategoriesAndWithOrders();
+
 }
