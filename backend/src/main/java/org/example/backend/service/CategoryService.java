@@ -27,7 +27,6 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO registerOrUpdateCategory(CategoryDTO dto) {
-        System.out.println(dto.toString());
         Category parentCategory = categoryRepository.findByName(dto.name())
                 .orElseGet(() -> new Category(dto.name()));
 
