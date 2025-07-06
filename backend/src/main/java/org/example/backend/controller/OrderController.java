@@ -62,6 +62,16 @@ public class OrderController {
         return this.orderService.getAllOrders();
     }
 
+    /*@GetMapping("/get/in-prepare/bar")
+    public List<OrderDTO> getOrdersInPrepareAndBar() {
+        return this.orderService.getOrdersInPrepareAndBar();
+    }
+
+    @GetMapping("/get/in-prepare/kitchen")
+    public List<OrderDTO> getOrdersInPrepareAndKitchen() {
+        return this.orderService.getOrdersInPrepareAndKitchen();
+    }*/
+
     /*@PostMapping("/filter")
     public ResponseEntity<OrderKanbanResponseDTO> getKanbanData(
             @RequestBody OrderKanbanFilterDTO filterDTO,
