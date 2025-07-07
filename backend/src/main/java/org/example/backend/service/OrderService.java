@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -164,30 +165,30 @@ public class OrderService {
     }
 
     private FilteredOrderKanbanDTO mapOrderToDto(Order order) {
-    if (order == null) {
-        return null;
+        if (order == null) {
+            return null;
+        }
+
+        String productName = (order.getProduct() != null) ? order.getProduct().getName() : "N/A";
+        String workstationName = (order.getWorkstation() != null) ? order.getWorkstation().getName() : "N/A";
+
+        List<FilteredOrderKanbanDTO> additionalOrdersDto = (order.getAdditionalOrders() != null)
+                ? order.getAdditionalOrders().stream()
+                .map(this::mapOrderToDto)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        return FilteredOrderKanbanDTO.builder()
+                .id(order.getId())
+                .productName(productName)
+                .amount(order.getAmount())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .status(order.getStatus())
+                .workstationName(workstationName)
+                .additionalOrders(additionalOrdersDto)
+                .build();
     }
-
-    String productName = (order.getProduct() != null) ? order.getProduct().getName() : "N/A";
-    String workstationName = (order.getWorkstation() != null) ? order.getWorkstation().getName() : "N/A";
-
-    List<FilteredOrderKanbanDTO> additionalOrdersDto = (order.getAdditionalOrders() != null)
-            ? order.getAdditionalOrders().stream()
-                    .map(this::mapOrderToDto)
-                    .collect(Collectors.toList())
-            : Collections.emptyList();
-
-    return FilteredOrderKanbanDTO.builder()
-            .id(order.getId())
-            .productName(productName)
-            .amount(order.getAmount())
-            .observation(order.getObservation())
-            .orderedTime(order.getOrderedTime())
-            .status(order.getStatus())
-            .workstationName(workstationName)
-            .additionalOrders(additionalOrdersDto)
-            .build();
-}
 
     @Transactional
     public void advanceStatus(Long orderId) {
