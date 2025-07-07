@@ -4,8 +4,7 @@ import {fetchSimpleWorkstationsByEmployee} from "@/services/workstationService";
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from "react-query";
 import {
     KanbanOrderResultsFilter,
-    SimpleWorkstation,
-    OrderStatus
+    SimpleWorkstation
 } from "@/model/Interfaces";
 import {useMemo, useState} from "react";
 import {MultiSelect} from "@/components/ui/multi-select";
@@ -56,8 +55,8 @@ export const OrdersByWorkstationKanban = () => {
     });
 
     const { mutate: advanceStatus } = useMutation({
-        mutationFn: ({ orderId, currentStatus }: { orderId: number, currentStatus: OrderStatus }) =>
-            nextOrderStatus({ orderId, currentStatus }),
+        mutationFn: ({ orderId }: { orderId: number }) =>
+            nextOrderStatus({ orderId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Avançado!", {
@@ -78,8 +77,8 @@ export const OrdersByWorkstationKanban = () => {
     });
 
     const { mutate: revertStatus } = useMutation({
-        mutationFn: ({ orderId, currentStatus }: { orderId: number, currentStatus: OrderStatus }) =>
-            previousOrderStatus({ orderId, currentStatus }),
+        mutationFn: ({ orderId }: { orderId: number }) =>
+            previousOrderStatus({ orderId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Revertido!", {
@@ -99,12 +98,12 @@ export const OrdersByWorkstationKanban = () => {
         },
     });
 
-    const handleAdvanceStatus = (orderId: number, currentStatus: OrderStatus) => {
-        advanceStatus({ orderId, currentStatus });
+    const handleAdvanceStatus = (orderId: number) => {
+        advanceStatus({ orderId });
     };
 
-    const handleRevertStatus = (orderId: number, currentStatus: OrderStatus) => {
-        revertStatus({ orderId, currentStatus });
+    const handleRevertStatus = (orderId: number) => {
+        revertStatus({ orderId });
     };
 
     const columns = useMemo(

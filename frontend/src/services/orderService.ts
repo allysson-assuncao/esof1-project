@@ -39,12 +39,12 @@ export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderRe
     return response.data
 }
 
-export const nextOrderStatus = async ({ orderId, currentStatus }: { orderId: number; currentStatus: OrderStatus }) => {
-    const response = await order.get(`/order/${orderId}/next-status/${currentStatus}`);
+export const nextOrderStatus = async ({ orderId }: { orderId: number }) => {
+    const response = await order.get(`/order/${orderId}`);
     return response.data;
 };
 
-export const previousOrderStatus = async ({ orderId, currentStatus }: { orderId: number; currentStatus: OrderStatus }) => {
-    const response = await order.get(`/order/${orderId}/previous-status/${currentStatus}`);
+export const previousOrderStatus = async ({ orderId }: { orderId: number }) => {
+    const response = await order.get(`/order/${orderId}`);
     return response.data;
 };

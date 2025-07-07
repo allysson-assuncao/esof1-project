@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import {DisplayOrderItem, OrderStatus, UserRole} from "@/model/Interfaces";
+import {DisplayOrderItem, UserRole} from "@/model/Interfaces";
 
 export interface ProtectedRouteProps {
     children: ReactNode;
@@ -24,6 +24,6 @@ export interface AdditionalOrdersContainerProps {
 }
 
 export interface MakeOrderColumnsProps {
-    onAdvanceStatus: (orderId: number, newStatus: OrderStatus) => void;
-    onRevertStatus: (orderId: number, newStatus: OrderStatus) => void;
+    onAdvanceStatus: (orderId: number) => void;
+    onRevertStatus: (orderId: number) => void;
 }

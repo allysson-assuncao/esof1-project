@@ -65,7 +65,7 @@ export const makeOrderKanbanColumns = ({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => onRevertStatus(order.id, OrderStatus.IN_PREPARE.value)}
+                            onClick={() => onRevertStatus(order.id)}
                         >
                             <ArrowLeft className="h-4 w-4"/>
                         </Button>
@@ -74,7 +74,7 @@ export const makeOrderKanbanColumns = ({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => onRevertStatus(order.id, OrderStatus.READY.value)}
+                            onClick={() => onRevertStatus(order.id)}
                         >
                             <ArrowLeft className="h-4 w-4"/>
                         </Button>
@@ -85,7 +85,7 @@ export const makeOrderKanbanColumns = ({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => onAdvanceStatus(order.id, OrderStatus.SENT.value)}
+                            onClick={() => onAdvanceStatus(order.id)}
                         >
                             <ArrowRight className="h-4 w-4"/>
                         </Button>
@@ -94,7 +94,7 @@ export const makeOrderKanbanColumns = ({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => onAdvanceStatus(order.id, OrderStatus.IN_PREPARE.value)}
+                            onClick={() => onAdvanceStatus(order.id)}
                         >
                             <ArrowRight className="h-4 w-4"/>
                         </Button>
