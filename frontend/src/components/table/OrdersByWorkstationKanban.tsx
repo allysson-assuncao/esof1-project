@@ -45,11 +45,12 @@ export const OrdersByWorkstationKanban = () => {
             size: 20,
         }),
         getNextPageParam: (lastPage, allPages) => {
-            const nextPage = allPages.length;
-            const hasMore = lastPage.sentOrders.totalPages > nextPage ||
-                lastPage.inPrepareOrders.totalPages > nextPage ||
-                lastPage.readyOrders.totalPages > nextPage;
-            return hasMore ? nextPage : undefined;
+            const hasMoreInSent = (lastPage?.sentOrders?.totalPages ?? 0) > allPages.length;
+        const hasMoreInPrepare = (lastPage?.inPrepareOrders?.totalPages ?? 0) > allPages.length;
+        const hasMoreInReady = (lastPage?.readyOrders?.totalPages ?? 0) > allPages.length;
+
+        const hasMore = hasMoreInSent || hasMoreInPrepare || hasMoreInReady;
+        return hasMore ? allPages.length : undefined;
         },
         enabled: !isLoadingWorkstations,
     });

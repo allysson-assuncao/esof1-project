@@ -1,6 +1,7 @@
 package org.example.backend.service;
 
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.example.backend.dto.GuestTab.GuestTabFilterDTO;
 import org.example.backend.dto.Order.OrderKanbanFilterDTO;
@@ -19,13 +20,12 @@ public class OrderSpecificationService {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            Join<Order, Workstation> workstationJoin = root.join("workstation");
-
             predicates.add(criteriaBuilder.isNull(root.get("parentOrder")));
 
             predicates.add(criteriaBuilder.equal(root.get("status"), status));
 
             if (filterDto.workstationIds() != null && !filterDto.workstationIds().isEmpty()) {
+                Join<Order, Workstation> workstationJoin = root.join("workstation", JoinType.LEFT);
                 predicates.add(workstationJoin.get("id").in(filterDto.workstationIds()));
             }
 

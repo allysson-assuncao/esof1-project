@@ -134,9 +134,9 @@ public class OrderService {
     @Transactional(readOnly = true)
     public KanbanOrdersDTO getOrdersForKanban(OrderKanbanFilterDTO filter, int page, int size, String orderBy, Sort.Direction direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
+        System.out.println(pageable);
 
         FilteredPageDTO<FilteredOrderKanbanDTO> sentOrders = findOrdersByStatus(filter, OrderStatus.SENT, pageable);
-        System.out.println(sentOrders);
         FilteredPageDTO<FilteredOrderKanbanDTO> inPrepareOrders = findOrdersByStatus(filter, OrderStatus.IN_PREPARE, pageable);
         FilteredPageDTO<FilteredOrderKanbanDTO> readyOrders = findOrdersByStatus(filter, OrderStatus.READY, pageable);
 
@@ -150,29 +150,37 @@ public class OrderService {
     private FilteredPageDTO<FilteredOrderKanbanDTO> findOrdersByStatus(OrderKanbanFilterDTO filter, OrderStatus status, Pageable pageable) {
         Specification<Order> spec = orderSpecificationService.getOrderKanbanSpecification(filter, status);
         Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+        System.out.println(orderPage.getTotalElements());
 
         Page<FilteredOrderKanbanDTO> dtoPage = orderPage.map(this::mapOrderToDto);
         return new FilteredPageDTO<>(dtoPage.getContent(), dtoPage.getTotalPages()/*, dtoPage.getTotalElements()*/);
     }
 
     private FilteredOrderKanbanDTO mapOrderToDto(Order order) {
-        return FilteredOrderKanbanDTO.builder()
-                .id(order.getId())
-                .productName(order.getProduct().getName())
-                .amount(order.getAmount())
-                .observation(order.getObservation())
-                .orderedTime(order.getOrderedTime())
-                .status(order.getStatus())
-                .workstationName(order.getWorkstation() != null ? order.getWorkstation().getName() : "N/A")
-                .additionalOrders(
-                        order.getAdditionalOrders() != null ?
-                                order.getAdditionalOrders().stream()
-                                        .map(this::mapOrderToDto)
-                                        .collect(Collectors.toList())
-                                : Collections.emptyList()
-                )
-                .build();
+    if (order == null) {
+        return null;
     }
+
+    String productName = (order.getProduct() != null) ? order.getProduct().getName() : "N/A";
+    String workstationName = (order.getWorkstation() != null) ? order.getWorkstation().getName() : "N/A";
+
+    List<FilteredOrderKanbanDTO> additionalOrdersDto = (order.getAdditionalOrders() != null)
+            ? order.getAdditionalOrders().stream()
+                    .map(this::mapOrderToDto)
+                    .collect(Collectors.toList())
+            : Collections.emptyList();
+
+    return FilteredOrderKanbanDTO.builder()
+            .id(order.getId())
+            .productName(productName)
+            .amount(order.getAmount())
+            .observation(order.getObservation())
+            .orderedTime(order.getOrderedTime())
+            .status(order.getStatus())
+            .workstationName(workstationName)
+            .additionalOrders(additionalOrdersDto)
+            .build();
+}
 
     /*@Transactional
     public List<OrderDTO> getOrdersInPrepareAndBar() {
