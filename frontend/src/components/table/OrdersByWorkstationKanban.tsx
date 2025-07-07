@@ -54,13 +54,20 @@ export const OrdersByWorkstationKanban = () => {
         enabled: !isLoadingWorkstations,
     });
 
-    const { mutate: advanceStatus } = useMutation({
+    const advanceStatusMutation = useMutation({
         mutationFn: ({ orderId }: { orderId: number }) =>
             advanceOrderStatus({ orderId }),
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Avançado!", {
                 description: "O pedido foi movido para a próxima fila.",
+                duration: 5000,
+                action: {
+                    label: "Desfazer",
+                    onClick: () => {
+                        revertStatusMutation.mutate({ orderId: variables.orderId });
+                    }
+                }
             });
         },
         onError: (error: unknown) => {
@@ -76,13 +83,20 @@ export const OrdersByWorkstationKanban = () => {
         },
     });
 
-    const { mutate: revertStatus } = useMutation({
+    const revertStatusMutation = useMutation({
         mutationFn: ({ orderId }: { orderId: number }) =>
             regressOrderStatus({ orderId }),
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Revertido!", {
                 description: "O pedido foi movido para a fila anterior.",
+                duration: 5000,
+                action: {
+                    label: "Desfazer",
+                    onClick: () => {
+                        advanceStatusMutation.mutate({ orderId: variables.orderId });
+                    }
+                }
             });
         },
         onError: (error: unknown) => {
@@ -99,11 +113,11 @@ export const OrdersByWorkstationKanban = () => {
     });
 
     const handleAdvanceStatus = (orderId: number) => {
-        advanceStatus({ orderId });
+        advanceStatusMutation.mutate({ orderId });
     };
 
     const handleRevertStatus = (orderId: number) => {
-        revertStatus({ orderId });
+        revertStatusMutation.mutate({ orderId });
     };
 
     const columns = useMemo(
