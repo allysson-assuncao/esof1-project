@@ -2,7 +2,7 @@ import axios from "axios";
 
 /*const port = "8080";*/
 
-const port = "8081";
+const port = "8080";
 
 export const auth = axios.create({
     baseURL: `http://localhost:${port}/app/auth`,

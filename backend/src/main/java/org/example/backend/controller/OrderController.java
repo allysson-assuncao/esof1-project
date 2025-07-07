@@ -33,6 +33,18 @@ public class OrderController {
                 ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
     }
 
+    @PostMapping("/{orderId}/advance")
+    public ResponseEntity<Void> advanceOrderStatus(@PathVariable Long orderId) {
+        orderService.advanceStatus(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/regress")
+    public ResponseEntity<Void> regressOrderStatus(@PathVariable Long orderId) {
+        orderService.regressStatus(orderId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/queue")
     public ResponseEntity<List<DetailedOrderDTO>> getQueue() {
         return ResponseEntity.ok(this.orderService.getQueue());

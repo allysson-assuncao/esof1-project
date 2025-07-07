@@ -14,10 +14,14 @@ public record OrderDTO(Long id,
                        OrderStatus status,
                        String observation,
                        LocalDateTime orderedTime,
+                       LocalDateTime preparationTime,
+                       LocalDateTime readyTime,
+                       LocalDateTime closedTime,
                        Set<Long> additionalOrders,
                        String productName,
                        double productUnitPrice,
                        String waiterName) {
+
     public OrderDTO(Order order) {
         this(
                 order.getId(),
@@ -25,6 +29,9 @@ public record OrderDTO(Long id,
                 order.getStatus(),
                 order.getObservation(),
                 order.getOrderedTime(),
+                order.getPreparationTime(),
+                order.getReadyTime(),
+                order.getClosedTime(),
                 order.getAdditionalOrders()
                         .stream().map(Order::getId).collect(Collectors.toSet()),
                 order.getProduct().getName(),
