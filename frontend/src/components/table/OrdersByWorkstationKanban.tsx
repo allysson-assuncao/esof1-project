@@ -8,7 +8,7 @@ import {
 } from "@/model/Interfaces";
 import {useMemo, useState} from "react";
 import {MultiSelect} from "@/components/ui/multi-select";
-import {fetchFilteredOrderKanbanResults, nextOrderStatus, previousOrderStatus} from "@/services/orderService";
+import {fetchFilteredOrderKanbanResults, advanceOrderStatus, regressOrderStatus} from "@/services/orderService";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
 import {OrdersByWorkstationDataTable} from "@/components/table/data-table/OrdersByWorkstationDataTable";
@@ -56,7 +56,7 @@ export const OrdersByWorkstationKanban = () => {
 
     const { mutate: advanceStatus } = useMutation({
         mutationFn: ({ orderId }: { orderId: number }) =>
-            nextOrderStatus({ orderId }),
+            advanceOrderStatus({ orderId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Avançado!", {
@@ -78,7 +78,7 @@ export const OrdersByWorkstationKanban = () => {
 
     const { mutate: revertStatus } = useMutation({
         mutationFn: ({ orderId }: { orderId: number }) =>
-            previousOrderStatus({ orderId }),
+            regressOrderStatus({ orderId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
             toast.success("Status do Pedido Revertido!", {
