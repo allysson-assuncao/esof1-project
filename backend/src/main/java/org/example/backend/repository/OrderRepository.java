@@ -24,6 +24,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     List<Order> findByGuestTabId(Long guestTabId);
 
+    List<Order> findByParentOrderId(Long id);
+
     Optional<Order> findById(Long id);
     /*Optional<List<Order>> findByStatusAndProduct_Destination(OrderStatus status, ProductDestination destination);*/
 
