@@ -3,6 +3,8 @@ package org.example.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.backend.model.enums.OrderStatus;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -48,6 +50,7 @@ public class Order {
     private LocalDateTime closedTime; // delivered or canceled, this treats both
 
     @OneToMany(mappedBy = "parentOrder", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Order> additionalOrders;
 
     @ManyToOne(fetch = FetchType.LAZY)

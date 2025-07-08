@@ -27,6 +27,14 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     Optional<Order> findById(Long id);
     /*Optional<List<Order>> findByStatusAndProduct_Destination(OrderStatus status, ProductDestination destination);*/
 
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.product " +
+            "JOIN FETCH o.waiter " +
+            "LEFT JOIN FETCH o.additionalOrders " +
+            "WHERE o.guestTab.id IN :guestTabIds AND o.parentOrder IS NULL")
+    List<Order> findTopLevelOrdersWithAdditionalsByGuestTabIds(@Param("guestTabIds") List<Long> guestTabIds);
+
+
     @Query("""
                 SELECT new org.example.backend.dto.Order.FlatOrderDTO(
                     o.id,
