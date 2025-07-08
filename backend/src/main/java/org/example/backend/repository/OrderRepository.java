@@ -2,8 +2,6 @@ package org.example.backend.repository;
 
 import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.model.Order;
-import org.example.backend.model.enums.OrderStatus;
-/*import org.example.backend.model.enums.ProductDestination;*/
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
