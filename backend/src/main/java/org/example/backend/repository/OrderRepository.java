@@ -4,6 +4,10 @@ import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.model.Order;
 import org.example.backend.model.enums.OrderStatus;
 /*import org.example.backend.model.enums.ProductDestination;*/
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -44,5 +48,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
                 WHERE gt.id IN :guestTabIds
             """)
     List<FlatOrderDTO> findFlatOrderDTOsByGuestTabIds(@Param("guestTabIds") List<Long> guestTabIds);
+
+    @Override
+    @EntityGraph(value = "Order.withAdditionalOrders")
+    Page<Order> findAll(Specification<Order> spec, Pageable pageable);
 
 }

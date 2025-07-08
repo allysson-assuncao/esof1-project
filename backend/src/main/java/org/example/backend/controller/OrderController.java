@@ -1,11 +1,12 @@
 package org.example.backend.controller;
 
-import org.example.backend.dto.Order.DetailedOrderDTO;
-import org.example.backend.dto.Order.SimpleOrderDTO;
-import org.example.backend.dto.Order.OrderDTO;
-import org.example.backend.dto.Order.OrderRequestDTO;
+import org.example.backend.dto.FilteredPageDTO;
+import org.example.backend.dto.Order.*;
+import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,18 @@ public class OrderController {
         return this.orderService.registerOrder(request) ?
                 ResponseEntity.status(HttpStatus.OK).body("Pedido registrado com sucesso") :
                 ResponseEntity.badRequest().body("Algo deu errado! Tente novamente.");
+    }
+
+    @PostMapping("/{orderId}/advance")
+    public ResponseEntity<Void> advanceOrderStatus(@PathVariable Long orderId) {
+        orderService.advanceStatus(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/regress")
+    public ResponseEntity<Void> regressOrderStatus(@PathVariable Long orderId) {
+        orderService.regressStatus(orderId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/queue")
@@ -61,5 +74,19 @@ public class OrderController {
     public List<OrderDTO> getOrdersInPrepareAndKitchen() {
         return this.orderService.getOrdersInPrepareAndKitchen();
     }*/
+
+    @PostMapping("/filter-kanban")
+    public ResponseEntity<KanbanOrdersDTO> getKanbanData(
+            @RequestBody OrderKanbanFilterDTO filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "orderedTime") String orderBy,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction
+    ) {
+        System.out.println(filter);
+        KanbanOrdersDTO kanbanData = this.orderService.getOrdersForKanban(filter, page, size, orderBy, direction);
+        System.out.println(kanbanData);
+        return ResponseEntity.ok(kanbanData);
+    }
 
 }

@@ -61,9 +61,7 @@ public class GuestTabController {
             @RequestParam(defaultValue = "timeOpened") String orderBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
-        System.out.println(filterDto.toString());
         Page<GuestTabDTO> guestTabPage = this.guestTabService.getGuestTabByFilters(filterDto, page, size, orderBy, direction);
-        System.out.println(guestTabPage.getTotalElements());
         return ResponseEntity.ok(new FilteredPageDTO<>(guestTabPage.getContent(), guestTabPage.getTotalPages()));
     }
 

@@ -32,37 +32,28 @@ public class CategoryService {
 
         updateCategoryFromDTO(parentCategory, dto);
 
-        if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
-            Set<Category> subcategories = processSubcategories(dto.subcategories(), parentCategory);
-            parentCategory.setSubCategories(subcategories);
+        if (parentCategory.getId() == null) {
+            parentCategory = categoryRepository.save(parentCategory);
         }
+
+        Set<Category> updatedSubcategories = new HashSet<>();
+        if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
+            for (String subName : dto.subcategories()) {
+                Category sub = categoryRepository.findByName(subName)
+                        .orElseGet(() -> new Category(subName));
+
+                sub.setParentCategory(parentCategory);
+                sub.setMultiple(parentCategory.isMultiple());
+                sub.setWorkstation(parentCategory.getWorkstation());
+
+                sub = categoryRepository.save(sub);
+                updatedSubcategories.add(sub);
+            }
+        }
+        parentCategory.setSubCategories(updatedSubcategories);
 
         Category savedParentCategory = categoryRepository.save(parentCategory);
         return convertToDTO(savedParentCategory);
-    }
-
-    private Set<Category> processSubcategories(Set<String> subcategoryNames, Category parentCategory) {
-        Set<Category> processedSubcategories = new HashSet<>();
-
-        for (String subcategoryName : subcategoryNames) {
-            Category subcategory = categoryRepository.findByName(subcategoryName)
-                    .orElseGet(() -> new Category(subcategoryName));
-
-            if (subcategory.getId() != null && subcategory.getParentCategory() != null &&
-                    !subcategory.getParentCategory().getId().equals(parentCategory.getId())) {
-                throw new IllegalStateException(
-                        String.format("A subcategoria '%s' já está associada à categoria '%s'.",
-                                subcategoryName, subcategory.getParentCategory().getName())
-                );
-            }
-
-            subcategory.setParentCategory(parentCategory);
-            subcategory.setMultiple(parentCategory.isMultiple());
-            subcategory.setWorkstation(parentCategory.getWorkstation());
-
-            processedSubcategories.add(categoryRepository.save(subcategory));
-        }
-        return processedSubcategories;
     }
 
     private void updateCategoryFromDTO(Category category, CategoryDTO dto) {

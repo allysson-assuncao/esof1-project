@@ -6,6 +6,7 @@ import org.example.backend.dto.Product.SimpleProductDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
+import org.example.backend.repository.OrderRepository;
 import org.example.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderRepository orderRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.orderRepository = orderRepository;
     }
 
     public void registerProduct(ProductRegisterDTO productRegisterDTO) {
@@ -104,13 +107,20 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<SimpleProductDTO> selectAllSimpleIfAdditional() {
-        return productRepository.findByCategoryName("Adicional")
-                .stream()
-                .map(product -> new SimpleProductDTO(
-                        product.getId(),
-                        product.getName()
-                ))
+    public List<SimpleProductDTO> selectAllSimpleIfAdditional(Long parentOrderId) {
+        List<Product> products;
+
+        if (parentOrderId != null && this.orderRepository.existsById(parentOrderId)) {
+            System.out.println("1");
+            products = productRepository.findProductsFromParentOrderCategoryAndSubcategories(parentOrderId);
+        } else {
+            System.out.println("2");
+            products = productRepository.findProductsWithCategoryWithSubcategories();
+        }
+
+        return products.stream()
+                .map(product -> new SimpleProductDTO(product.getId(), product.getName()))
                 .collect(Collectors.toList());
     }
+
 }

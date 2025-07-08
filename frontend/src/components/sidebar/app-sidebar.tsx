@@ -65,16 +65,12 @@ const data = {
                     url: '/dashboard/table/grid',
                 },
                 {
-                    title: "Lista de Comandas",
-                    url: '/dashboard/table/guest-tabs/',
-                },
-                {
                     title: "Cardápio",
                     url: '/dashboard/menu',
                 },
                 {
                     title: "Pedidos por Área",
-                    url: '/dashboard/table/workspace',
+                    url: '/dashboard/table/orders-by-workstation',
                 },
             ],
         },
