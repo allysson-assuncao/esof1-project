@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.example.backend.model.*;
+import org.example.backend.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,19 +12,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
-import org.example.backend.model.GuestTab;
-import org.example.backend.model.Order;
-import org.example.backend.model.User;
 import org.example.backend.model.enums.OrderStatus;
-import org.example.backend.repository.GuestTabRepository;
-import org.example.backend.repository.OrderRepository;
-import org.example.backend.repository.ProductRepository;
-import org.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -69,25 +65,34 @@ public class OrderService {
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
 
-
         Order parent = null;
         if (request.parentOrderId() != null) {
             parent = orderRepository.findById(request.parentOrderId())
                     .orElse(null);
         }
 
+        OrderStatus status = parent != null
+                ? parent.getStatus()
+                : OrderStatus.SENT;
+
         LocalDateTime now = LocalDateTime.now();
 
         for (OrderItemDTO item : request.items()) {
+            Product product = productRepository.findById(item.productId()).orElseThrow();
+            Category category = product.getCategory();
+
+            Workstation workstation = category.getWorkstation();
+
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
-                    .status(OrderStatus.SENT)
+                    .status(status)
                     .orderedTime(now)
                     .parentOrder(parent)
                     .guestTab(guestTab)
-                    .product(productRepository.findById(item.productId()).orElseThrow())
+                    .product(product)
                     .waiter(waiter)
+                    .workstation(workstation)
                     .build();
 
             orderRepository.save(order);
@@ -239,9 +244,11 @@ public class OrderService {
             case DELIVERED, CANCELED -> order.setClosedTime(now);
         }
 
+        List<Order> additionalOrders = orderRepository.findByParentOrderId(order.getId());
+
         // Atualizar pedidos adicionais
-        if (order.getAdditionalOrders() != null) {
-            for (Order additional : order.getAdditionalOrders()) {
+        if (!additionalOrders.isEmpty()) {
+            for (Order additional : additionalOrders) {
                 additional.setStatus(newStatus);
                 switch (newStatus) {
                     case SENT -> additional.setOrderedTime(now);
