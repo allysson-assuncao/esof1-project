@@ -18,11 +18,13 @@ import java.util.Set;
         }
 )
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"parentOrder", "additionalOrders", "guestTab", "product", "waiter", "workstation"})
 public class Order {
     @Id
     @Column(name = "id", nullable = false, unique = true, updatable = false)

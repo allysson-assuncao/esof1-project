@@ -10,7 +10,8 @@ import java.util.List;
 
 @Table(name = "guest_tabs")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
