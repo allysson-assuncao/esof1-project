@@ -30,6 +30,8 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
         () => fetchSimpleProductsIfAdditional(parentOrderId? parentOrderId : -1),
     );
 
+
+
     const form = useForm<RegisterOrdersFormData>({
         resolver: zodResolver(registerOrdersFormSchema),
         defaultValues: {
