@@ -7,6 +7,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Table(name = "orders")
@@ -72,5 +73,17 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
+
+    public void localSetParentOrder(Order parentOrder) {
+        this.parentOrder = parentOrder;
+    }
+
+    public void addAdditionalOrder(Order additionalOrder) {
+        if (this.additionalOrders == null) {
+            this.additionalOrders = new HashSet<>();
+        }
+        this.additionalOrders.add(additionalOrder);
+        additionalOrder.localSetParentOrder(this);
+    }
 
 }

@@ -67,13 +67,12 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
 
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Comanda não encontrada"));
 
-
-        Order parent = null;
+        Order parentOrder = null;
         if (request.parentOrderId() != null) {
-            parent = orderRepository.findById(request.parentOrderId())
-                    .orElse(null);
+            parentOrder = orderRepository.findById(request.parentOrderId())
+                    .orElseThrow(() -> new EntityNotFoundException("Pedido pai não encontrado com o ID: " + request.parentOrderId()));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -84,11 +83,14 @@ public class OrderService {
                     .observation(item.observation())
                     .status(OrderStatus.SENT)
                     .orderedTime(now)
-                    .parentOrder(parent)
                     .guestTab(guestTab)
                     .product(productRepository.findById(item.productId()).orElseThrow())
                     .waiter(waiter)
                     .build();
+
+            if (parentOrder != null) {
+                parentOrder.addAdditionalOrder(order);
+            }
 
             orderRepository.save(order);
         }

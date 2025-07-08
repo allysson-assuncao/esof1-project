@@ -22,8 +22,6 @@ public class GuestTabSpecificationService {
             query.distinct(true);
 
             // Use LEFT JOIN to include GuestTabs without Orders
-            Join<GuestTab, Order> orderJoin = root.join("orders", JoinType.LEFT);
-            Join<Order, User> userJoin = orderJoin.join("waiter", JoinType.LEFT);
             Join<GuestTab, LocalTable> localTableJoin = root.join("localTable", JoinType.LEFT);
 
             if (filterDto.guestTabIds() != null && !filterDto.guestTabIds().isEmpty()) {
@@ -48,56 +46,62 @@ public class GuestTabSpecificationService {
                 mainPredicates.add(criteriaBuilder.disjunction());
             }
 
-            List<Predicate> subQueryPredicates = new ArrayList<>();
-
             if (isOrderFilterPresent(filterDto)) {
-                Subquery<Long> subquery = query.subquery(Long.class);
-                Root<Order> subOrderRoot = subquery.from(Order.class);
-                subQueryPredicates.add(criteriaBuilder.equal(subOrderRoot.get("guestTab"), root));
+                // LÓGICA PRINCIPAL DA SOLUÇÃO:
+                // A comanda deve aparecer se:
+                // (A) ELA TIVER PEDIDOS QUE CORRESPONDEM AOS FILTROS
+                // OU
+                // (B) ELA NÃO TIVER NENHUM PEDIDO
 
-                // Only filter out sub-orders if orderJoin is null
-                subQueryPredicates.add(criteriaBuilder.isNull(subOrderRoot.get("parentOrder")));
+                // --- Subquery A: Verifica se EXISTE um pedido que bate com os filtros ---
+                Subquery<Long> subqueryWithFilters = query.subquery(Long.class);
+                Root<Order> orderRootWithFilters = subqueryWithFilters.from(Order.class);
+                List<Predicate> subQueryPredicates = new ArrayList<>();
+
+                subQueryPredicates.add(criteriaBuilder.equal(orderRootWithFilters.get("guestTab"), root));
+                subQueryPredicates.add(criteriaBuilder.isNull(orderRootWithFilters.get("parentOrder")));
+
+                // Otimização: Criar o join com Product uma única vez
+                Join<Order, Product> productJoin = orderRootWithFilters.join("product");
 
                 if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
-                    subQueryPredicates.add(subOrderRoot.get("id").in(filterDto.orderIds()));
+                    subQueryPredicates.add(orderRootWithFilters.get("id").in(filterDto.orderIds()));
                 }
-
                 if (filterDto.orderStatuses() != null && !filterDto.orderStatuses().isEmpty()) {
-                    subQueryPredicates.add(subOrderRoot.get("status").in(filterDto.orderStatuses()));
+                    subQueryPredicates.add(orderRootWithFilters.get("status").in(filterDto.orderStatuses()));
                 }
-
                 if (filterDto.waiterIds() != null && !filterDto.waiterIds().isEmpty()) {
-                    subQueryPredicates.add(subOrderRoot.join("waiter").get("id").in(filterDto.waiterIds()));
+                    subQueryPredicates.add(orderRootWithFilters.join("waiter").get("id").in(filterDto.waiterIds()));
                 }
-
                 if (filterDto.productName() != null && !filterDto.productName().isBlank()) {
-                    Join<Order, Product> productJoin = subOrderRoot.join("product");
-                    subQueryPredicates.add(criteriaBuilder.like(
-                            criteriaBuilder.lower(productJoin.get("name")),
-                            "%" + filterDto.productName().toLowerCase() + "%"
-                    ));
+                    subQueryPredicates.add(criteriaBuilder.like(criteriaBuilder.lower(productJoin.get("name")), "%" + filterDto.productName().toLowerCase() + "%"));
                 }
-
                 if (filterDto.startTime() != null) {
-                    subQueryPredicates.add(criteriaBuilder.greaterThanOrEqualTo(subOrderRoot.get("orderedTime"), filterDto.startTime()));
+                    subQueryPredicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRootWithFilters.get("orderedTime"), filterDto.startTime()));
                 }
-
                 if (filterDto.endTime() != null) {
-                    subQueryPredicates.add(criteriaBuilder.lessThanOrEqualTo(subOrderRoot.get("orderedTime"), filterDto.endTime()));
+                    subQueryPredicates.add(criteriaBuilder.lessThanOrEqualTo(orderRootWithFilters.get("orderedTime"), filterDto.endTime()));
                 }
-
-                Join<Order, Product> productPriceJoin = subOrderRoot.join("product");
                 if (filterDto.minPrice() != null) {
-                    subQueryPredicates.add(criteriaBuilder.greaterThanOrEqualTo(productPriceJoin.get("price"), filterDto.minPrice()));
+                    subQueryPredicates.add(criteriaBuilder.greaterThanOrEqualTo(productJoin.get("price"), filterDto.minPrice()));
                 }
                 if (filterDto.maxPrice() != null) {
-                    subQueryPredicates.add(criteriaBuilder.lessThanOrEqualTo(productPriceJoin.get("price"), filterDto.maxPrice()));
+                    subQueryPredicates.add(criteriaBuilder.lessThanOrEqualTo(productJoin.get("price"), filterDto.maxPrice()));
                 }
 
-                subquery.select(subOrderRoot.get("id"))
-                        .where(criteriaBuilder.and(subQueryPredicates.toArray(new Predicate[0])));
+                subqueryWithFilters.select(orderRootWithFilters.get("id")).where(criteriaBuilder.and(subQueryPredicates.toArray(new Predicate[0])));
+                Predicate matchingOrdersExist = criteriaBuilder.exists(subqueryWithFilters);
 
-                mainPredicates.add(criteriaBuilder.exists(subquery));
+
+                // --- Subquery B: Verifica se NÃO EXISTE NENHUM pedido na comanda ---
+                Subquery<Long> subqueryAnyOrder = query.subquery(Long.class);
+                Root<Order> anyOrderRoot = subqueryAnyOrder.from(Order.class);
+                subqueryAnyOrder.select(anyOrderRoot.get("id"))
+                        .where(criteriaBuilder.equal(anyOrderRoot.get("guestTab"), root));
+                Predicate noOrdersExist = criteriaBuilder.not(criteriaBuilder.exists(subqueryAnyOrder));
+
+                // --- Combina as duas lógicas com OR ---
+                mainPredicates.add(criteriaBuilder.or(matchingOrdersExist, noOrdersExist));
             }
 
             return criteriaBuilder.and(mainPredicates.toArray(new Predicate[0]));
