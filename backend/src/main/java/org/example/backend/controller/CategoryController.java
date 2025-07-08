@@ -6,6 +6,7 @@ import org.example.backend.dto.Category.HierarchicalCategoryDTO;
 import org.example.backend.dto.Category.SimpleCategoryDTO;
 import org.example.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,12 @@ public class CategoryController {
 
     @PostMapping("/register")
     @Operation(summary = "create – Endpoint para cadastro de novas categorias")
-    public ResponseEntity<String> create(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<?> create(@RequestBody CategoryDTO dto) {
         try {
-            categoryService.createCategory(dto);
-            return ResponseEntity.status(201).body("Categoria cadastrada com sucesso!");
+            CategoryDTO registeredCategory = categoryService.registerOrUpdateCategory(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(registeredCategory);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

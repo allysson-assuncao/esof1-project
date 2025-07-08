@@ -27,7 +27,7 @@ export function AddOrderForm({guestTabId, parentOrderId, onSuccess}: AddOrderFor
 
     const {data: products, isLoading: isLoadingProducts} = useQuery<SimpleProduct[]>(
         ['simpleProducts', parentOrderId],
-        () => fetchSimpleProductsIfAdditional(parentOrderId != null)
+        () => fetchSimpleProductsIfAdditional(parentOrderId? parentOrderId : -1),
     );
 
     const form = useForm<RegisterOrdersFormData>({

@@ -45,6 +45,7 @@ export const fetchSimpleCategories = async (): Promise<SimpleCategory[]> => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
             }
         });
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Erro ao buscar categorias:", error);

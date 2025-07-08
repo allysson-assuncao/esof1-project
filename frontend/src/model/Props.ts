@@ -22,3 +22,8 @@ export interface AdditionalOrdersContainerProps {
   guestTabId: number;
   parentOrder: DisplayOrderItem;
 }
+
+export interface MakeOrderColumnsProps {
+    onAdvanceStatus: (orderId: number) => void;
+    onRevertStatus: (orderId: number) => void;
+}

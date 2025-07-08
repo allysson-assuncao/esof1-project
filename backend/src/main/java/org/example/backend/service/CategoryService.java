@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.backend.dto.Category.CategoryDTO;
 import org.example.backend.dto.Category.HierarchicalCategoryDTO;
 import org.example.backend.dto.Category.SimpleCategoryDTO;
@@ -25,9 +26,63 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category createCategory(CategoryDTO dto) {
-        checkCategoryNameAvailability(dto.name());
-        return saveCategory(dto, null);
+    public CategoryDTO registerOrUpdateCategory(CategoryDTO dto) {
+        Category parentCategory = categoryRepository.findByName(dto.name())
+                .orElseGet(() -> new Category(dto.name()));
+
+        updateCategoryFromDTO(parentCategory, dto);
+
+        if (parentCategory.getId() == null) {
+            parentCategory = categoryRepository.save(parentCategory);
+        }
+
+        Set<Category> updatedSubcategories = new HashSet<>();
+        if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
+            for (String subName : dto.subcategories()) {
+                Category sub = categoryRepository.findByName(subName)
+                        .orElseGet(() -> new Category(subName));
+
+                sub.setParentCategory(parentCategory);
+                sub.setMultiple(parentCategory.isMultiple());
+                sub.setWorkstation(parentCategory.getWorkstation());
+
+                sub = categoryRepository.save(sub);
+                updatedSubcategories.add(sub);
+            }
+        }
+        parentCategory.setSubCategories(updatedSubcategories);
+
+        Category savedParentCategory = categoryRepository.save(parentCategory);
+        return convertToDTO(savedParentCategory);
+    }
+
+    private void updateCategoryFromDTO(Category category, CategoryDTO dto) {
+        category.setName(dto.name());
+        category.setMultiple(dto.isMultiple());
+
+        if (dto.workstationId() != null) {
+            Workstation workstation = workstationRepository.findById(dto.workstationId())
+                    .orElseThrow(() -> new EntityNotFoundException("Workstation não encontrada com ID: " + dto.workstationId()));
+            category.setWorkstation(workstation);
+        } else {
+            category.setWorkstation(null);
+        }
+    }
+
+    private CategoryDTO convertToDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
+        Set<String> subcategoryNames = category.getSubCategories() != null ?
+                category.getSubCategories().stream().map(Category::getName).collect(Collectors.toSet()) :
+                new HashSet<>();
+
+        return new CategoryDTO(
+                category.getName(),
+                category.isMultiple(),
+                subcategoryNames,
+                category.getWorkstation() != null ? category.getWorkstation().getId() : null
+        );
     }
 
     public List<SimpleCategoryDTO> getAllCategories() {
@@ -76,7 +131,7 @@ public class CategoryService {
 
         Set<CategoryDTO> subcategoriesDto = new HashSet<>();
 
-        for(String it: subcategoryNames) {
+        for (String it : subcategoryNames) {
             Category tempCategory = categoryRepository.findByName(it)
                     .orElse(Category.builder()
                             .name(it)
@@ -110,51 +165,6 @@ public class CategoryService {
                 categoryRepository.save(newSub);
             }
         }
-    }
-
-    private Category saveCategory(CategoryDTO dto, Category parent) {
-        Category category = buildCategoryFromDTO(dto, parent);
-
-        if (dto.subcategories() != null && !dto.subcategories().isEmpty()) {
-            categoryRepository.save(category);
-            Set<Category> subCats = dto.subcategories().stream()
-                    .map(subDto -> saveCategory(
-                            convertToDTO(
-                                    categoryRepository.findByName(subDto).orElse(Category.builder()
-                                            .name(subDto)
-                                            .parentCategory(category)
-                                            .isMultiple(category.isMultiple())
-                                            .subCategories(null)
-                                            .workstation(category.getWorkstation())
-                                            .build()
-                                    )
-                            ), category
-                    ))
-                    .collect(Collectors.toSet());
-            category.setSubCategories(subCats);
-        }
-
-        return categoryRepository.save(category);
-    }
-
-    private CategoryDTO convertToDTO(Category category){
-        UUID workstationId = null;
-        if(category.getWorkstation() != null){
-             workstationId = category.getWorkstation().getId();
-        }
-
-        Set<String> subs = new HashSet<>();
-
-        if(category.getSubCategories() != null){
-            subs = category.getSubCategories().stream().map(x -> new String(x.getName())).collect(Collectors.toSet());
-        }
-
-        return CategoryDTO.builder()
-                .name(category.getName())
-                .isMultiple(category.isMultiple())
-                .subcategories(subs)
-                .workstationId(workstationId)
-                .build();
     }
 
     private Category buildCategoryFromDTO(CategoryDTO dto, Category parent) {

@@ -52,6 +52,11 @@ public class LocalTableController {
         }
     }
 
-
+    @GetMapping("/{number}/open-guest-tab")
+    @Operation(summary = "Verifica se há uma comanda aberta na mesa informada")
+    public ResponseEntity<Boolean> hasOpenGuestTab(@PathVariable int number) {
+        boolean hasOpenTab = localTableService.hasOpenGuestTab(number);
+        return ResponseEntity.ok(hasOpenTab);
+    }
 
 }

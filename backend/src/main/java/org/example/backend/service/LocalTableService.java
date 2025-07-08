@@ -4,7 +4,9 @@ import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.model.LocalTable;
+import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.model.enums.LocalTableStatus;
+import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,12 @@ import java.util.stream.Collectors;
 public class LocalTableService {
 
     private final LocalTableRepository localTableRepository;
+    private final GuestTabRepository guestTabRepository;
 
     @Autowired
-    public LocalTableService(LocalTableRepository localTableRepository) {
+    public LocalTableService(LocalTableRepository localTableRepository, GuestTabRepository guestTabRepository) {
         this.localTableRepository = localTableRepository;
+        this.guestTabRepository = guestTabRepository;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +77,10 @@ public class LocalTableService {
                 .status(localTable.getStatus())
                 .guestTabCountToday(guestTabCountOpen)
                 .build();
+    }
+
+    public boolean hasOpenGuestTab(int tableNumber) {
+        return guestTabRepository.existsByLocalTable_NumberAndStatus(tableNumber, GuestTabStatus.OPEN);
     }
 
 }
