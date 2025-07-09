@@ -15,4 +15,5 @@ public interface WorkstationRepository extends JpaRepository<Workstation, UUID> 
     List<Workstation> findWorkstationsByUserId(@Param("userId") UUID userId);
 
     Optional<Workstation> findByName(String name);
+    boolean existsByName(String name);
 }

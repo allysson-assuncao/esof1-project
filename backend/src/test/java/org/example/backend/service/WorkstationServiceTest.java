@@ -39,7 +39,7 @@ public class WorkstationServiceTest {
 
         // verificação
         assertNotNull(success, "Registro retornou nulo");
-        assertFalse(success, "Registrou workstation já existente");
+        assertFalse(success, "Teve sucesso em registrar workstation já existente");
     }
 
 }
