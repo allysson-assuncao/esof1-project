@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.Workstation.SimpleWorkstationDTO;
 import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.model.Workstation;
 import org.example.backend.repository.CategoryRepository;
@@ -10,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,9 +33,8 @@ public class WorkstationServiceTest {
     @Test
     void registerWorkstation_WhenWorkstationNameExists_ShouldReturnFalse(){
         // configuração mock
-        Workstation mockWorkstation = Workstation.builder().name("mockWorkstation").build();
         WorkstationRegisterDTO request = new WorkstationRegisterDTO("mockWorkstation", null);
-        when(workstationRepository.findByName("mockWorkstation")).thenReturn(Optional.of(mockWorkstation));
+        when(workstationRepository.existsByName("mockWorkstation")).thenReturn(true);
 
         // execução
         boolean success = service.registerWorkstation(request);
@@ -40,6 +42,30 @@ public class WorkstationServiceTest {
         // verificação
         assertNotNull(success, "Registro retornou nulo");
         assertFalse(success, "Teve sucesso em registrar workstation já existente");
+    }
+
+    @Test
+    void registerWorkstation_WhenWorkstationNameNotExists_ShouldReturnTrue(){
+        // config mock
+        WorkstationRegisterDTO request = new WorkstationRegisterDTO("mockWorkstation", null);
+        when(workstationRepository.existsByName("mockWorkstation")).thenReturn(false);
+
+        // execução do teste
+        boolean success = service.registerWorkstation(request);
+
+        // verificação
+        assertNotNull(success, "Registro retornou nulo");
+        assertTrue(success, "Não conseguiu registrar mesmo que Workstation ainda não existisse");
+
+    }
+
+    @Test
+    void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnWorkstations(){
+        // config mock
+        List<SimpleWorkstationDTO> workstations = service.getAllWorkstations();
+
+
+
     }
 
 }
