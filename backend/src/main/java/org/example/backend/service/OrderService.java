@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.example.backend.model.*;
+import org.example.backend.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,17 +78,28 @@ public class OrderService {
                     .orElseThrow(() -> new EntityNotFoundException("Pedido pai não encontrado com o ID: " + request.parentOrderId()));
         }
 
+        OrderStatus status = parentOrder != null
+                ? parentOrder.getStatus()
+                : OrderStatus.SENT;
+
         LocalDateTime now = LocalDateTime.now();
 
         for (OrderItemDTO item : request.items()) {
+            Product product = productRepository.findById(item.productId()).orElseThrow();
+            Category category = product.getCategory();
+
+            Workstation workstation = category.getWorkstation();
+
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
-                    .status(OrderStatus.SENT)
+                    .status(status)
                     .orderedTime(now)
+                    .parentOrder(parentOrder)
                     .guestTab(guestTab)
-                    .product(productRepository.findById(item.productId()).orElseThrow())
+                    .product(product)
                     .waiter(waiter)
+                    .workstation(workstation)
                     .build();
 
             if (parentOrder != null) {
@@ -241,9 +255,11 @@ public class OrderService {
             case DELIVERED, CANCELED -> order.setClosedTime(now);
         }
 
+        List<Order> additionalOrders = orderRepository.findByParentOrderId(order.getId());
+
         // Atualizar pedidos adicionais
-        if (order.getAdditionalOrders() != null) {
-            for (Order additional : order.getAdditionalOrders()) {
+        if (!additionalOrders.isEmpty()) {
+            for (Order additional : additionalOrders) {
                 additional.setStatus(newStatus);
                 switch (newStatus) {
                     case SENT -> additional.setOrderedTime(now);
