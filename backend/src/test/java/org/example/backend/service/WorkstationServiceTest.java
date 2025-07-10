@@ -60,12 +60,38 @@ public class WorkstationServiceTest {
     }
 
     @Test
-    void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnWorkstations(){
+    void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnSimpleWorkstationDTO(){
         // config mock
+        List<Workstation> mockWorkstationList = new ArrayList<>();
+        mockWorkstationList.add(Workstation.builder().name("mockWorkstation1").build());
+        mockWorkstationList.add(Workstation.builder().name("mockWorkstation2").build());
+        when(workstationRepository.findAll()).thenReturn(mockWorkstationList);
+
+        // execução
         List<SimpleWorkstationDTO> workstations = service.getAllWorkstations();
 
+        // verificação
+        assertNotNull(workstations, "Busca de workstations retornou null");
+        assertEquals(SimpleWorkstationDTO.class, workstations.getFirst().getClass(),"Não retornou SimpleWorkstationDTO");
+    }
 
+    @Test
+    void getAllWorkstations_WhenThereAreNoWorkstations_ShouldReturnEmptyList(){
+        // config mock
+        List<Workstation> mockWorkstationList = new ArrayList<>();
+        when(workstationRepository.findAll()).thenReturn(mockWorkstationList);
 
+        // execução
+        List<SimpleWorkstationDTO> workstations = service.getAllWorkstations();
+
+        // verificação
+        assertNotNull(workstations, "Busca de workstations retornou null");
+        assertArrayEquals(new SimpleWorkstationDTO[]{}, workstations.toArray(), "Não retornou lista vazia, mesmo sem dados no banco");
+    }
+
+    @Test
+    void getAllWorkstationsByEmployee_WhenUserIdIsNull_ShouldReturnEmptyList(){
+        List<Workstation> mockWorkstationList = new ArrayList<>();
     }
 
 }
