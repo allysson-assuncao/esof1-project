@@ -4,7 +4,6 @@ import org.example.backend.dto.Workstation.SimpleWorkstationDTO;
 import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
 import org.example.backend.model.User;
 import org.example.backend.model.Workstation;
-import org.example.backend.repository.CategoryRepository;
 import org.example.backend.repository.WorkstationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +23,10 @@ import static org.mockito.Mockito.when;
 public class WorkstationServiceTest {
 
     @Mock
-    WorkstationRepository workstationRepository;
-
-    @Mock
-    CategoryRepository categoryRepository;
+    private WorkstationRepository workstationRepository;
 
     @InjectMocks
-    WorkstationService service;
+    private WorkstationService service;
 
     @Test
     void registerWorkstation_WhenWorkstationNameExists_ShouldReturnFalse(){
@@ -130,11 +126,10 @@ public class WorkstationServiceTest {
                 .build();
         when(workstationRepository.findWorkstationsByUserId(mockUser.getId()))
                 .thenReturn(mockWorkstationList.stream().toList());
-        ArrayList<SimpleWorkstationDTO> model = new ArrayList<>();
+        List<SimpleWorkstationDTO> model = new ArrayList<>();
 
         // execução
         List<SimpleWorkstationDTO> workstations = service.getAllWorkstationsByEmployee(mockUser);
-
 
 
         // verificação
@@ -142,7 +137,7 @@ public class WorkstationServiceTest {
         assertNotEquals(model, workstations, "Retornou lista vazia, mesmo com dados no banco");
         assertEquals(ArrayList.class, workstations.getClass(), "Não retornou ArrayList");
         if(!workstations.isEmpty()){
-            assertEquals(SimpleWorkstationDTO.class, workstations.get(0).getClass(), "Elementos do ArrayList não são SimpleWorkstationDTO");
+            assertEquals(SimpleWorkstationDTO.class, workstations.getFirst().getClass(), "Elementos do ArrayList não são SimpleWorkstationDTO");
         }
     }
 
