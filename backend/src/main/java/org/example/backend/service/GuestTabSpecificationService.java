@@ -47,13 +47,6 @@ public class GuestTabSpecificationService {
             }
 
             if (isOrderFilterPresent(filterDto)) {
-                // LÓGICA PRINCIPAL DA SOLUÇÃO:
-                // A comanda deve aparecer se:
-                // (A) ELA TIVER PEDIDOS QUE CORRESPONDEM AOS FILTROS
-                // OU
-                // (B) ELA NÃO TIVER NENHUM PEDIDO
-
-                // --- Subquery A: Verifica se EXISTE um pedido que bate com os filtros ---
                 Subquery<Long> subqueryWithFilters = query.subquery(Long.class);
                 Root<Order> orderRootWithFilters = subqueryWithFilters.from(Order.class);
                 List<Predicate> subQueryPredicates = new ArrayList<>();
@@ -61,7 +54,6 @@ public class GuestTabSpecificationService {
                 subQueryPredicates.add(criteriaBuilder.equal(orderRootWithFilters.get("guestTab"), root));
                 subQueryPredicates.add(criteriaBuilder.isNull(orderRootWithFilters.get("parentOrder")));
 
-                // Otimização: Criar o join com Product uma única vez
                 Join<Order, Product> productJoin = orderRootWithFilters.join("product");
 
                 if (filterDto.orderIds() != null && !filterDto.orderIds().isEmpty()) {
@@ -92,15 +84,12 @@ public class GuestTabSpecificationService {
                 subqueryWithFilters.select(orderRootWithFilters.get("id")).where(criteriaBuilder.and(subQueryPredicates.toArray(new Predicate[0])));
                 Predicate matchingOrdersExist = criteriaBuilder.exists(subqueryWithFilters);
 
-
-                // --- Subquery B: Verifica se NÃO EXISTE NENHUM pedido na comanda ---
                 Subquery<Long> subqueryAnyOrder = query.subquery(Long.class);
                 Root<Order> anyOrderRoot = subqueryAnyOrder.from(Order.class);
                 subqueryAnyOrder.select(anyOrderRoot.get("id"))
                         .where(criteriaBuilder.equal(anyOrderRoot.get("guestTab"), root));
                 Predicate noOrdersExist = criteriaBuilder.not(criteriaBuilder.exists(subqueryAnyOrder));
 
-                // --- Combina as duas lógicas com OR ---
                 mainPredicates.add(criteriaBuilder.or(matchingOrdersExist, noOrdersExist));
             }
 

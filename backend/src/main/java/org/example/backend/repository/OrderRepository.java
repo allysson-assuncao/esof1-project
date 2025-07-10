@@ -34,7 +34,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             "WHERE o.guestTab.id IN :guestTabIds AND o.parentOrder IS NULL")
     List<Order> findTopLevelOrdersWithAdditionalsByGuestTabIds(@Param("guestTabIds") List<Long> guestTabIds);
 
-
     @Query("""
                 SELECT new org.example.backend.dto.Order.FlatOrderDTO(
                     o.id,
