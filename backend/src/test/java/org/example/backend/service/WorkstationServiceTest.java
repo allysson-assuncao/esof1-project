@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.Workstation.SimpleWorkstationDTO;
 import org.example.backend.dto.Workstation.WorkstationRegisterDTO;
+import org.example.backend.model.User;
 import org.example.backend.model.Workstation;
 import org.example.backend.repository.CategoryRepository;
 import org.example.backend.repository.WorkstationRepository;
@@ -12,8 +13,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -91,7 +93,57 @@ public class WorkstationServiceTest {
 
     @Test
     void getAllWorkstationsByEmployee_WhenUserIdIsNull_ShouldReturnEmptyList(){
-        List<Workstation> mockWorkstationList = new ArrayList<>();
+        // execução
+        List<SimpleWorkstationDTO> workstations = service.getAllWorkstationsByEmployee(null);
+
+        // verificação
+        assertNotNull(workstations, "Busca de workstations retornou null");
+        assertArrayEquals(new SimpleWorkstationDTO[]{}, workstations.toArray(), "Retornou workstations para usuário nulo");
+    }
+
+    @Test
+    void getAllWorkstationsByEmployee_WhenUserIdNotFound_ShouldReturnEmptyList(){
+        // config mock
+        User mockUser = User.builder()
+                .username("mockUser")
+                .email("example@gmail.com")
+                .build();
+
+        // execução
+        List<SimpleWorkstationDTO> workstations = service.getAllWorkstationsByEmployee(mockUser);
+
+        // verificação
+        assertNotNull(workstations, "Busca de workstations retornou null");
+        assertArrayEquals(new SimpleWorkstationDTO[]{}, workstations.toArray(), "Retornou workstations de usuário inexistente");
+    }
+
+    @Test
+    void getAllWorkstationsByEmployee_WhenUserIdIsFound_ShouldReturnSimpleWorkstationDTOs(){
+        // config mock
+        Set<Workstation> mockWorkstationList = new HashSet<>();
+        mockWorkstationList.add(Workstation.builder().name("mockWorkstation1").build());
+        mockWorkstationList.add(Workstation.builder().name("mockWorkstation2").build());
+        User mockUser = User.builder()
+                .username("mockUser")
+                .email("mockUser@gmail.com")
+                .workstations(mockWorkstationList)
+                .build();
+        when(workstationRepository.findWorkstationsByUserId(mockUser.getId()))
+                .thenReturn(mockWorkstationList.stream().toList());
+        ArrayList<SimpleWorkstationDTO> model = new ArrayList<>();
+
+        // execução
+        List<SimpleWorkstationDTO> workstations = service.getAllWorkstationsByEmployee(mockUser);
+
+
+
+        // verificação
+        assertNotNull(workstations, "Busca de workstations retornou null");
+        assertNotEquals(model, workstations, "Retornou lista vazia, mesmo com dados no banco");
+        assertEquals(ArrayList.class, workstations.getClass(), "Não retornou ArrayList");
+        if(!workstations.isEmpty()){
+            assertEquals(SimpleWorkstationDTO.class, workstations.get(0).getClass(), "Elementos do ArrayList não são SimpleWorkstationDTO");
+        }
     }
 
 }

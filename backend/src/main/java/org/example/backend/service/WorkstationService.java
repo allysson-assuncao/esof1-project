@@ -60,6 +60,8 @@ public class WorkstationService {
     }
 
     public List<SimpleWorkstationDTO> getAllWorkstationsByEmployee(User user) {
+
+        if (user == null) return new ArrayList<>();
         List<Workstation> userWorkstations = this.workstationRepository.findWorkstationsByUserId(user.getId());
 
         List<Workstation> workstations;
