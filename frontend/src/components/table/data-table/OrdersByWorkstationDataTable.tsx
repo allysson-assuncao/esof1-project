@@ -4,7 +4,6 @@ import React, {useRef, useCallback} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useVirtualizer} from "@tanstack/react-virtual";
 import {Loader2, Package} from "lucide-react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 
 interface DataTableProps<TData, TValue> {
@@ -35,17 +34,28 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
 
     const {rows} = table.getRowModel();
 
+    const virtualRows: { row: typeof rows[0]; isSubRow: boolean; virtualIndex: number }[] = [];
+    let vIndex = 0;
+    rows.forEach((row) => {
+        virtualRows.push({row, isSubRow: false, virtualIndex: vIndex++});
+        if (row.getIsExpanded()) {
+            virtualRows.push({row, isSubRow: true, virtualIndex: vIndex++});
+        }
+    });
+
     const rowVirtualizer = useVirtualizer({
-        count: hasNextPage ? rows.length + 1 : rows.length,
+        count: hasNextPage ? virtualRows.length + 1 : virtualRows.length,
         getScrollElement: () => tableContainerRef.current,
         estimateSize: (index) => {
-            const row = rows[index];
-            const baseHeight = 64;
-            if (row?.getIsExpanded()) {
-                const subItemsHeight = (row.original.additionalOrders.length * 48) + 16;
-                return baseHeight + subItemsHeight;
+            const vRow = virtualRows[index];
+            if (!vRow) return 64;
+            if (vRow.isSubRow) {
+                const additionalOrders = vRow.row.original.additionalOrders || [];
+                return additionalOrders.length > 0
+                    ? additionalOrders.length * 72 + 80
+                    : 80;
             }
-            return baseHeight;
+            return 64;
         },
         overscan: 10,
     });
@@ -74,39 +84,40 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
                     <div className="overflow-x-auto">
                         <Table className="min-w-full divide-y divide-muted">
                             <TableHeader className="bg-muted/30">
-                            <TableRow>
-                                <TableCell className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Produto</TableCell>
-                                <TableCell className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Observação</TableCell>
-                                <TableCell className="px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Quantidade</TableCell>
-                            </TableRow>
+                                <TableRow>
+                                    <TableCell
+                                        className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Produto</TableCell>
+                                    <TableCell
+                                        className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Observação</TableCell>
+                                    <TableCell
+                                        className="px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Quantidade</TableCell>
+                                </TableRow>
                             </TableHeader>
                             <TableBody className="bg-card divide-y divide-muted">
-                            {additionalOrders.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center py-4 text-muted-foreground text-sm">
-                                        Nenhum pedido adicional.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                additionalOrders.map(subOrder => (
-                                    <TableRow key={subOrder.id}>
-                                        <TableCell className="px-4 py-2 font-semibold flex items-center gap-2">
-                                            <Package className="h-4 w-4 text-muted-foreground"/>
-                                            {subOrder.productName}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-2 text-sm text-muted-foreground">
-                                            {subOrder.observation ||
-                                                <span className="italic text-muted-foreground/60">—</span>}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-2 text-center">
-                                                <span
-                                                    className="inline-block rounded bg-muted px-2 py-1 text-xs font-medium">
-                                                    {subOrder.amount}
-                                                </span>
+                                {additionalOrders.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={3}
+                                                   className="text-center py-4 text-muted-foreground text-sm">
+                                            Nenhum pedido adicional.
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
+                                ) : (
+                                    additionalOrders.map(subOrder => (
+                                        <TableRow key={subOrder.id}>
+                                            <TableCell className="px-4 py-2 font-semibold flex items-center gap-2">
+                                                <Package className="h-5 w-5 text-muted-foreground"/>
+                                                {subOrder.productName}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-2 text-sm text-muted-foreground">
+                                                {subOrder.observation ||
+                                                    <span className="italic text-muted-foreground/60">—</span>}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-2 text-center">
+                                                <Badge variant="secondary">Qtd: {subOrder.amount}</Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
                         </Table>
                     </div>
@@ -137,53 +148,67 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
                     </TableHeader>
                     <TableBody style={{height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative'}}>
                         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                            const isLoaderRow = virtualRow.index > rows.length - 1;
-                            const row = rows[virtualRow.index];
-
-                            return isLoaderRow ? (
-                                <TableRow key="loader-row" style={{
-                                    height: `${virtualRow.size}px`,
-                                    transform: `translateY(${virtualRow.start}px)`,
-                                    position: 'absolute',
-                                    width: '100%'
-                                }}>
-                                    <TableCell colSpan={columns.length} className="text-center">
-                                        {hasNextPage && <div className="flex justify-center items-center py-4"><Loader2
-                                            className="mr-2 h-6 w-6 animate-spin"/><span>Carregando...</span></div>}
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                <React.Fragment key={row.id}>
+                            const index = virtualRow.index;
+                            if (hasNextPage && index === virtualRows.length) {
+                                return (
                                     <TableRow
-                                        data-index={virtualRow.index}
+                                        key="loader-row"
                                         style={{
                                             height: `${virtualRow.size}px`,
                                             transform: `translateY(${virtualRow.start}px)`,
-                                            position: 'absolute',
-                                            width: '100%'
+                                            position: "absolute",
+                                            width: "100%",
                                         }}
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
+                                        <TableCell colSpan={columns.length} className="text-center">
+                                            {hasNextPage && (
+                                                <div className="flex justify-center items-center py-4">
+                                                    <Loader2 className="mr-2 h-6 w-6 animate-spin"/>
+                                                    <span>Carregando...</span>
+                                                </div>
+                                            )}
+                                        </TableCell>
                                     </TableRow>
-                                    {row.getIsExpanded() && (
-                                        <TableRow
-                                            style={{
-                                                transform: `translateY(${virtualRow.start}px)`,
-                                                position: 'absolute',
-                                                width: '100%',
-                                                top: `${virtualRow.size}px`,
-                                            }}
-                                        >
-                                            <TableCell colSpan={columns.length} className="p-0">
-                                                {renderSubComponent({row})}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </React.Fragment>
+                                );
+                            }
+                            const vRow = virtualRows[index];
+                            if (!vRow) return null;
+                            if (vRow.isSubRow) {
+                                return (
+                                    <TableRow
+                                        key={vRow.row.id + "-expanded"}
+                                        style={{
+                                            height: `${virtualRow.size}px`,
+                                            transform: `translateY(${virtualRow.start}px)`,
+                                            position: "absolute",
+                                            width: "100%",
+                                        }}
+                                    >
+                                        <TableCell colSpan={columns.length}
+                                                   style={{padding: 0, background: "transparent"}}>
+                                            {renderSubComponent({row: vRow.row})}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            }
+                            return (
+                                <TableRow
+                                    key={vRow.row.id}
+                                    data-index={index}
+                                    style={{
+                                        height: `${virtualRow.size}px`,
+                                        transform: `translateY(${virtualRow.start}px)`,
+                                        position: "absolute",
+                                        width: "100%",
+                                        verticalAlign: "top",
+                                    }}
+                                >
+                                    {vRow.row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} style={{verticalAlign: "top"}}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
                             );
                         })}
                         {rows.length === 0 && !isFetchingNextPage && (
