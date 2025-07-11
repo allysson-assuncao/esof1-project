@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public class WorkstationServiceTest {
     @Test
     void registerWorkstation_WhenWorkstationNameExists_ShouldReturnFalse(){
         // configuração mock
-        WorkstationRegisterDTO request = new WorkstationRegisterDTO("mockWorkstation", null);
-        when(workstationRepository.existsByName("mockWorkstation")).thenReturn(true);
+        WorkstationRegisterDTO request = Mockito.mock(WorkstationRegisterDTO.class);
+        when(workstationRepository.existsByName(request.name())).thenReturn(true);
 
         // execução
         boolean success = service.registerWorkstation(request);
@@ -45,8 +46,8 @@ public class WorkstationServiceTest {
     @Test
     void registerWorkstation_WhenWorkstationNameNotExists_ShouldReturnTrue(){
         // config mock
-        WorkstationRegisterDTO request = new WorkstationRegisterDTO("mockWorkstation", null);
-        when(workstationRepository.existsByName("mockWorkstation")).thenReturn(false);
+        WorkstationRegisterDTO request = Mockito.mock(WorkstationRegisterDTO.class);
+        when(workstationRepository.existsByName(request.name())).thenReturn(false);
 
         // execução do teste
         boolean success = service.registerWorkstation(request);
@@ -61,8 +62,9 @@ public class WorkstationServiceTest {
     void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnSimpleWorkstationDTO(){
         // config mock
         List<Workstation> mockWorkstationList = new ArrayList<>();
-        mockWorkstationList.add(Workstation.builder().name("mockWorkstation1").build());
-        mockWorkstationList.add(Workstation.builder().name("mockWorkstation2").build());
+        for(int i=0;i<10;i++){
+            mockWorkstationList.add(Mockito.mock(Workstation.class));
+        }
         when(workstationRepository.findAll()).thenReturn(mockWorkstationList);
 
         // execução
@@ -100,10 +102,7 @@ public class WorkstationServiceTest {
     @Test
     void getAllWorkstationsByEmployee_WhenUserIdNotFound_ShouldReturnEmptyList(){
         // config mock
-        User mockUser = User.builder()
-                .username("mockUser")
-                .email("example@gmail.com")
-                .build();
+        User mockUser = Mockito.mock(User.class);
 
         // execução
         List<SimpleWorkstationDTO> workstations = service.getAllWorkstationsByEmployee(mockUser);
@@ -117,13 +116,10 @@ public class WorkstationServiceTest {
     void getAllWorkstationsByEmployee_WhenUserIdIsFound_ShouldReturnSimpleWorkstationDTOs(){
         // config mock
         Set<Workstation> mockWorkstationList = new HashSet<>();
-        mockWorkstationList.add(Workstation.builder().name("mockWorkstation1").build());
-        mockWorkstationList.add(Workstation.builder().name("mockWorkstation2").build());
-        User mockUser = User.builder()
-                .username("mockUser")
-                .email("mockUser@gmail.com")
-                .workstations(mockWorkstationList)
-                .build();
+        for(int i=0;i<10;i++){
+            mockWorkstationList.add(Mockito.mock(Workstation.class));
+        }
+        User mockUser = Mockito.mock(User.class);
         when(workstationRepository.findWorkstationsByUserId(mockUser.getId()))
                 .thenReturn(mockWorkstationList.stream().toList());
         List<SimpleWorkstationDTO> model = new ArrayList<>();

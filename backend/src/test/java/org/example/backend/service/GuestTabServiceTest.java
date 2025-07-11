@@ -45,15 +45,13 @@ public class GuestTabServiceTest {
     @Test
     void registerGuestTab_WhenTableNotExists_ShouldReturnFalse(){
         // config mock
-        LocalTable mockLocalTable = Mockito.mock(LocalTable.class);
         GuestTabRequestDTO mockGuestTabRequestDTO = Mockito.mock(GuestTabRequestDTO.class);
-        when(localTableRepository.findById(mockGuestTabRequestDTO.localTableId())).thenReturn(null);
 
         // execução
         boolean result = guestTabService.registerGuestTab(mockGuestTabRequestDTO);
 
         // verificação
-        assertFalse(result);
+        assertFalse(result, "GuestTab registrada em mesa inexistente");
     }
 
     @Test
