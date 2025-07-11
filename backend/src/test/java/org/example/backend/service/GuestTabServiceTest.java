@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.GuestTab.GuestTabGetDTO;
 import org.example.backend.dto.GuestTab.GuestTabRequestDTO;
 import org.example.backend.model.LocalTable;
 import org.example.backend.repository.GuestTabRepository;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +58,17 @@ public class GuestTabServiceTest {
 
     @Test
     void getGuestTabsByTableNumber_WhenTableNumberNotFound_ShouldReturnEmptyList() {
+        // config mock
+        LocalTable mockLocalTable = Mockito.mock(LocalTable.class);
+
+        // execução
+        List<GuestTabGetDTO> result = guestTabService.getGuestTabsByTableNumber(mockLocalTable.getNumber());
+
+        // verificação
+        assertNotNull(result, "Resultado retornou null");
+        assertArrayEquals(new GuestTabGetDTO[]{}, result.toArray(), "Lista de mesa inexistente veio preenchida");
 
     }
+
 
 }
