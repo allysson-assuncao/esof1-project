@@ -63,29 +63,54 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const renderSubComponent = ({row}: { row: typeof rows[0] }) => {
+        const additionalOrders = row.original.additionalOrders || [];
+
         return (
             <div className="p-4 bg-muted/50">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Pedidos Adicionais</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="space-y-3">
-                            {row.original.additionalOrders.map(subOrder => (
-                                <li key={subOrder.id} className="flex items-center gap-4 p-2 border-b last:border-b-0">
-                                    <Package className="h-5 w-5 text-muted-foreground"/>
-                                    <div className="flex-1">
-                                        <p className="font-semibold">{subOrder.productName}</p>
-                                        {subOrder.observation && (
-                                            <p className="text-sm text-muted-foreground">{subOrder.observation}</p>
-                                        )}
-                                    </div>
-                                    <Badge variant="secondary">Qtd: {subOrder.amount}</Badge>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
+                <div className="rounded-xl border bg-card text-card-foreground shadow">
+                    <div className="px-4 py-2 border-b">
+                        <span className="text-lg font-semibold">Pedidos Adicionais</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <Table className="min-w-full divide-y divide-muted">
+                            <TableHeader className="bg-muted/30">
+                            <TableRow>
+                                <TableCell className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Produto</TableCell>
+                                <TableCell className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Observação</TableCell>
+                                <TableCell className="px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Quantidade</TableCell>
+                            </TableRow>
+                            </TableHeader>
+                            <TableBody className="bg-card divide-y divide-muted">
+                            {additionalOrders.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={3} className="text-center py-4 text-muted-foreground text-sm">
+                                        Nenhum pedido adicional.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                additionalOrders.map(subOrder => (
+                                    <TableRow key={subOrder.id}>
+                                        <TableCell className="px-4 py-2 font-semibold flex items-center gap-2">
+                                            <Package className="h-4 w-4 text-muted-foreground"/>
+                                            {subOrder.productName}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-2 text-sm text-muted-foreground">
+                                            {subOrder.observation ||
+                                                <span className="italic text-muted-foreground/60">—</span>}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-2 text-center">
+                                                <span
+                                                    className="inline-block rounded bg-muted px-2 py-1 text-xs font-medium">
+                                                    {subOrder.amount}
+                                                </span>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
             </div>
         );
     };
