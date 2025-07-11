@@ -50,9 +50,11 @@ public class GuestTabService {
     @Transactional
     public boolean registerGuestTab(GuestTabRequestDTO request) {
         LocalTable table = localTableRepository.findById(request.localTableId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Table number " + request.localTableId() + " not found."
-                ));
+                .orElse(null);
+
+        if(table==null){
+            return false;
+        }
 
         GuestTab guestTab = GuestTab.builder()
                 .guestName(request.guestName())
