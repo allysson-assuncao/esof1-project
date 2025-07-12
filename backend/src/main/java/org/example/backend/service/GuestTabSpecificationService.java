@@ -28,16 +28,16 @@ public class GuestTabSpecificationService {
                 mainPredicates.add(root.get("id").in(filterDto.guestTabIds()));
             }
 
-            /*if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
+            if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
                 mainPredicates.add(root.get("status").in(filterDto.guestTabStatuses()));
-            }*/
+            }
 
-            mainPredicates.add(
+            /*mainPredicates.add(
                     criteriaBuilder.or(
                             criteriaBuilder.equal(root.get("status"), GuestTabStatus.OPEN),
                             criteriaBuilder.isNull(root.get("id"))
                     )
-            );
+            );*/
 
             if (filterDto.tableId() != null) {
                 mainPredicates.add(criteriaBuilder.equal(localTableJoin.get("id"), filterDto.tableId()));
