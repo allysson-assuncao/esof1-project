@@ -1,6 +1,6 @@
 import {order} from "@/services/index";
 import {RegisterOrdersFormData} from "@/model/FormData";
-import {FetchKanbanOrderResultsParams, KanbanOrders, OrderStatus} from "@/model/Interfaces";
+import {FetchKanbanOrderResultsParams, KanbanOrders} from "@/model/Interfaces";
 
 export const registerOrdersRequest = async (data: RegisterOrdersFormData) => {
     const response = await order.post(`/register`, data, {
@@ -39,12 +39,12 @@ export const fetchFilteredOrderKanbanResults = async (params: FetchKanbanOrderRe
     return response.data
 }
 
-export const nextOrderStatus = async ({ orderId }: { orderId: number }) => {
-    const response = await order.get(`/order/${orderId}`);
+export const advanceOrderStatus = async ({ orderId }: { orderId: number }) => {
+    const response = await order.get(`/${orderId}/advance`);
     return response.data;
 };
 
-export const previousOrderStatus = async ({ orderId }: { orderId: number }) => {
-    const response = await order.get(`/order/${orderId}`);
+export const regressOrderStatus = async ({ orderId }: { orderId: number }) => {
+    const response = await order.get(`/${orderId}/regress`);
     return response.data;
 };

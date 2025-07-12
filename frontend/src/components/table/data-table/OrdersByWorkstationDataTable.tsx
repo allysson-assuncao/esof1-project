@@ -3,7 +3,9 @@ import {OrderKanban} from "@/model/Interfaces";
 import React, {useRef, useCallback} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useVirtualizer} from "@tanstack/react-virtual";
-import {Loader2} from "lucide-react";
+import {Loader2, Package} from "lucide-react";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -36,7 +38,15 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
     const rowVirtualizer = useVirtualizer({
         count: hasNextPage ? rows.length + 1 : rows.length,
         getScrollElement: () => tableContainerRef.current,
-        estimateSize: () => 64,
+        estimateSize: (index) => {
+            const row = rows[index];
+            const baseHeight = 64;
+            if (row?.getIsExpanded()) {
+                const subItemsHeight = (row.original.additionalOrders.length * 48) + 16;
+                return baseHeight + subItemsHeight;
+            }
+            return baseHeight;
+        },
         overscan: 10,
     });
 
@@ -52,19 +62,32 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    // Sub-componente para renderizar os detalhes dos pedidos adicionais
     const renderSubComponent = ({row}: { row: typeof rows[0] }) => {
         return (
-            <div style={{paddingLeft: '2rem', backgroundColor: '#f9f9f9'}}>
-                {row.original.additionalOrders.map(subOrder => (
-                    <div key={subOrder.id} className="flex items-center gap-4 p-2 border-b">
-                        <span className="font-semibold">{subOrder.productName}</span>
-                        <span>(Qtd: {subOrder.amount})</span>
-                        <span className="text-sm text-muted-foreground">{subOrder.observation}</span>
-                    </div>
-                ))}
+            <div className="p-4 bg-muted/50">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Pedidos Adicionais</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="space-y-3">
+                            {row.original.additionalOrders.map(subOrder => (
+                                <li key={subOrder.id} className="flex items-center gap-4 p-2 border-b last:border-b-0">
+                                    <Package className="h-5 w-5 text-muted-foreground"/>
+                                    <div className="flex-1">
+                                        <p className="font-semibold">{subOrder.productName}</p>
+                                        {subOrder.observation && (
+                                            <p className="text-sm text-muted-foreground">{subOrder.observation}</p>
+                                        )}
+                                    </div>
+                                    <Badge variant="secondary">Qtd: {subOrder.amount}</Badge>
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
             </div>
-        )
+        );
     };
 
     return (
@@ -124,14 +147,13 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
                                     {row.getIsExpanded() && (
                                         <TableRow
                                             style={{
-                                                height: `${row.original.additionalOrders.length * 48}px`,
-                                                transform: `translateY(${virtualRow.start + virtualRow.size}px)`,
+                                                transform: `translateY(${virtualRow.start}px)`,
                                                 position: 'absolute',
                                                 width: '100%',
-                                                backgroundColor: '#f9f9f9'
+                                                top: `${virtualRow.size}px`,
                                             }}
                                         >
-                                            <TableCell colSpan={columns.length}>
+                                            <TableCell colSpan={columns.length} className="p-0">
                                                 {renderSubComponent({row})}
                                             </TableCell>
                                         </TableRow>

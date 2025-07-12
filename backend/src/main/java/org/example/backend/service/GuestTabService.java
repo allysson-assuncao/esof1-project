@@ -152,48 +152,39 @@ public class GuestTabService {
                 .map(GuestTab::getId)
                 .toList();
 
-        if (guestTabIdsOnPage.isEmpty()) {
-            return guestTabPage.map(gt -> convertToGuestTabDTOWithNestedOrders(gt, Collections.emptyList()));
+        Map<Long, List<Order>> ordersByGuestTabId = new HashMap<>();
+
+        if (!guestTabIdsOnPage.isEmpty()) {
+            List<Order> topLevelOrders = this.orderRepository.findTopLevelOrdersWithAdditionalsByGuestTabIds(guestTabIdsOnPage);
+
+            ordersByGuestTabId = topLevelOrders.stream()
+                    .collect(Collectors.groupingBy(order -> order.getGuestTab().getId()));
         }
 
-        List<FlatOrderDTO> flatOrders = this.orderRepository.findFlatOrderDTOsByGuestTabIds(guestTabIdsOnPage);
-
-        Map<Long, List<FlatOrderDTO>> ordersByGuestTabId = flatOrders.stream()
-                .collect(Collectors.groupingBy(FlatOrderDTO::guestTabId));
-
+        final Map<Long, List<Order>> finalOrdersByGuestTabId = ordersByGuestTabId;
         return guestTabPage.map(guestTab ->
-                convertToGuestTabDTOWithNestedOrders(guestTab, ordersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()))
+                convertToGuestTabDTOWithEntities(guestTab, finalOrdersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()))
         );
     }
 
-    private GuestTabDTO convertToGuestTabDTOWithNestedOrders(GuestTab guestTab, List<FlatOrderDTO> flatOrders) {
+    private GuestTabDTO convertToGuestTabDTOWithEntities(GuestTab guestTab, List<Order> topLevelOrders) {
         if (guestTab == null) return null;
 
-        Map<Long, List<FlatOrderDTO>> subOrdersByParentId = flatOrders.stream()
-                .filter(order -> order.parentOrderId() != null)
-                .collect(Collectors.groupingBy(FlatOrderDTO::parentOrderId));
-
-        List<FlatOrderDTO> topLevelOrders = flatOrders.stream()
-                .filter(order -> order.parentOrderId() == null)
-                .toList();
-
-        Map<LocalDateTime, List<FlatOrderDTO>> ordersGroupedByTime = topLevelOrders.stream()
-                .collect(Collectors.groupingBy(FlatOrderDTO::orderedTime));
+        Map<LocalDateTime, List<Order>> ordersGroupedByTime = topLevelOrders.stream()
+                .collect(Collectors.groupingBy(Order::getOrderedTime));
 
         Set<OrderGroupDTO> orderGroupDTOs = ordersGroupedByTime.entrySet().stream()
                 .map(entry -> {
-                    LocalDateTime groupTime = entry.getKey();
-                    List<FlatOrderDTO> ordersInGroup = entry.getValue();
-
+                    List<Order> ordersInGroup = entry.getValue();
                     Set<DrillDownOrderDTO> drillDownOrders = ordersInGroup.stream()
-                            .map(flatOrder -> convertToDrillDownOrderDTO(flatOrder, subOrdersByParentId))
+                            .map(this::convertEntityToDrillDownDTO)
                             .collect(Collectors.toSet());
 
                     double groupTotalPrice = drillDownOrders.stream()
                             .mapToDouble(this::calculateOrderTotal)
                             .sum();
 
-                    return new OrderGroupDTO(groupTime, groupTotalPrice, drillDownOrders.size(), drillDownOrders);
+                    return new OrderGroupDTO(entry.getKey(), groupTotalPrice, drillDownOrders.size(), drillDownOrders);
                 })
                 .collect(Collectors.toSet());
 
@@ -211,23 +202,23 @@ public class GuestTabService {
                 .build();
     }
 
-    private DrillDownOrderDTO convertToDrillDownOrderDTO(FlatOrderDTO flatOrder, Map<Long, List<FlatOrderDTO>> subOrdersMap) {
-        if (flatOrder == null) return null;
-
-        Set<DrillDownOrderDTO> additionalOrderDTOs = subOrdersMap.getOrDefault(flatOrder.id(), Collections.emptyList()).stream()
-                .map(child -> convertToDrillDownOrderDTO(child, subOrdersMap))
-                .collect(Collectors.toSet());
+    private DrillDownOrderDTO convertEntityToDrillDownDTO(Order order) {
+        if (order == null) return null;
 
         return DrillDownOrderDTO.builder()
-                .id(flatOrder.id())
-                .amount(flatOrder.amount())
-                .status(flatOrder.status())
-                .observation(flatOrder.observation())
-                .orderedTime(flatOrder.orderedTime())
-                .additionalOrders(additionalOrderDTOs)
-                .productName(flatOrder.productName())
-                .productUnitPrice(flatOrder.productUnitPrice())
-                .waiterName(flatOrder.waiterName())
+                .id(order.getId())
+                .amount(order.getAmount())
+                .status(order.getStatus())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .productName(order.getProduct().getName())
+                .productUnitPrice(order.getProduct().getPrice())
+                .waiterName(order.getWaiter().getName())
+                .additionalOrders(
+                        order.getAdditionalOrders().stream()
+                                .map(this::convertEntityToDrillDownDTO)
+                                .collect(Collectors.toSet())
+                )
                 .build();
     }
 

@@ -2,8 +2,6 @@ package org.example.backend.repository;
 
 import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.model.Order;
-import org.example.backend.model.enums.OrderStatus;
-/*import org.example.backend.model.enums.ProductDestination;*/
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,8 +22,17 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     List<Order> findByGuestTabId(Long guestTabId);
 
+    List<Order> findByParentOrderId(Long id);
+
     Optional<Order> findById(Long id);
     /*Optional<List<Order>> findByStatusAndProduct_Destination(OrderStatus status, ProductDestination destination);*/
+
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.product " +
+            "JOIN FETCH o.waiter " +
+            "LEFT JOIN FETCH o.additionalOrders " +
+            "WHERE o.guestTab.id IN :guestTabIds AND o.parentOrder IS NULL")
+    List<Order> findTopLevelOrdersWithAdditionalsByGuestTabIds(@Param("guestTabIds") List<Long> guestTabIds);
 
     @Query("""
                 SELECT new org.example.backend.dto.Order.FlatOrderDTO(
