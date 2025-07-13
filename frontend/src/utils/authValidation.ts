@@ -50,6 +50,7 @@ export const guestTabRegisterSchema = z.object({
 export const categoryRegisterSchema = z.object({
     name: z.string().min(1, "Nome é obrigatório"),
     isMultiple: z.boolean(),
+    isAdditional: z.boolean(),
     subcategories: z.array(z.string().min(1, "Subcategoria não pode ser vazia")),
     workstationId: z.string().uuid("ID da estação inválido"),
 });
