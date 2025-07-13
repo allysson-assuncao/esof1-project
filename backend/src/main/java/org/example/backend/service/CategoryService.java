@@ -44,6 +44,7 @@ public class CategoryService {
 
                 sub.setParentCategory(parentCategory);
                 sub.setMultiple(parentCategory.isMultiple());
+                sub.setAdditional(parentCategory.isAdditional());
                 sub.setWorkstation(parentCategory.getWorkstation());
 
                 sub = categoryRepository.save(sub);
@@ -80,6 +81,7 @@ public class CategoryService {
         return new CategoryDTO(
                 category.getName(),
                 category.isMultiple(),
+                category.isAdditional(),
                 subcategoryNames,
                 category.getWorkstation() != null ? category.getWorkstation().getId() : null
         );
