@@ -44,6 +44,7 @@ public class CategoryService {
 
                 sub.setParentCategory(parentCategory);
                 sub.setMultiple(parentCategory.isMultiple());
+                sub.setAdditional(parentCategory.isAdditional());
                 sub.setWorkstation(parentCategory.getWorkstation());
 
                 sub = categoryRepository.save(sub);
@@ -56,16 +57,17 @@ public class CategoryService {
         return convertToDTO(savedParentCategory);
     }
 
-    private void updateCategoryFromDTO(Category category, CategoryDTO dto) {
-        category.setName(dto.name());
-        category.setMultiple(dto.isMultiple());
+    private void updateCategoryFromDTO(Category parentCategory, CategoryDTO dto) {
+        parentCategory.setName(dto.name());
+        parentCategory.setMultiple(dto.isMultiple());
+        parentCategory.setAdditional(dto.isAdditional());
 
         if (dto.workstationId() != null) {
             Workstation workstation = workstationRepository.findById(dto.workstationId())
                     .orElseThrow(() -> new EntityNotFoundException("Workstation não encontrada com ID: " + dto.workstationId()));
-            category.setWorkstation(workstation);
+            parentCategory.setWorkstation(workstation);
         } else {
-            category.setWorkstation(null);
+            parentCategory.setWorkstation(null);
         }
     }
 
@@ -80,6 +82,7 @@ public class CategoryService {
         return new CategoryDTO(
                 category.getName(),
                 category.isMultiple(),
+                category.isAdditional(),
                 subcategoryNames,
                 category.getWorkstation() != null ? category.getWorkstation().getId() : null
         );

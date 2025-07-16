@@ -30,11 +30,11 @@ public class ProductService {
     }
 
     public void registerProduct(ProductRegisterDTO productRegisterDTO) {
-        if (productRepository.existsByName(productRegisterDTO.name())) {
+        if (this.productRepository.existsByName(productRegisterDTO.name())) {
             throw new RuntimeException("Produto com o nome " + productRegisterDTO.name() + "já existe");
         }
 
-        Category category = categoryRepository.findById(productRegisterDTO.idCategory())
+        Category category = this.categoryRepository.findById(productRegisterDTO.idCategory())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productRegisterDTO.idCategory()));
 
         Product product = Product.builder()
@@ -45,11 +45,11 @@ public class ProductService {
                 .active(true)
                 .build();
 
-        productRepository.save(product);
+        this.productRepository.save(product);
     }
 
     public List<ProductRegisterDTO> getAllProducts() {
-        return productRepository.findAll()
+        return this.productRepository.findAll()
                 .stream()
                 .map(product -> new ProductRegisterDTO(
                         product.getName(),
@@ -61,15 +61,15 @@ public class ProductService {
     }
 
     public Product updateProductById(UUID id, ProductRegisterDTO productRegisterDTO) {
-        Product existingProduct = productRepository.findById(id)
+        Product existingProduct = this.productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
 
         boolean nameChanged = !existingProduct.getName().equals(productRegisterDTO.name());
-        if (nameChanged && productRepository.existsByName(productRegisterDTO.name())) {
+        if (nameChanged && this.productRepository.existsByName(productRegisterDTO.name())) {
             throw new RuntimeException("Já existe outro produto com o nome: " + productRegisterDTO.name());
         }
 
-        Category category = categoryRepository.findById(productRegisterDTO.idCategory())
+        Category category = this.categoryRepository.findById(productRegisterDTO.idCategory())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada: " + productRegisterDTO.idCategory()));
 
         existingProduct.setName(productRegisterDTO.name());
@@ -77,15 +77,15 @@ public class ProductService {
         existingProduct.setPrice(productRegisterDTO.price());
         existingProduct.setCategory(category);
 
-        return productRepository.save(existingProduct);
+        return this.productRepository.save(existingProduct);
     }
 
     public List<ProductByCategoryDTO> getProductsByCategoryId(UUID categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
+        if (!this.categoryRepository.existsById(categoryId)) {
             throw new RuntimeException("Categoria não encontrada com ID: " + categoryId);
         }
 
-        return productRepository.findByCategoryId(categoryId)
+        return this.productRepository.findByCategoryId(categoryId)
                 .stream()
                 .map(product -> new ProductByCategoryDTO(
                         product.getId(),
@@ -98,7 +98,7 @@ public class ProductService {
     }
 
     public List<SimpleProductDTO> getAllSimpleProducts() {
-        return productRepository.findAll()
+        return this.productRepository.findAll()
                 .stream()
                 .map(product -> new SimpleProductDTO(
                         product.getId(),
@@ -111,11 +111,9 @@ public class ProductService {
         List<Product> products;
 
         if (parentOrderId != null && this.orderRepository.existsById(parentOrderId)) {
-            System.out.println("1");
-            products = productRepository.findProductsFromParentOrderCategoryAndSubcategories(parentOrderId);
+            products = this.productRepository.findAdditionalProductsInParentOrderSubcategories(parentOrderId);
         } else {
-            System.out.println("2");
-            products = productRepository.findProductsWithCategoryWithSubcategories();
+            products = this.productRepository.findAllProductsWithNonAdditionalCategory();
         }
 
         return products.stream()

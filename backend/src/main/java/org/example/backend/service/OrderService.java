@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Order.*;
+import org.example.backend.model.*;
+import org.example.backend.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,28 +70,41 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Garçom não encontrado"));
 
         GuestTab guestTab = guestTabRepository.findById(request.guestTabId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Comanda não encontrada"));
 
-
-        Order parent = null;
+        Order parentOrder = null;
         if (request.parentOrderId() != null) {
-            parent = orderRepository.findById(request.parentOrderId())
-                    .orElse(null);
+            parentOrder = orderRepository.findById(request.parentOrderId())
+                    .orElseThrow(() -> new EntityNotFoundException("Pedido pai não encontrado com o ID: " + request.parentOrderId()));
         }
+
+        OrderStatus status = parentOrder != null
+                ? parentOrder.getStatus()
+                : OrderStatus.SENT;
 
         LocalDateTime now = LocalDateTime.now();
 
         for (OrderItemDTO item : request.items()) {
+            Product product = productRepository.findById(item.productId()).orElseThrow();
+            Category category = product.getCategory();
+
+            Workstation workstation = category.getWorkstation();
+
             Order order = Order.builder()
                     .amount(item.amount())
                     .observation(item.observation())
-                    .status(OrderStatus.SENT)
+                    .status(status)
                     .orderedTime(now)
-                    .parentOrder(parent)
+                    .parentOrder(parentOrder)
                     .guestTab(guestTab)
-                    .product(productRepository.findById(item.productId()).orElseThrow())
+                    .product(product)
                     .waiter(waiter)
+                    .workstation(workstation)
                     .build();
+
+            if (parentOrder != null) {
+                parentOrder.addAdditionalOrder(order);
+            }
 
             orderRepository.save(order);
         }
@@ -239,9 +255,11 @@ public class OrderService {
             case DELIVERED, CANCELED -> order.setClosedTime(now);
         }
 
+        List<Order> additionalOrders = orderRepository.findByParentOrderId(order.getId());
+
         // Atualizar pedidos adicionais
-        if (order.getAdditionalOrders() != null) {
-            for (Order additional : order.getAdditionalOrders()) {
+        if (!additionalOrders.isEmpty()) {
+            for (Order additional : additionalOrders) {
                 additional.setStatus(newStatus);
                 switch (newStatus) {
                     case SENT -> additional.setOrderedTime(now);

@@ -3,7 +3,8 @@ import {OrderKanban} from "@/model/Interfaces";
 import React, {useRef, useCallback} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useVirtualizer} from "@tanstack/react-virtual";
-import {Loader2} from "lucide-react";
+import {Loader2, Package} from "lucide-react";
+import {Badge} from "@/components/ui/badge";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -33,10 +34,29 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
 
     const {rows} = table.getRowModel();
 
+    const virtualRows: { row: typeof rows[0]; isSubRow: boolean; virtualIndex: number }[] = [];
+    let vIndex = 0;
+    rows.forEach((row) => {
+        virtualRows.push({row, isSubRow: false, virtualIndex: vIndex++});
+        if (row.getIsExpanded()) {
+            virtualRows.push({row, isSubRow: true, virtualIndex: vIndex++});
+        }
+    });
+
     const rowVirtualizer = useVirtualizer({
-        count: hasNextPage ? rows.length + 1 : rows.length,
+        count: hasNextPage ? virtualRows.length + 1 : virtualRows.length,
         getScrollElement: () => tableContainerRef.current,
-        estimateSize: () => 64,
+        estimateSize: (index) => {
+            const vRow = virtualRows[index];
+            if (!vRow) return 64;
+            if (vRow.isSubRow) {
+                const additionalOrders = vRow.row.original.additionalOrders || [];
+                return additionalOrders.length > 0
+                    ? additionalOrders.length * 72 + 80
+                    : 80;
+            }
+            return 64;
+        },
         overscan: 10,
     });
 
@@ -52,19 +72,58 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    // Sub-componente para renderizar os detalhes dos pedidos adicionais
     const renderSubComponent = ({row}: { row: typeof rows[0] }) => {
+        const additionalOrders = row.original.additionalOrders || [];
+
         return (
-            <div style={{paddingLeft: '2rem', backgroundColor: '#f9f9f9'}}>
-                {row.original.additionalOrders.map(subOrder => (
-                    <div key={subOrder.id} className="flex items-center gap-4 p-2 border-b">
-                        <span className="font-semibold">{subOrder.productName}</span>
-                        <span>(Qtd: {subOrder.amount})</span>
-                        <span className="text-sm text-muted-foreground">{subOrder.observation}</span>
+            <div className="p-4 bg-muted/50">
+                <div className="rounded-xl border bg-card text-card-foreground shadow">
+                    <div className="px-4 py-2 border-b">
+                        <span className="text-lg font-semibold">Pedidos Adicionais</span>
                     </div>
-                ))}
+                    <div className="overflow-x-auto">
+                        <Table className="min-w-full divide-y divide-muted">
+                            <TableHeader className="bg-muted/30">
+                                <TableRow>
+                                    <TableCell
+                                        className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Produto</TableCell>
+                                    <TableCell
+                                        className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Observação</TableCell>
+                                    <TableCell
+                                        className="px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Quantidade</TableCell>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="bg-card divide-y divide-muted">
+                                {additionalOrders.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={3}
+                                                   className="text-center py-4 text-muted-foreground text-sm">
+                                            Nenhum pedido adicional.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    additionalOrders.map(subOrder => (
+                                        <TableRow key={subOrder.id}>
+                                            <TableCell className="px-4 py-2 font-semibold flex items-center gap-2">
+                                                <Package className="h-5 w-5 text-muted-foreground"/>
+                                                {subOrder.productName}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-2 text-sm text-muted-foreground">
+                                                {subOrder.observation ||
+                                                    <span className="italic text-muted-foreground/60">—</span>}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-2 text-center">
+                                                <Badge variant="secondary">Qtd: {subOrder.amount}</Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
             </div>
-        )
+        );
     };
 
     return (
@@ -89,54 +148,67 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
                     </TableHeader>
                     <TableBody style={{height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative'}}>
                         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                            const isLoaderRow = virtualRow.index > rows.length - 1;
-                            const row = rows[virtualRow.index];
-
-                            return isLoaderRow ? (
-                                <TableRow key="loader-row" style={{
-                                    height: `${virtualRow.size}px`,
-                                    transform: `translateY(${virtualRow.start}px)`,
-                                    position: 'absolute',
-                                    width: '100%'
-                                }}>
-                                    <TableCell colSpan={columns.length} className="text-center">
-                                        {hasNextPage && <div className="flex justify-center items-center py-4"><Loader2
-                                            className="mr-2 h-6 w-6 animate-spin"/><span>Carregando...</span></div>}
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                <React.Fragment key={row.id}>
+                            const index = virtualRow.index;
+                            if (hasNextPage && index === virtualRows.length) {
+                                return (
                                     <TableRow
-                                        data-index={virtualRow.index}
+                                        key="loader-row"
                                         style={{
                                             height: `${virtualRow.size}px`,
                                             transform: `translateY(${virtualRow.start}px)`,
-                                            position: 'absolute',
-                                            width: '100%'
+                                            position: "absolute",
+                                            width: "100%",
                                         }}
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
+                                        <TableCell colSpan={columns.length} className="text-center">
+                                            {hasNextPage && (
+                                                <div className="flex justify-center items-center py-4">
+                                                    <Loader2 className="mr-2 h-6 w-6 animate-spin"/>
+                                                    <span>Carregando...</span>
+                                                </div>
+                                            )}
+                                        </TableCell>
                                     </TableRow>
-                                    {row.getIsExpanded() && (
-                                        <TableRow
-                                            style={{
-                                                height: `${row.original.additionalOrders.length * 48}px`,
-                                                transform: `translateY(${virtualRow.start + virtualRow.size}px)`,
-                                                position: 'absolute',
-                                                width: '100%',
-                                                backgroundColor: '#f9f9f9'
-                                            }}
-                                        >
-                                            <TableCell colSpan={columns.length}>
-                                                {renderSubComponent({row})}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </React.Fragment>
+                                );
+                            }
+                            const vRow = virtualRows[index];
+                            if (!vRow) return null;
+                            if (vRow.isSubRow) {
+                                return (
+                                    <TableRow
+                                        key={vRow.row.id + "-expanded"}
+                                        style={{
+                                            height: `${virtualRow.size}px`,
+                                            transform: `translateY(${virtualRow.start}px)`,
+                                            position: "absolute",
+                                            width: "100%",
+                                        }}
+                                    >
+                                        <TableCell colSpan={columns.length}
+                                                   style={{padding: 0, background: "transparent"}}>
+                                            {renderSubComponent({row: vRow.row})}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            }
+                            return (
+                                <TableRow
+                                    key={vRow.row.id}
+                                    data-index={index}
+                                    style={{
+                                        height: `${virtualRow.size}px`,
+                                        transform: `translateY(${virtualRow.start}px)`,
+                                        position: "absolute",
+                                        width: "100%",
+                                        verticalAlign: "top",
+                                    }}
+                                >
+                                    {vRow.row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} style={{verticalAlign: "top"}}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
                             );
                         })}
                         {rows.length === 0 && !isFetchingNextPage && (

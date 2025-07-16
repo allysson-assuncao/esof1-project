@@ -6,4 +6,4 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-public record CategoryDTO(String name, boolean isMultiple, Set<String> subcategories, UUID workstationId) {}
+public record CategoryDTO(String name, boolean isMultiple, boolean isAdditional, Set<String> subcategories, UUID workstationId) {}
