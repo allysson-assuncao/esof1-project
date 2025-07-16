@@ -14,7 +14,7 @@ import {
     DisplayGuestTabItem,
     SimpleGuestTab,
     GuestTabFilters,
-    OrderStatus, SimpleOrder, SimpleWaiter
+    OrderStatus, SimpleOrder, SimpleWaiter, UserRoles, GuestTabStatus
 } from "@/model/Interfaces";
 import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/components/ui/date-picker";
@@ -44,6 +44,8 @@ import {
 import {AddGuestTabForm} from "@/components/form/add/AddGuestTabForm";
 import {OrderGroupsSubTable} from "@/components/table/sub-table/OrderGroupsSubTable";
 import {AddOrderDialog} from "@/components/dialog/AddOrderDialog";
+import {useSelector} from "react-redux";
+import {RootState} from "@/store";
 
 interface DataTableProps<TValue> {
     columns: ColumnDef<DisplayGuestTabItem, TValue>[];
@@ -69,6 +71,8 @@ export function GuestTabDataTable<TValue>({
                                           }: DataTableProps<TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [openAddGuestTab, setOpenAddGuestTab] = useState(false);
+
+    const role = useSelector((state: RootState) => state.auth.role)
 
     /*const isDesktop = useMediaQuery("(min-width: 768px)");*/
     const isDesktop = true;
@@ -146,10 +150,10 @@ export function GuestTabDataTable<TValue>({
             label: tab.userName,
         })) ?? [];
 
-    /*const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
+    const guestTabStatusOptions = Object.entries(GuestTabStatus).map(([, {value, label}]) => ({
         value,
         label,
-    }));*/
+    }));
 
     const orderStatusOptions = Object.entries(OrderStatus).map(([, {value, label}]) => ({
         value,
@@ -225,17 +229,19 @@ export function GuestTabDataTable<TValue>({
                     animation={2}
                     maxCount={3}
                 />
-                {/*<MultiSelect
-                    options={guestTabStatusOptions}
-                    onValueChange={(selectedValues) => setSelectedFilters({
-                        ...selectedFilters,
-                        guestTabStatuses: selectedValues,
-                    })}
-                    defaultValue={selectedFilters.guestTabStatuses || []}
-                    placeholder="Selecione o status da comanda"
-                    animation={2}
-                    maxCount={3}
-                />*/}
+                {role == UserRoles.ADMIN.value || role == UserRoles.CASHIER.value && (
+                    <MultiSelect
+                        options={guestTabStatusOptions}
+                        onValueChange={(selectedValues) => setSelectedFilters({
+                            ...selectedFilters,
+                            guestTabStatuses: selectedValues,
+                        })}
+                        defaultValue={selectedFilters.guestTabStatuses || []}
+                        placeholder="Selecione o status da comanda"
+                        animation={2}
+                        maxCount={3}
+                    />
+                )}
                 <MultiSelect
                     options={orderStatusOptions}
                     onValueChange={(selectedValues) => setSelectedFilters({

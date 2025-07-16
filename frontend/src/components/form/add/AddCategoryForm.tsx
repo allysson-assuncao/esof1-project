@@ -31,6 +31,7 @@ export function AddCategoryForm({onSubmit}: { className?: string, onSubmit?: (da
         defaultValues: {
             name: "",
             isMultiple: false,
+            isAdditional: false,
             subcategories: [""],
             workstationId: "",
         },
@@ -118,6 +119,26 @@ export function AddCategoryForm({onSubmit}: { className?: string, onSubmit?: (da
                                         render={({field}) => (
                                             <FormItem className="flex items-center gap-2 mt-6">
                                                 <FormLabel className="text-base m-0">Múltipla seleção</FormLabel>
+                                                <FormControl className="p-0 m-0">
+                                                    <div className="m-0 p-0">
+                                                        <Switch
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                            className="m-0 p-0"
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* isAdditional */}
+                                    <FormField
+                                        control={form.control}
+                                        name="isAdditional"
+                                        render={({field}) => (
+                                            <FormItem className="flex items-center gap-2 mt-6">
+                                                <FormLabel className="text-base m-0">É adicional</FormLabel>
                                                 <FormControl className="p-0 m-0">
                                                     <div className="m-0 p-0">
                                                         <Switch

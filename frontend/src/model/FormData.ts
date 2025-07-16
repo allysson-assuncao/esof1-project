@@ -48,6 +48,7 @@ export interface RegisterOrdersFormData {
 export type CategoryFormData = {
     name: string;
     isMultiple: boolean;
+    isAdditional: boolean;
     subcategories: string[];
     workstationId: string;
 };

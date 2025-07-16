@@ -25,18 +25,23 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findByCategory_SubCategoriesIsNotEmptyAndOrdersIsNotEmpty();
 
     @Query("""
-            SELECT p FROM Product p
-            WHERE p.category.id IN (
-                SELECT subCat.id FROM Order o
-                JOIN o.product prod
-                JOIN prod.category cat
-                JOIN cat.subCategories subCat
-                WHERE o.id = :parentOrderId
-            )
-            """)
-    List<Product> findProductsFromParentOrderCategoryAndSubcategories(@Param("parentOrderId") Long parentOrderId);
+        SELECT p FROM Product p
+        WHERE p.category.isAdditional = true
+          AND p.category.id IN (
+            SELECT subCat.id FROM Order o
+            JOIN o.product prod
+            JOIN prod.category cat
+            JOIN cat.subCategories subCat
+            WHERE o.id = :parentOrderId
+          )
+    """)
+    List<Product> findAdditionalProductsInParentOrderSubcategories(@Param("parentOrderId") Long parentOrderId);
 
-    @Query("SELECT p FROM Product p JOIN p.category c WHERE c.subCategories IS NOT EMPTY")
-    List<Product> findProductsWithCategoryWithSubcategories();
+
+    @Query("""
+                SELECT p FROM Product p
+                WHERE p.category.isAdditional = false
+            """)
+    List<Product> findAllProductsWithNonAdditionalCategory();
 
 }

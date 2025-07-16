@@ -5,15 +5,18 @@ import {useState} from 'react'
 import {GuestTabDataTable} from "@/components/table/data-table/GuestTabDataTable";
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
 import {guestTabColumns} from "@/components/table/columns/GuestTabColumns";
-import {GuestTabFilters} from "@/model/Interfaces";
+import {GuestTabFilters, GuestTabStatus, UserRoles} from "@/model/Interfaces";
 import {fetchFilteredGuestTabs} from "@/services/guestTabService";
+import {useSelector} from "react-redux";
+import {RootState} from "@/store";
 
 const GuestTabTable = ({localTableId} : { localTableId: string}) => {
+    const role = useSelector((state: RootState) => state.auth.role)
     const [selectedFilters, setSelectedFilters] = useState<GuestTabFilters>({
         tableId: localTableId,
         guestTabIds: [],
         orderIds: [],
-        orderStatuses: [],
+        orderStatuses: role != UserRoles.ADMIN.value || role != UserRoles.ADMIN.value ? [GuestTabStatus.OPEN.value] : [],
         guestTabStatuses: [],
         minPrice: 0,
         maxPrice: 9999999,

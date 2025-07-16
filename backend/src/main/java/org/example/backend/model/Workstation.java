@@ -38,10 +38,10 @@ public class Workstation {
     private Set<User> users;
 
     @OneToMany(mappedBy = "workstation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore // para evitar recursão no JSON
+    @JsonIgnore
     private List<Order> ordersQueue;
 
     @OneToMany(mappedBy = "workstation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore // para evitar recursão no JSON
+    @JsonIgnore
     private Set<Category> categories;
 }
