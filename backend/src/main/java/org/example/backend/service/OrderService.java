@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -216,8 +213,7 @@ public class OrderService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já está no status final, não pode regredir");
         }
 
-        updateStatusAndTimestamp(order, nextStatus);
-        orderRepository.save(order);
+        updateStatusAndTimestamp(order, nextStatus, null);
     }
 
     @Transactional
@@ -230,8 +226,7 @@ public class OrderService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já está no status final, não pode regredir");
         }
 
-        updateStatusAndTimestamp(order, nextStatus);
-        orderRepository.save(order);
+        updateStatusAndTimestamp(order, nextStatus, currentStatus);
     }
 
     private OrderStatus getRelativeStatus(OrderStatus current, boolean forward) {
@@ -244,30 +239,36 @@ public class OrderService {
         return STATUS_FLOW.get(newIndex);
     }
 
-    private void updateStatusAndTimestamp(Order order, OrderStatus newStatus) {
-        order.setStatus(newStatus);
+    private void updateStatusAndTimestamp(Order order, OrderStatus newStatus, OrderStatus statusToClear) {
         LocalDateTime now = LocalDateTime.now();
 
-        switch (newStatus) {
-            case SENT -> order.setOrderedTime(now);
-            case IN_PREPARE -> order.setPreparationTime(now);
-            case READY -> order.setReadyTime(now);
-            case DELIVERED, CANCELED -> order.setClosedTime(now);
+        List<Order> allOrdersToUpdate = new ArrayList<>();
+        allOrdersToUpdate.add(order); // Adiciona o pedido principal
+        allOrdersToUpdate.addAll(orderRepository.findByParentOrderId(order.getId())); // Adiciona os filhos
+
+        allOrdersToUpdate.forEach(currentOrder ->
+                applyStatusChange(currentOrder, newStatus, statusToClear, now)
+        );
+    }
+
+    private void applyStatusChange(Order order, OrderStatus newStatus, OrderStatus statusToClear, LocalDateTime timestamp) {
+        // Limpa o timestamp antigo, se for uma regressão
+        if (statusToClear != null) {
+            switch (statusToClear) {
+                case SENT -> order.setOrderedTime(null);
+                case IN_PREPARE -> order.setPreparationTime(null);
+                case READY -> order.setReadyTime(null);
+                case DELIVERED, CANCELED -> order.setClosedTime(null);
+            }
         }
 
-        List<Order> additionalOrders = orderRepository.findByParentOrderId(order.getId());
-
-        // Atualizar pedidos adicionais
-        if (!additionalOrders.isEmpty()) {
-            for (Order additional : additionalOrders) {
-                additional.setStatus(newStatus);
-                switch (newStatus) {
-                    case SENT -> additional.setOrderedTime(now);
-                    case IN_PREPARE -> additional.setPreparationTime(now);
-                    case READY -> additional.setReadyTime(now);
-                    case DELIVERED, CANCELED -> additional.setClosedTime(now);
-                }
-            }
+        // Define o novo status e o novo timestamp
+        order.setStatus(newStatus);
+        switch (newStatus) {
+            case SENT -> order.setOrderedTime(timestamp);
+            case IN_PREPARE -> order.setPreparationTime(timestamp);
+            case READY -> order.setReadyTime(timestamp);
+            case DELIVERED, CANCELED -> order.setClosedTime(timestamp);
         }
     }
 
