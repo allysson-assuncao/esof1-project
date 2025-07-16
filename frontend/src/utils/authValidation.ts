@@ -17,7 +17,7 @@ export const registerSchema = z.object({
         .min(8, { message: 'A senha deve ter ao menos 8 caracteres' })
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_#@$%^&+=]).{8,}$/, { message: 'A senha deve ter ao menos uma letra maiúscula, uma minúscula, um número, e um caractere especial (-, _, #, @, $, etc.)' }),
     name: z.string().min(1, { message: 'O nome é obrigatório' }),
-    role: z.enum([UserRoles.COOK.value, UserRoles.CASHIER.value, UserRoles.ADMIN.value], { message: 'O cargo do usuário é obrigatório' }),
+    role: z.enum([UserRoles.BARMAN.value, UserRoles.COOK.value, UserRoles.WAITER.value, UserRoles.CASHIER.value, UserRoles.ADMIN.value], { message: 'O cargo do usuário é obrigatório' }),
 })
 
 export const workstationRegisterSchema = z.object({
@@ -51,7 +51,7 @@ export const categoryRegisterSchema = z.object({
     name: z.string().min(1, "Nome é obrigatório"),
     isMultiple: z.boolean(),
     isAdditional: z.boolean(),
-    subcategories: z.array(z.string().min(1, "Subcategoria não pode ser vazia")),
+    /*subcategories: z.array(z.string().min(1, "Subcategoria não pode ser vazia")),*/
     workstationId: z.string().uuid("ID da estação inválido"),
 });
 

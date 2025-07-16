@@ -15,6 +15,7 @@ export const registerCategoryService = async (data: CategoryFormData) => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
             }
         });
+        console.log(data);
         return response.data;
     } catch (error) {
         console.error("Erro ao registrar categoria:", error);
