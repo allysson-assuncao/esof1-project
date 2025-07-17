@@ -32,3 +32,8 @@ export const registerGuestTab = async (data: GuestTabRegisterFormData) => {
     const response = await guestTab.post(`/register`, data);
     return response.data;
 }
+
+export const closeGuestTab = async ({ guestTabId, numberOfPayers }: { guestTabId: number; numberOfPayers: number }) => {
+    const response = await guestTab.patch(`/${guestTabId}/close`, { numberOfPayers });
+    return response.data;
+};
