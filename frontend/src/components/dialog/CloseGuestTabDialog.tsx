@@ -12,6 +12,10 @@ import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Separator} from "@/components/ui/separator";
+import {toast} from "sonner";
+import {useMutation, useQueryClient} from "react-query";
+import {closeGuestTab} from "@/services/guestTabService";
+import {AxiosError} from "axios";
 
 interface CloseGuestTabDialogProps {
     guestTab: DisplayGuestTabItem;
@@ -45,24 +49,46 @@ const renderOrderItems = (items: DisplayOrderItem[], isAdditional = false) => (
 );
 
 export const CloseGuestTabDialog: React.FC<CloseGuestTabDialogProps> = ({guestTab}) => {
+    const queryClient = useQueryClient();
     const [step, setStep] = useState(1);
     const [payers, setPayers] = useState(1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const closeTabMutation = useMutation(closeGuestTab, {
+        onSuccess: () => {
+            toast.success(`Comanda #${guestTab.id} fechada com sucesso!`);
+            queryClient.invalidateQueries(['guestTabs']);
+        },
+        onError: (error: unknown) => {
+            if (error instanceof AxiosError) {
+                toast.error("Erro ao fechar a comanda", {
+                    description: error.response?.data?.message || 'Ocorreu um erro inesperado.',
+                })
+            } else {
+                toast.error("Erro ao fechar a comanda", {
+                    description: 'Ocorreu um erro inesperado.',
+                })
+            }
+        },
+        onSettled: () => {
+            setIsDialogOpen(false);
+            setTimeout(() => {
+                setStep(1);
+                setPayers(1);
+            }, 300);
+        }
+    });
 
     const handleConfirmPayers = () => {
         setStep(2);
     };
 
-    // Change the GuestTab status request to backend endpoint
-    // Also register empty payment with the chosen amount?
-    const handleClose = () => {
-        // service method here
-        setIsDialogOpen(false);
-        setTimeout(() => {
-            setStep(1);
-            setPayers(1);
-        }, 300);
-    }
+    const handleFinalizeAndClose = () => {
+        closeTabMutation.mutate({
+            guestTabId: guestTab.id,
+            numberOfPayers: payers,
+        });
+    };
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -138,7 +164,7 @@ export const CloseGuestTabDialog: React.FC<CloseGuestTabDialogProps> = ({guestTa
                         <Button type="button" variant="secondary" onClick={() => alert('Imprimindo...')}>
                             Imprimir
                         </Button>
-                        <Button type="button" onClick={handleClose}>
+                        <Button type="button" onClick={handleFinalizeAndClose}>
                             Fechar
                         </Button>
                     </DialogFooter>

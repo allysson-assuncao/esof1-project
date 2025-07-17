@@ -29,6 +29,19 @@ export const fetchSimpleGuestTabs = async (localTableId: string) => {
 };
 
 export const registerGuestTab = async (data: GuestTabRegisterFormData) => {
-    const response = await guestTab.post(`/register`, data);
+    const response = await guestTab.post(`/register`, data, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    });
     return response.data;
 }
+
+export const closeGuestTab = async ({ guestTabId, numberOfPayers }: { guestTabId: number; numberOfPayers: number }) => {
+    const response = await guestTab.patch(`/${guestTabId}/close`, { numberOfPayers }, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    });
+    return response.data;
+};

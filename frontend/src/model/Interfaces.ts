@@ -20,6 +20,7 @@ export const GuestTabStatus = {
     OPEN: {value: 'OPEN', label: 'Aberta'},
     CLOSED: {value: 'CLOSED', label: 'Fechada'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
+    PAYED: {value: 'PAYED', label: 'Paga'},
 } as const
 
 export const LocalTableStatus = {
@@ -92,6 +93,13 @@ export interface DisplayGuestTabItem {
     orderGroups: DisplayOrderGroup[];
     totalPrice: number;
     waiterName?: string;
+    payment?: PaymentItem;
+}
+
+export interface PaymentItem {
+    id: number;
+    totalAmount: number;
+    /*other stuff*/
 }
 
 export interface LocalTable {
@@ -176,4 +184,18 @@ export interface KanbanOrders {
     sentOrders: FilteredPage<OrderKanban>;
     inPrepareOrders: FilteredPage<OrderKanban>;
     readyOrders: FilteredPage<OrderKanban>;
+}
+
+export interface SimplePaymentMethod {
+    id: number;
+    name: string;
+}
+
+export interface RegisterIndividualPaymentDTO {
+    paymentMethodId: number;
+    amount: number;
+}
+
+export interface RegisterPaymentRequest {
+    individualPayments: RegisterIndividualPaymentDTO[];
 }
