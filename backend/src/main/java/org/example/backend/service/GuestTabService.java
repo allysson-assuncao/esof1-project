@@ -106,7 +106,7 @@ public class GuestTabService {
             throw new IllegalStateException("A comanda não está aberta e não pode ser fechada.");
         }
 
-        guestTab.setStatus(GuestTabStatus.CLOSED); // Muda para CLOSED
+        guestTab.setStatus(GuestTabStatus.CLOSED);
         guestTab.setTimeClosed(LocalDateTime.now());
 
         Payment payment = this.paymentService.createPendingPaymentForGuestTab(guestTab, request.numberOfPayers());
