@@ -178,3 +178,17 @@ export interface KanbanOrders {
     inPrepareOrders: FilteredPage<OrderKanban>;
     readyOrders: FilteredPage<OrderKanban>;
 }
+
+export interface SimplePaymentMethod {
+    id: number;
+    name: string;
+}
+
+export interface RegisterIndividualPaymentDTO {
+    paymentMethodId: number;
+    amount: number;
+}
+
+export interface RegisterPaymentRequest {
+    individualPayments: RegisterIndividualPaymentDTO[];
+}

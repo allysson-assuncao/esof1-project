@@ -1,43 +1,40 @@
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
+import {DisplayGuestTabItem} from "@/model/Interfaces";
+import React from "react";
 
 interface RegisterPaymentDialogProps {
-    guestTabId: number;
+    guestTab: DisplayGuestTabItem;
 }
 
-export const RegisterPaymentDialog: React.FC<RegisterPaymentDialogProps> = ({guestTabId}) => {
+export const RegisterPaymentDialog: React.FC<RegisterPaymentDialogProps> = ({guestTab}) => {
+    const [open, setOpen] = React.useState(false);
+
+    if (guestTab.status !== 'CLOSED' || !guestTab.payment) {
+        return <Button variant="default" size="sm" disabled>Pagar</Button>;
+    }
+
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="default" size="sm">Registrar Pagamento</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                    <DialogTitle>Registrar Pagamento - Comanda #{guestTabId}</DialogTitle>
-                    <DialogDescription>
-                        (Placeholder) O formulário de registro de pagamento será implementado aqui.
-                    </DialogDescription>
+                    <DialogTitle>Registrar Pagamento - Comanda #{guestTab.id}</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="paymentMethod">Método de Pagamento</Label>
-                        <Input id="paymentMethod" placeholder="Ex: Cartão de Crédito" disabled/>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="paymentValue">Valor Pago</Label>
-                        <Input id="paymentValue" placeholder="R$ 0,00" disabled/>
-                    </div>
-                </div>
+                <RegisterPaymentForm
+                    guestTab={guestTab}
+                    onSuccess={() => setOpen(false)}
+                />
             </DialogContent>
         </Dialog>
     );
 };
+

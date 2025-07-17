@@ -35,3 +35,11 @@ export const workstation = axios.create({
 export const product = axios.create({
     baseURL: `http://localhost:${port}/app/product`,
 });
+
+export const paymentMethod = axios.create({
+    baseURL: `http://localhost:${port}/app/payment-method`,
+});
+
+export const payment = axios.create({
+    baseURL: `http://localhost:${port}/app/payment`,
+});
