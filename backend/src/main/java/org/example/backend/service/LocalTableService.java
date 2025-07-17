@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,6 +82,21 @@ public class LocalTableService {
 
     public boolean hasOpenGuestTab(int tableNumber) {
         return guestTabRepository.existsByLocalTable_NumberAndStatus(tableNumber, GuestTabStatus.OPEN);
+    }
+
+    @Transactional
+    public void updateTableStatusBasedOnGuestTabs(UUID tableId) {
+        LocalTable table = localTableRepository.findById(tableId)
+                .orElseThrow(() -> new RuntimeException("Mesa não encontrada com id: " + tableId));
+
+        long openTabsCount = guestTabRepository.countByLocalTableAndStatus(table, GuestTabStatus.OPEN);
+
+        if (openTabsCount > 0) {
+            table.setStatus(LocalTableStatus.OCCUPIED);
+        } else {
+            table.setStatus(LocalTableStatus.FREE);
+        }
+        localTableRepository.save(table);
     }
 
 }

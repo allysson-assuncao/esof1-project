@@ -37,16 +37,18 @@ public class GuestTabService {
     private final LocalTableRepository localTableRepository;
     private final OrderRepository orderRepository;
     private final LocalTableService localTableService;
+    private final PaymentService paymentService;
 
     @Autowired
     public GuestTabService(GuestTabRepository guestTapRepository,
                            GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService) {
+                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService, PaymentService paymentService) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
         this.localTableRepository = localTableRepository;
         this.orderRepository = orderRepository;
         this.localTableService = localTableService;
+        this.paymentService = paymentService;
     }
 
     //Registra nova guest tab
@@ -103,7 +105,7 @@ public class GuestTabService {
         guestTab.setStatus(GuestTabStatus.CLOSED); // Muda para CLOSED
         guestTab.setTimeClosed(LocalDateTime.now());
 
-        /*Payment payment = this.paymentService.createPendingPaymentForGuestTab(guestTab, request.getNumberOfPayers());
+        Payment payment = this.paymentService.createPendingPaymentForGuestTab(guestTab, request.numberOfPayers());
         guestTab.setPayment(payment);
 
         GuestTab savedGuestTab = guestTabRepository.save(guestTab);
@@ -112,8 +114,7 @@ public class GuestTabService {
             this.localTableService.updateTableStatusBasedOnGuestTabs(savedGuestTab.getLocalTable().getId());
         }
 
-        return savedGuestTab;*/
-        return null;
+        return savedGuestTab;
     }
 
     //Retorna todas as GuestTabs
