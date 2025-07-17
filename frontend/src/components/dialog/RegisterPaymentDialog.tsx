@@ -38,4 +38,3 @@ export const RegisterPaymentDialog: React.FC<RegisterPaymentDialogProps> = ({gue
         </Dialog>
     );
 };
-
