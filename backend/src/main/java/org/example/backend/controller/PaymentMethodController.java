@@ -23,7 +23,7 @@ public class PaymentMethodController {
         this.paymentMethodService = paymentMethodService;
     }
 
-    @GetMapping
+    @GetMapping("/select-all-simple")
     public ResponseEntity<List<SimplePaymentMethodDTO>> getAllPaymentMethods() {
         return ResponseEntity.ok(paymentMethodService.findAll());
     }

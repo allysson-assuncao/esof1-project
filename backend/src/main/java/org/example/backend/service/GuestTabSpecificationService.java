@@ -30,6 +30,11 @@ public class GuestTabSpecificationService {
 
             if (filterDto.guestTabStatuses() != null && !filterDto.guestTabStatuses().isEmpty()) {
                 mainPredicates.add(root.get("status").in(filterDto.guestTabStatuses()));
+            } else {
+                mainPredicates.add(root.get("status").in(
+                        GuestTabStatus.OPEN,
+                        GuestTabStatus.CLOSED
+                ));
             }
 
             /*mainPredicates.add(
