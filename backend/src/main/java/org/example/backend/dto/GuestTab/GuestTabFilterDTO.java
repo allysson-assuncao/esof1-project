@@ -1,5 +1,6 @@
 package org.example.backend.dto.GuestTab;
 
+import org.example.backend.dto.Payment.PaymentSummaryDTO;
 import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.model.enums.OrderStatus;
 

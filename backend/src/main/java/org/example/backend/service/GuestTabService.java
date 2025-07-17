@@ -5,6 +5,7 @@ import org.example.backend.dto.DrillDownOrderDTO;
 import org.example.backend.dto.GuestTab.*;
 import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.dto.Order.OrderGroupDTO;
+import org.example.backend.dto.Payment.PaymentSummaryDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
@@ -13,6 +14,7 @@ import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
 import org.example.backend.repository.OrderRepository;
+import org.example.backend.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,17 +40,19 @@ public class GuestTabService {
     private final OrderRepository orderRepository;
     private final LocalTableService localTableService;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     public GuestTabService(GuestTabRepository guestTapRepository,
                            GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService, PaymentService paymentService) {
+                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService, PaymentService paymentService, PaymentRepository paymentRepository) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
         this.localTableRepository = localTableRepository;
         this.orderRepository = orderRepository;
         this.localTableService = localTableService;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     //Registra nova guest tab
@@ -180,21 +184,32 @@ public class GuestTabService {
                 .toList();
 
         Map<Long, List<Order>> ordersByGuestTabId = new HashMap<>();
+        Map<Long, Payment> paymentsByGuestTabId = new HashMap<>();
 
         if (!guestTabIdsOnPage.isEmpty()) {
             List<Order> topLevelOrders = this.orderRepository.findTopLevelOrdersWithAdditionalsByGuestTabIds(guestTabIdsOnPage);
 
             ordersByGuestTabId = topLevelOrders.stream()
                     .collect(Collectors.groupingBy(order -> order.getGuestTab().getId()));
+
+            List<Payment> payments = this.paymentRepository.findByGuestTabIdIn(guestTabIdsOnPage);
+            paymentsByGuestTabId = payments.stream()
+                    .collect(Collectors.toMap(p -> p.getGuestTab().getId(), p -> p));
         }
 
         final Map<Long, List<Order>> finalOrdersByGuestTabId = ordersByGuestTabId;
+        final Map<Long, Payment> finalPaymentsByGuestTabId = paymentsByGuestTabId;
+
         return guestTabPage.map(guestTab ->
-                convertToGuestTabDTOWithEntities(guestTab, finalOrdersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()))
+                convertToGuestTabDTOWithEntities(
+                        guestTab,
+                        finalOrdersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()),
+                        finalPaymentsByGuestTabId.get(guestTab.getId()) // <-- NOVO PARÂMETRO
+                )
         );
     }
 
-    private GuestTabDTO convertToGuestTabDTOWithEntities(GuestTab guestTab, List<Order> topLevelOrders) {
+    private GuestTabDTO convertToGuestTabDTOWithEntities(GuestTab guestTab, List<Order> topLevelOrders, Payment payment) {
         if (guestTab == null) return null;
 
         Map<LocalDateTime, List<Order>> ordersGroupedByTime = topLevelOrders.stream()
@@ -217,6 +232,15 @@ public class GuestTabService {
 
         double totalGuestTabPrice = orderGroupDTOs.stream().mapToDouble(OrderGroupDTO::groupTotalPrice).sum();
 
+        PaymentSummaryDTO paymentDTO = null;
+        if (payment != null) {
+            paymentDTO = PaymentSummaryDTO.builder()
+                    .id(payment.getId())
+                    .totalAmount(payment.getTotalAmount())
+                    .status(payment.getStatus())
+                    .build();
+        }
+
         return GuestTabDTO.builder()
                 .id(guestTab.getId())
                 .status(guestTab.getStatus())
@@ -226,6 +250,7 @@ public class GuestTabService {
                 .orderGroups(orderGroupDTOs)
                 .totalPrice(totalGuestTabPrice)
                 .localTableNumber(guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0)
+                .payment(paymentDTO)
                 .build();
     }
 
