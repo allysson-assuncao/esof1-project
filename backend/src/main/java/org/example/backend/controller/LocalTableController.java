@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
+import org.example.backend.dto.LocalTable.LocalTableGridDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.service.LocalTableService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class LocalTableController {
     }
 
     @GetMapping("/select-all")
-    public ResponseEntity<List<LocalTableDTO>> getGridTables() {
-        List<LocalTableDTO> tables = localTableService.getGridTables();
+    public ResponseEntity<List<LocalTableGridDTO>> getGridTables() {
+        List<LocalTableGridDTO> tables = localTableService.getGridTables();
         return ResponseEntity.ok(tables);
     }
 

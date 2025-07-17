@@ -25,7 +25,8 @@ public interface LocalTableRepository extends JpaRepository<LocalTable, UUID> {
                                    @Param("startOfDay") LocalDateTime startOfDay,
                                    @Param("endOfDay") LocalDateTime endOfDay);
 
-    @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.localTable.id = :tableId AND gt.status = org.example.backend.model.enums.GuestTabStatus.OPEN")
-    int findOpenGuestTabCountById(@Param("tableId") UUID tableId);
+    @Query("SELECT COUNT(gt) FROM GuestTab gt WHERE gt.localTable.id = :tableId AND gt.status <> org.example.backend.model.enums.GuestTabStatus.CANCELED AND gt.status <> org.example.backend.model.enums.GuestTabStatus.PAYED")
+    int findActiveGuestTabCountById(@Param("tableId") UUID tableId);
+
 
 }

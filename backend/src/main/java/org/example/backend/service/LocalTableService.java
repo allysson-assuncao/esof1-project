@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
+import org.example.backend.dto.LocalTable.LocalTableGridDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.GuestTabStatus;
@@ -57,20 +58,30 @@ public class LocalTableService {
         return true;
     }
 
-    public List<LocalTableDTO> getGridTables() {
-        List<LocalTableDTO> gridTables = this.localTableRepository.findAll()
-                .stream()
-                .map(this::convertToLocalTableDTO)
-                .collect(Collectors.toList());
+    public List<LocalTableGridDTO> getGridTables() {
 
-        Collections.sort(gridTables);
-        return gridTables;
+        return this.localTableRepository.findAll()
+                .stream()
+                .map(this::convertToLocalTableGridDTO).sorted().collect(Collectors.toList());
+    }
+
+    private LocalTableGridDTO convertToLocalTableGridDTO(LocalTable localTable) {
+        if (localTable == null) return null;
+
+        int guestTabCountOpen = this.localTableRepository.findActiveGuestTabCountById(localTable.getId());
+
+        return LocalTableGridDTO.builder()
+                .id(localTable.getId())
+                .number(localTable.getNumber())
+                .status(localTable.getStatus())
+                .guestTabCountToday(guestTabCountOpen)
+                .build();
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
         if (localTable == null) return null;
 
-        int guestTabCountOpen = this.localTableRepository.findOpenGuestTabCountById(localTable.getId());
+        int guestTabCountOpen = this.localTableRepository.findActiveGuestTabCountById(localTable.getId());
 
         return LocalTableDTO.builder()
                 .id(localTable.getId())
