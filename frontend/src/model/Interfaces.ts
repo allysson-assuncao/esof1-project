@@ -93,6 +93,13 @@ export interface DisplayGuestTabItem {
     orderGroups: DisplayOrderGroup[];
     totalPrice: number;
     waiterName?: string;
+    payment?: PaymentItem;
+}
+
+export interface PaymentItem {
+    id: number;
+    totalAmount: number;
+    /*other stuff*/
 }
 
 export interface LocalTable {

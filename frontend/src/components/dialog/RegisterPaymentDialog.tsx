@@ -8,6 +8,7 @@ import {
 import {Button} from "@/components/ui/button";
 import {DisplayGuestTabItem} from "@/model/Interfaces";
 import React from "react";
+import {RegisterPaymentForm} from "@/components/form/register/RegisterPaymentForm";
 
 interface RegisterPaymentDialogProps {
     guestTab: DisplayGuestTabItem;
