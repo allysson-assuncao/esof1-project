@@ -14,7 +14,8 @@ export const fetchFilteredGuestTabs = async (params: FetchGuestTabParams) => {
             direction: params.direction || 'ASC',
         },
     });
-    console.log(response.data)
+    /*console.log(response);
+    console.log(response.data);*/
     return response.data;
 };
 
