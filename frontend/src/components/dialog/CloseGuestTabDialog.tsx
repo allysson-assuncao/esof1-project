@@ -7,7 +7,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {DisplayGuestTabItem, DisplayOrderItem} from "@/model/Interfaces";
-import {useState} from "react";
+import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -49,15 +49,14 @@ export const CloseGuestTabDialog: React.FC<CloseGuestTabDialogProps> = ({guestTa
     const [payers, setPayers] = useState(1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    // Idealmente, a mutação para fechar a comanda seria chamada aqui.
-    // Por enquanto, apenas simulamos o fluxo.
     const handleConfirmPayers = () => {
-        // Lógica de mutação para fechar a comanda pode ser adicionada aqui
-        // mutation.mutate({ guestTabId: guestTab.id, payers });
         setStep(2);
     };
 
+    // Change the GuestTab status request to backend endpoint
+    // Also register empty payment with the chosen amount?
     const handleClose = () => {
+        // service method here
         setIsDialogOpen(false);
         setTimeout(() => {
             setStep(1);
@@ -136,11 +135,11 @@ export const CloseGuestTabDialog: React.FC<CloseGuestTabDialogProps> = ({guestTa
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="secondary" onClick={handleClose}>
-                            Fechar
-                        </Button>
-                        <Button type="button" onClick={() => alert('Imprimindo...')}>
+                        <Button type="button" variant="secondary" onClick={() => alert('Imprimindo...')}>
                             Imprimir
+                        </Button>
+                        <Button type="button" onClick={handleClose}>
+                            Fechar
                         </Button>
                     </DialogFooter>
                 </DialogContent>
