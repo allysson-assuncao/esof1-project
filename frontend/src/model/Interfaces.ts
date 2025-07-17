@@ -20,6 +20,7 @@ export const GuestTabStatus = {
     OPEN: {value: 'OPEN', label: 'Aberta'},
     CLOSED: {value: 'CLOSED', label: 'Fechada'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
+    PAYED: {value: 'PAYED', label: 'Paga'},
 } as const
 
 export const LocalTableStatus = {

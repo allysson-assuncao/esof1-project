@@ -8,6 +8,7 @@ import org.example.backend.dto.Order.OrderGroupDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
+import org.example.backend.model.Payment;
 import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
@@ -35,15 +36,17 @@ public class GuestTabService {
     private final GuestTabSpecificationService guestTabSpecificationService;
     private final LocalTableRepository localTableRepository;
     private final OrderRepository orderRepository;
+    private final LocalTableService localTableService;
 
     @Autowired
     public GuestTabService(GuestTabRepository guestTapRepository,
                            GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository, OrderRepository orderRepository) {
+                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
         this.localTableRepository = localTableRepository;
         this.orderRepository = orderRepository;
+        this.localTableService = localTableService;
     }
 
     //Registra nova guest tab
@@ -86,6 +89,31 @@ public class GuestTabService {
         output.append("\n" + "Preço total: R$ " + accum);
         tab.setStatus(GuestTabStatus.CLOSED);
         return output.toString();
+    }
+
+    @Transactional
+    public GuestTab closeGuestTab(Long guestTabId, CloseGuestTabRequest request) {
+        GuestTab guestTab = guestTabRepository.findById(guestTabId)
+                .orElseThrow(() -> new RuntimeException("Comanda não encontrada com id: " + guestTabId));
+
+        if (guestTab.getStatus() != GuestTabStatus.OPEN) {
+            throw new IllegalStateException("A comanda não está aberta e não pode ser fechada.");
+        }
+
+        guestTab.setStatus(GuestTabStatus.CLOSED); // Muda para CLOSED
+        guestTab.setTimeClosed(LocalDateTime.now());
+
+        /*Payment payment = this.paymentService.createPendingPaymentForGuestTab(guestTab, request.getNumberOfPayers());
+        guestTab.setPayment(payment);
+
+        GuestTab savedGuestTab = guestTabRepository.save(guestTab);
+
+        if (savedGuestTab.getLocalTable() != null) {
+            this.localTableService.updateTableStatusBasedOnGuestTabs(savedGuestTab.getLocalTable().getId());
+        }
+
+        return savedGuestTab;*/
+        return null;
     }
 
     //Retorna todas as GuestTabs

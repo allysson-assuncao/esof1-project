@@ -13,6 +13,10 @@ import java.util.UUID;
 @Repository
 public interface GuestTabRepository extends JpaRepository<GuestTab, Long>, JpaSpecificationExecutor<GuestTab> {
     List<GuestTab> findByLocalTable(LocalTable localTable);
+
     List<GuestTab> findByLocalTableId(UUID localTableId);
+
     boolean existsByLocalTable_NumberAndStatus(int number, GuestTabStatus status);
+
+    long countByLocalTableAndStatus(LocalTable localTable, GuestTabStatus status);
 }
