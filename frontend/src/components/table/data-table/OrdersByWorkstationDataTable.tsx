@@ -52,8 +52,7 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
             if (vRow.isSubRow) {
                 const additionalOrders = vRow.row.original.additionalOrders || [];
                 return additionalOrders.length > 0
-                    ? additionalOrders.length * 72 + 80
-                    : 80;
+                    ? additionalOrders.length * 60 + 94 : 80;
             }
             return 64;
         },
