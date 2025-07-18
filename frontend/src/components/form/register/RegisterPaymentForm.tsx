@@ -32,40 +32,32 @@ export function RegisterPaymentForm({guestTab, onSuccess}: RegisterPaymentFormPr
     const [activeAccordionItem, setActiveAccordionItem] = useState<string>("item-0");
 
     const paymentInfo = guestTab.payment;
-    if (!paymentInfo) {
-        return <div>Erro: Informações de pagamento não encontradas para esta comanda.</div>;
-    }
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const {data: paymentMethods, isLoading: isLoadingMethods} = useQuery<SimplePaymentMethod[]>(
         'paymentMethods',
         fetchAllPaymentMethods
     );
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const form = useForm<RegisterPaymentFormData>({
         resolver: zodResolver(registerPaymentFormSchema),
         defaultValues: {
-            items: [{paymentMethodId: '', amount: paymentInfo.totalAmount}],
+            items: [{paymentMethodId: '', amount: 0}],
         },
         mode: 'onBlur',
     });
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const {fields, append, remove} = useFieldArray({
         control: form.control,
         name: "items",
     });
 
     const watchedItems = form.watch('items');
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const totalPaid = useMemo(() =>
             watchedItems.reduce((acc, item) => acc + (Number(item.amount) || 0), 0),
         [watchedItems]
     );
-    const remainingAmount = paymentInfo.totalAmount - totalPaid;
+    const remainingAmount = !paymentInfo ? 0 : paymentInfo.totalAmount - totalPaid;
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const mutation = useMutation(registerPaymentRequest, {
         onSuccess: () => {
             toast.success("Pagamento registrado com sucesso!");
@@ -85,6 +77,10 @@ export function RegisterPaymentForm({guestTab, onSuccess}: RegisterPaymentFormPr
         },
     });
 
+    if (!paymentInfo) {
+        return <div>Erro: Informações de pagamento não encontradas para esta comanda.</div>;
+    }
+
     const onSubmit = (data: RegisterPaymentFormData) => {
         if (totalPaid > paymentInfo.totalAmount) {
             toast.error("O valor total pago não pode ser maior que o valor da comanda.");
@@ -102,7 +98,7 @@ export function RegisterPaymentForm({guestTab, onSuccess}: RegisterPaymentFormPr
     };
 
     const handleAddMore = () => {
-        append({paymentMethodId: '', amount: Math.max(0, remainingAmount)});
+        append({paymentMethodId: '', amount: 0 /*Math.max(0, remainingAmount)*/});
         setActiveAccordionItem(`item-${fields.length}`);
     };
 

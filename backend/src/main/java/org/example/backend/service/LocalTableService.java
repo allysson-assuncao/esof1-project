@@ -2,7 +2,6 @@ package org.example.backend.service;
 
 import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
-import org.example.backend.dto.LocalTable.LocalTableGridDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.GuestTabStatus;
@@ -58,24 +57,11 @@ public class LocalTableService {
         return true;
     }
 
-    public List<LocalTableGridDTO> getGridTables() {
+    public List<LocalTableDTO> getGridTables() {
 
         return this.localTableRepository.findAll()
                 .stream()
-                .map(this::convertToLocalTableGridDTO).sorted().collect(Collectors.toList());
-    }
-
-    private LocalTableGridDTO convertToLocalTableGridDTO(LocalTable localTable) {
-        if (localTable == null) return null;
-
-        int guestTabCountOpen = this.localTableRepository.findActiveGuestTabCountById(localTable.getId());
-
-        return LocalTableGridDTO.builder()
-                .id(localTable.getId())
-                .number(localTable.getNumber())
-                .status(localTable.getStatus())
-                .guestTabCountToday(guestTabCountOpen)
-                .build();
+                .map(this::convertToLocalTableDTO).sorted().collect(Collectors.toList());
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
@@ -104,8 +90,10 @@ public class LocalTableService {
 
         if (openTabsCount > 0) {
             table.setStatus(LocalTableStatus.OCCUPIED);
+            System.out.println("Comanda fechada!");
         } else {
             table.setStatus(LocalTableStatus.FREE);
+            System.out.println("Comanda liberada!");
         }
         localTableRepository.save(table);
     }
