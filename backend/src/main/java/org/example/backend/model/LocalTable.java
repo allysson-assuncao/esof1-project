@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @Table(name = "tables")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,6 +32,5 @@ public class LocalTable {
     @OneToMany(mappedBy = "localTable", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<GuestTab> guestTabs;
-
 
 }

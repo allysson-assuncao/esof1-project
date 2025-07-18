@@ -48,6 +48,16 @@ export interface RegisterOrdersFormData {
 export type CategoryFormData = {
     name: string;
     isMultiple: boolean;
+    isAdditional: boolean;
     subcategories: string[];
     workstationId: string;
 };
+
+export interface RegisterPaymentFormData {
+    items: RegisterPaymentItemDTO[];
+}
+
+export interface RegisterPaymentItemDTO {
+    paymentMethodId: string;
+    amount: number;
+}

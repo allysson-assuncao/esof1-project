@@ -5,13 +5,16 @@ import org.example.backend.dto.DrillDownOrderDTO;
 import org.example.backend.dto.GuestTab.*;
 import org.example.backend.dto.Order.FlatOrderDTO;
 import org.example.backend.dto.Order.OrderGroupDTO;
+import org.example.backend.dto.Payment.PaymentSummaryDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.Order;
+import org.example.backend.model.Payment;
 import org.example.backend.model.enums.GuestTabStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
 import org.example.backend.repository.OrderRepository;
+import org.example.backend.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,15 +38,21 @@ public class GuestTabService {
     private final GuestTabSpecificationService guestTabSpecificationService;
     private final LocalTableRepository localTableRepository;
     private final OrderRepository orderRepository;
+    private final LocalTableService localTableService;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     public GuestTabService(GuestTabRepository guestTapRepository,
                            GuestTabSpecificationService guestTabSpecificationService,
-                           LocalTableRepository localTableRepository, OrderRepository orderRepository) {
+                           LocalTableRepository localTableRepository, OrderRepository orderRepository, LocalTableService localTableService, PaymentService paymentService, PaymentRepository paymentRepository) {
         this.guestTabRepository = guestTapRepository;
         this.guestTabSpecificationService = guestTabSpecificationService;
         this.localTableRepository = localTableRepository;
         this.orderRepository = orderRepository;
+        this.localTableService = localTableService;
+        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     //Registra nova guest tab
@@ -88,6 +97,30 @@ public class GuestTabService {
         output.append("\n" + "Preço total: R$ " + accum);
         tab.setStatus(GuestTabStatus.CLOSED);
         return output.toString();
+    }
+
+    @Transactional
+    public GuestTab closeGuestTab(Long guestTabId, CloseGuestTabRequest request) {
+        GuestTab guestTab = guestTabRepository.findById(guestTabId)
+                .orElseThrow(() -> new RuntimeException("Comanda não encontrada com id: " + guestTabId));
+
+        if (guestTab.getStatus() != GuestTabStatus.OPEN) {
+            throw new IllegalStateException("A comanda não está aberta e não pode ser fechada.");
+        }
+
+        guestTab.setStatus(GuestTabStatus.CLOSED);
+        guestTab.setTimeClosed(LocalDateTime.now());
+
+        Payment payment = this.paymentService.createPendingPaymentForGuestTab(guestTab, request.numberOfPayers());
+        guestTab.setPayment(payment);
+
+        GuestTab savedGuestTab = guestTabRepository.save(guestTab);
+
+        if (savedGuestTab.getLocalTable() != null) {
+            this.localTableService.updateTableStatusBasedOnGuestTabs(savedGuestTab.getLocalTable().getId());
+        }
+
+        return savedGuestTab;
     }
 
     //Retorna todas as GuestTabs
@@ -152,52 +185,63 @@ public class GuestTabService {
                 .map(GuestTab::getId)
                 .toList();
 
-        if (guestTabIdsOnPage.isEmpty()) {
-            return guestTabPage.map(gt -> convertToGuestTabDTOWithNestedOrders(gt, Collections.emptyList()));
+        Map<Long, List<Order>> ordersByGuestTabId = new HashMap<>();
+        Map<Long, Payment> paymentsByGuestTabId = new HashMap<>();
+
+        if (!guestTabIdsOnPage.isEmpty()) {
+            List<Order> topLevelOrders = this.orderRepository.findTopLevelOrdersWithAdditionalsByGuestTabIds(guestTabIdsOnPage);
+
+            ordersByGuestTabId = topLevelOrders.stream()
+                    .collect(Collectors.groupingBy(order -> order.getGuestTab().getId()));
+
+            List<Payment> payments = this.paymentRepository.findByGuestTabIdIn(guestTabIdsOnPage);
+            paymentsByGuestTabId = payments.stream()
+                    .collect(Collectors.toMap(p -> p.getGuestTab().getId(), p -> p));
         }
 
-        List<FlatOrderDTO> flatOrders = this.orderRepository.findFlatOrderDTOsByGuestTabIds(guestTabIdsOnPage);
-
-        Map<Long, List<FlatOrderDTO>> ordersByGuestTabId = flatOrders.stream()
-                .collect(Collectors.groupingBy(FlatOrderDTO::guestTabId));
+        final Map<Long, List<Order>> finalOrdersByGuestTabId = ordersByGuestTabId;
+        final Map<Long, Payment> finalPaymentsByGuestTabId = paymentsByGuestTabId;
 
         return guestTabPage.map(guestTab ->
-                convertToGuestTabDTOWithNestedOrders(guestTab, ordersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()))
+                convertToGuestTabDTOWithEntities(
+                        guestTab,
+                        finalOrdersByGuestTabId.getOrDefault(guestTab.getId(), Collections.emptyList()),
+                        finalPaymentsByGuestTabId.get(guestTab.getId()) // <-- NOVO PARÂMETRO
+                )
         );
     }
 
-    private GuestTabDTO convertToGuestTabDTOWithNestedOrders(GuestTab guestTab, List<FlatOrderDTO> flatOrders) {
+    private GuestTabDTO convertToGuestTabDTOWithEntities(GuestTab guestTab, List<Order> topLevelOrders, Payment payment) {
         if (guestTab == null) return null;
 
-        Map<Long, List<FlatOrderDTO>> subOrdersByParentId = flatOrders.stream()
-                .filter(order -> order.parentOrderId() != null)
-                .collect(Collectors.groupingBy(FlatOrderDTO::parentOrderId));
-
-        List<FlatOrderDTO> topLevelOrders = flatOrders.stream()
-                .filter(order -> order.parentOrderId() == null)
-                .toList();
-
-        Map<LocalDateTime, List<FlatOrderDTO>> ordersGroupedByTime = topLevelOrders.stream()
-                .collect(Collectors.groupingBy(FlatOrderDTO::orderedTime));
+        Map<LocalDateTime, List<Order>> ordersGroupedByTime = topLevelOrders.stream()
+                .collect(Collectors.groupingBy(Order::getOrderedTime));
 
         Set<OrderGroupDTO> orderGroupDTOs = ordersGroupedByTime.entrySet().stream()
                 .map(entry -> {
-                    LocalDateTime groupTime = entry.getKey();
-                    List<FlatOrderDTO> ordersInGroup = entry.getValue();
-
+                    List<Order> ordersInGroup = entry.getValue();
                     Set<DrillDownOrderDTO> drillDownOrders = ordersInGroup.stream()
-                            .map(flatOrder -> convertToDrillDownOrderDTO(flatOrder, subOrdersByParentId))
+                            .map(this::convertEntityToDrillDownDTO)
                             .collect(Collectors.toSet());
 
                     double groupTotalPrice = drillDownOrders.stream()
                             .mapToDouble(this::calculateOrderTotal)
                             .sum();
 
-                    return new OrderGroupDTO(groupTime, groupTotalPrice, drillDownOrders.size(), drillDownOrders);
+                    return new OrderGroupDTO(entry.getKey(), groupTotalPrice, drillDownOrders.size(), drillDownOrders);
                 })
                 .collect(Collectors.toSet());
 
         double totalGuestTabPrice = orderGroupDTOs.stream().mapToDouble(OrderGroupDTO::groupTotalPrice).sum();
+
+        PaymentSummaryDTO paymentDTO = null;
+        if (payment != null) {
+            paymentDTO = PaymentSummaryDTO.builder()
+                    .id(payment.getId())
+                    .totalAmount(payment.getTotalAmount())
+                    .status(payment.getStatus())
+                    .build();
+        }
 
         return GuestTabDTO.builder()
                 .id(guestTab.getId())
@@ -208,26 +252,27 @@ public class GuestTabService {
                 .orderGroups(orderGroupDTOs)
                 .totalPrice(totalGuestTabPrice)
                 .localTableNumber(guestTab.getLocalTable() != null ? guestTab.getLocalTable().getNumber() : 0)
+                .payment(paymentDTO)
                 .build();
     }
 
-    private DrillDownOrderDTO convertToDrillDownOrderDTO(FlatOrderDTO flatOrder, Map<Long, List<FlatOrderDTO>> subOrdersMap) {
-        if (flatOrder == null) return null;
-
-        Set<DrillDownOrderDTO> additionalOrderDTOs = subOrdersMap.getOrDefault(flatOrder.id(), Collections.emptyList()).stream()
-                .map(child -> convertToDrillDownOrderDTO(child, subOrdersMap))
-                .collect(Collectors.toSet());
+    private DrillDownOrderDTO convertEntityToDrillDownDTO(Order order) {
+        if (order == null) return null;
 
         return DrillDownOrderDTO.builder()
-                .id(flatOrder.id())
-                .amount(flatOrder.amount())
-                .status(flatOrder.status())
-                .observation(flatOrder.observation())
-                .orderedTime(flatOrder.orderedTime())
-                .additionalOrders(additionalOrderDTOs)
-                .productName(flatOrder.productName())
-                .productUnitPrice(flatOrder.productUnitPrice())
-                .waiterName(flatOrder.waiterName())
+                .id(order.getId())
+                .amount(order.getAmount())
+                .status(order.getStatus())
+                .observation(order.getObservation())
+                .orderedTime(order.getOrderedTime())
+                .productName(order.getProduct().getName())
+                .productUnitPrice(order.getProduct().getPrice())
+                .waiterName(order.getWaiter().getName())
+                .additionalOrders(
+                        order.getAdditionalOrders().stream()
+                                .map(this::convertEntityToDrillDownDTO)
+                                .collect(Collectors.toSet())
+                )
                 .build();
     }
 

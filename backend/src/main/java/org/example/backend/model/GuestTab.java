@@ -10,7 +10,8 @@ import java.util.List;
 
 @Table(name = "guest_tabs")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,5 +42,9 @@ public class GuestTab {
     @OneToMany(mappedBy = "guestTab", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
+
+    @OneToOne(mappedBy = "guestTab", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Payment payment;
 
 }

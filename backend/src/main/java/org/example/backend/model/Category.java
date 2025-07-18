@@ -32,13 +32,16 @@ public class Category {
     @Column(name = "is_multiple", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean isMultiple;
 
+    @Column(name = "is_additional", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isAdditional;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
-    @JsonBackReference // Evita recursão infinita na serialização
+    @JsonBackReference
     private Category parentCategory;
     
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
-    @JsonManagedReference // Serializa subcategorias normalmente
+    @JsonManagedReference
     private Set<Category> subCategories;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

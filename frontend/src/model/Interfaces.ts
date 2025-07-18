@@ -8,6 +8,8 @@ export type OrderStatus = keyof typeof OrderStatus;
 
 export type OrderKanbanStatus = keyof typeof OrderKanbanStatus;
 
+export type PaymentStatus = keyof typeof PaymentStatus;
+
 export const UserRoles = {
     ADMIN: {value: 'ADMIN', label: 'Administrador'},
     CASHIER: {value: 'CASHIER', label: 'Caixa'},
@@ -20,6 +22,7 @@ export const GuestTabStatus = {
     OPEN: {value: 'OPEN', label: 'Aberta'},
     CLOSED: {value: 'CLOSED', label: 'Fechada'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
+    PAYED: {value: 'PAYED', label: 'Paga'},
 } as const
 
 export const LocalTableStatus = {
@@ -40,6 +43,13 @@ export const OrderKanbanStatus = {
     SENT: {value: 'SENT', label: 'Enviado'},
     IN_PREPARE: {value: 'IN_PREPARE', label: 'Em Preparo'},
     READY: {value: 'READY', label: 'Pronta'},
+} as const
+
+export const PaymentStatus = {
+    PENDING: {value: 'PENDING', label: 'Pendente'},
+    PARTIALLY_PAID: {value: 'PARTIALLY_PAID', label: 'Parcialmente Pago'},
+    PAID: {value: 'PAID', label: 'Pago'},
+    CANCELED: {value: 'CANCELED', label: 'Cancelado'},
 } as const
 
 export interface GuestTabFilters {
@@ -92,6 +102,13 @@ export interface DisplayGuestTabItem {
     orderGroups: DisplayOrderGroup[];
     totalPrice: number;
     waiterName?: string;
+    payment?: PaymentItem;
+}
+
+export interface PaymentItem {
+    id: number;
+    totalAmount: number;
+    status: PaymentStatus;
 }
 
 export interface LocalTable {
@@ -176,4 +193,18 @@ export interface KanbanOrders {
     sentOrders: FilteredPage<OrderKanban>;
     inPrepareOrders: FilteredPage<OrderKanban>;
     readyOrders: FilteredPage<OrderKanban>;
+}
+
+export interface SimplePaymentMethod {
+    id: number;
+    name: string;
+}
+
+export interface RegisterIndividualPaymentDTO {
+    paymentMethodId: number;
+    amount: number;
+}
+
+export interface RegisterPaymentRequest {
+    individualPayments: RegisterIndividualPaymentDTO[];
 }

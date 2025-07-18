@@ -3,8 +3,11 @@ package org.example.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.backend.model.enums.OrderStatus;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Table(name = "orders")
@@ -15,11 +18,13 @@ import java.util.Set;
         }
 )
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"parentOrder", "additionalOrders", "guestTab", "product", "waiter", "workstation"})
 public class Order {
     @Id
     @Column(name = "id", nullable = false, unique = true, updatable = false)
@@ -48,6 +53,7 @@ public class Order {
     private LocalDateTime closedTime; // delivered or canceled, this treats both
 
     @OneToMany(mappedBy = "parentOrder", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Order> additionalOrders;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -69,5 +75,17 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
+
+    public void localSetParentOrder(Order parentOrder) {
+        this.parentOrder = parentOrder;
+    }
+
+    public void addAdditionalOrder(Order additionalOrder) {
+        if (this.additionalOrders == null) {
+            this.additionalOrders = new HashSet<>();
+        }
+        this.additionalOrders.add(additionalOrder);
+        additionalOrder.localSetParentOrder(this);
+    }
 
 }

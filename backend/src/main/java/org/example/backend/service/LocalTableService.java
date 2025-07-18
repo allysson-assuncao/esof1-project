@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,19 +58,16 @@ public class LocalTableService {
     }
 
     public List<LocalTableDTO> getGridTables() {
-        List<LocalTableDTO> gridTables = this.localTableRepository.findAll()
-                .stream()
-                .map(this::convertToLocalTableDTO)
-                .collect(Collectors.toList());
 
-        Collections.sort(gridTables);
-        return gridTables;
+        return this.localTableRepository.findAll()
+                .stream()
+                .map(this::convertToLocalTableDTO).sorted().collect(Collectors.toList());
     }
 
     private LocalTableDTO convertToLocalTableDTO(LocalTable localTable) {
         if (localTable == null) return null;
 
-        int guestTabCountOpen = this.localTableRepository.findOpenGuestTabCountById(localTable.getId());
+        int guestTabCountOpen = this.localTableRepository.findActiveGuestTabCountById(localTable.getId());
 
         return LocalTableDTO.builder()
                 .id(localTable.getId())
@@ -81,6 +79,23 @@ public class LocalTableService {
 
     public boolean hasOpenGuestTab(int tableNumber) {
         return guestTabRepository.existsByLocalTable_NumberAndStatus(tableNumber, GuestTabStatus.OPEN);
+    }
+
+    @Transactional
+    public void updateTableStatusBasedOnGuestTabs(UUID tableId) {
+        LocalTable table = localTableRepository.findById(tableId)
+                .orElseThrow(() -> new RuntimeException("Mesa não encontrada com id: " + tableId));
+
+        long openTabsCount = guestTabRepository.countByLocalTableAndStatus(table, GuestTabStatus.OPEN);
+
+        if (openTabsCount > 0) {
+            table.setStatus(LocalTableStatus.OCCUPIED);
+            System.out.println("Comanda fechada!");
+        } else {
+            table.setStatus(LocalTableStatus.FREE);
+            System.out.println("Comanda liberada!");
+        }
+        localTableRepository.save(table);
     }
 
 }
