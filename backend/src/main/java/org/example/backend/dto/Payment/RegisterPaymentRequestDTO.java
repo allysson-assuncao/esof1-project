@@ -1,7 +1,7 @@
 package org.example.backend.dto.Payment;
 
-import org.example.backend.dto.IndividualPayment.IndividualPaymentDTO;
+import org.example.backend.dto.IndividualPayment.SimpleIndividualPaymentDTO;
 
 import java.util.List;
 
-public record RegisterPaymentRequestDTO(List<IndividualPaymentDTO> individualPayments) { }
+public record RegisterPaymentRequestDTO(List<SimpleIndividualPaymentDTO> individualPayments) { }

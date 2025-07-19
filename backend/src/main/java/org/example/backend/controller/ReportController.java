@@ -1,7 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.dto.FilteredPageDTO;
-import org.example.backend.dto.Payment.ReportPaymentDTO;
+import org.example.backend.dto.Payment.PaymentGroupDTO;
 import org.example.backend.dto.Report.GeneralReportFilterDTO;
 import org.example.backend.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +23,14 @@ public class ReportController {
     }
 
     @PostMapping("/filter-payments")
-    public ResponseEntity<FilteredPageDTO<ReportPaymentDTO>> filterPaymentsReport(
+    public ResponseEntity<FilteredPageDTO<PaymentGroupDTO>> filterPaymentsReport(
             @RequestBody GeneralReportFilterDTO filterDto,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String orderBy,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction
+            @RequestParam(defaultValue = "10") int size
     ) {
-        System.out.println(filterDto.toString());
-        Page<ReportPaymentDTO> paymentsPage = this.reportService.getPaymentsByFilters(filterDto, page, size, orderBy, direction);
+        Page<PaymentGroupDTO> paymentsPage = this.reportService.getGroupedPaymentsByFilters(filterDto, page, size, "date", Sort.Direction.DESC);
         return ResponseEntity.ok(new FilteredPageDTO<>(paymentsPage.getContent(), paymentsPage.getTotalPages()));
     }
+
 
 }

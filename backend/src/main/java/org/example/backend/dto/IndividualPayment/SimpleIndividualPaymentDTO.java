@@ -5,4 +5,4 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-public record IndividualPaymentDTO(Long id, BigDecimal amount, String paymentMethodName) { }
+public record SimpleIndividualPaymentDTO(Long paymentMethodId, BigDecimal amount) { }
