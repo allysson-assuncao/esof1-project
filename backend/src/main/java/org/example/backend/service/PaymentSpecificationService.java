@@ -28,6 +28,8 @@ public class PaymentSpecificationService {
                             criteriaBuilder.lessThanOrEqualTo(root.get("endTime"), endTime)
                     ));
 
+
+
             assert query != null;
             query.distinct(true);
 

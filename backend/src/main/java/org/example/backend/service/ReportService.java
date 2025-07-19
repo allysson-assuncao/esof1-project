@@ -24,7 +24,6 @@ public class ReportService {
         this.paymentSpecificationService = paymentSpecificationService;
     }
 
-
     public Page<ReportPaymentDTO> getPaymentsByFilters(GeneralReportFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
         Specification<Payment> specification = this.paymentSpecificationService.getAPIProcessSpecification(filterDto);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, orderBy));
@@ -39,4 +38,5 @@ public class ReportService {
                 .updatedAt(payment.getUpdatedAt())
                 .build());
     }
+
 }
