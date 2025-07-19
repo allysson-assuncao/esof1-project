@@ -73,6 +73,11 @@ public class GuestTabService {
                 .build();
 
         guestTabRepository.save(guestTab);
+
+        if (guestTab.getLocalTable() != null) {
+            this.localTableService.updateTableStatusBasedOnGuestTabs(guestTab.getLocalTable().getId());
+        }
+
         return true;
     }
 
