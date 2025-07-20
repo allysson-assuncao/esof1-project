@@ -27,10 +27,13 @@ public class WorkstationService {
 
     public boolean registerWorkstation(WorkstationRegisterDTO workstationRegisterDTO) {
         if (workstationRegisterDTO == null) return false;
+        if (workstationRepository.existsByName(workstationRegisterDTO.name())) return false;
 
         Set<Category> categories = new HashSet<>();
-        for (UUID it : workstationRegisterDTO.categoryIds()) {
-            categories.add(this.categoryRepository.findById(it).orElseThrow());
+        if(workstationRegisterDTO.categoryIds()!=null){
+            for (UUID it : workstationRegisterDTO.categoryIds()) {
+                categories.add(this.categoryRepository.findById(it).orElseThrow());
+            }
         }
 
         Workstation workstation = Workstation.builder()
@@ -57,6 +60,8 @@ public class WorkstationService {
     }
 
     public List<SimpleWorkstationDTO> getAllWorkstationsByEmployee(User user) {
+
+        if (user == null) return new ArrayList<>();
         List<Workstation> userWorkstations = this.workstationRepository.findWorkstationsByUserId(user.getId());
 
         List<Workstation> workstations;

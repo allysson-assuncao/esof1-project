@@ -59,9 +59,11 @@ public class GuestTabService {
     @Transactional
     public boolean registerGuestTab(GuestTabRequestDTO request) {
         LocalTable table = localTableRepository.findById(request.localTableId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Table number " + request.localTableId() + " not found."
-                ));
+                .orElse(null);
+
+        if(table==null){
+            return false;
+        }
 
         GuestTab guestTab = GuestTab.builder()
                 .guestName(request.guestName())
@@ -95,9 +97,13 @@ public class GuestTabService {
             output.append("         R$");
             output.append(it.getProduct().getPrice());
             output.append("\n");
-            accum += it.getProduct().getPrice();
+            accum += it.getProduct().getPrice()*it.getAmount();
         }
-        output.append("\n" + "Preço total: R$ " + accum);
+        output.append("\n" + "Subtotal: R$ " + accum + "\n");
+        double ten_percent = accum*0.1;
+        output.append("\n" + "Taxa de serviço: R$ " + ten_percent + "\n");
+        double total = accum + ten_percent;
+        output.append("\n" + "Valor final: R$ " + total + "\n");
         tab.setStatus(GuestTabStatus.CLOSED);
         return output.toString();
     }
