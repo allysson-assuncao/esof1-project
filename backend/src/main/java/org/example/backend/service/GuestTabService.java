@@ -153,7 +153,7 @@ public class GuestTabService {
         return result;
     }
 
-    public GuestTabGetDTO convertGuestTabToGetDTO(GuestTab guestTab) {
+    private GuestTabGetDTO convertGuestTabToGetDTO(GuestTab guestTab) {
         return GuestTabGetDTO.builder()
                 .id(guestTab.getId())
                 .tableNumber(guestTab.getLocalTable().getNumber())

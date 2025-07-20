@@ -22,6 +22,7 @@ import {NavMain} from "@/components/sidebar/nav/nav-main";
 import {NavAbout} from "@/components/sidebar/nav/nav-about";
 import {NavSecondary} from "@/components/sidebar/nav/nav-secondary";
 import {NavUser} from "@/components/sidebar/nav/nav-user";
+import { FileText } from "lucide-react";
 
 const data = {
     user: {
@@ -51,6 +52,22 @@ const data = {
                 {
                     title: "Mesas",
                     url: '/dashboard/manage/table',
+                },
+            ],
+        },
+        {
+            title: "Relatório",
+            /*url: "#",*/
+            icon: FileText,
+            isActive: true,
+            items: [
+                {
+                    title: "Faturamento",
+                    url: '/dashboard/report/sales',
+                },
+                {
+                    title: "Desempenho",
+                    url: '/dashboard/report/performance',
                 },
             ],
         },

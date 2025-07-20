@@ -22,7 +22,7 @@ export const GuestTabStatus = {
     OPEN: {value: 'OPEN', label: 'Aberta'},
     CLOSED: {value: 'CLOSED', label: 'Fechada'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
-    PAYED: {value: 'PAYED', label: 'Paga'},
+    PAID: {value: 'PAID', label: 'Paga'},
 } as const
 
 export const LocalTableStatus = {
@@ -74,6 +74,23 @@ export interface FetchGuestTabParams {
     direction?: 'ASC' | 'DESC';
 }
 
+export interface PaymentFilters {
+    minPrice?: number;
+    maxPrice?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    categoryNames?: string[];
+    productNames?: string[];
+}
+
+export interface FetchPaymentParams {
+    filter: PaymentFilters;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    direction?: 'ASC' | 'DESC';
+}
+
 export interface DisplayOrderItem {
     id: number;
     amount: number;
@@ -108,6 +125,7 @@ export interface DisplayGuestTabItem {
 export interface PaymentItem {
     id: number;
     totalAmount: number;
+    updatedAt: Date | undefined;
     status: PaymentStatus;
 }
 
