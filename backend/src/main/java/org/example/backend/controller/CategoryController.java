@@ -44,6 +44,12 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
+    @GetMapping("/product-eligible")
+    @Operation(summary = "selectProductEligible - Exibe apenas categorias que podem ter produtos associados")
+    public ResponseEntity<List<SimpleCategoryDTO>> selectProductEligible() {
+        return ResponseEntity.ok(categoryService.getProductEligibleCategories());
+    }
+
     @PutMapping("/update/{id}")
     @Operation(summary = "update – Recebe o ID de um categoria e abre body para edição das informações da categoria")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody CategoryDTO dto) {
