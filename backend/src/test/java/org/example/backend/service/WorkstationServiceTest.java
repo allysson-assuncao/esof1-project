@@ -59,7 +59,7 @@ public class WorkstationServiceTest {
     }
 
     @Test
-    void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnSimpleWorkstationDTO(){
+    void getAllWorkstations_WhenThereAreWorkstations_ShouldReturnSimpleWorkstationDTOs(){
         // config mock
         List<Workstation> mockWorkstationList = new ArrayList<>();
         for(int i=0;i<10;i++){

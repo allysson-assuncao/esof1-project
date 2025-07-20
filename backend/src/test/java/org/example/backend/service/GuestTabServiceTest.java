@@ -1,12 +1,11 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.DrillDownOrderDTO;
+
 import org.example.backend.dto.GuestTab.GuestTabGetDTO;
 import org.example.backend.dto.GuestTab.GuestTabRequestDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.LocalTable;
 import org.example.backend.model.enums.GuestTabStatus;
-import org.example.backend.model.enums.OrderStatus;
 import org.example.backend.repository.GuestTabRepository;
 import org.example.backend.repository.LocalTableRepository;
 import org.junit.jupiter.api.Test;
