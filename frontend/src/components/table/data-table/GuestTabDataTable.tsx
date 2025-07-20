@@ -229,7 +229,7 @@ export function GuestTabDataTable<TValue>({
                     animation={2}
                     maxCount={3}
                 />
-                {role == UserRoles.ADMIN.value || role == UserRoles.CASHIER.value && (
+                {(role == UserRoles.ADMIN.value || role == UserRoles.CASHIER.value) && (
                     <MultiSelect
                         options={guestTabStatusOptions}
                         onValueChange={(selectedValues) => setSelectedFilters({

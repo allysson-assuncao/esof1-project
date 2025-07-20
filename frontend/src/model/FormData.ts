@@ -52,3 +52,12 @@ export type CategoryFormData = {
     subcategories: string[];
     workstationId: string;
 };
+
+export interface RegisterPaymentFormData {
+    items: RegisterPaymentItemDTO[];
+}
+
+export interface RegisterPaymentItemDTO {
+    paymentMethodId: string;
+    amount: number;
+}

@@ -43,4 +43,8 @@ public class GuestTab {
     @JsonIgnore
     private List<Order> orders;
 
+    @OneToOne(mappedBy = "guestTab", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Payment payment;
+
 }

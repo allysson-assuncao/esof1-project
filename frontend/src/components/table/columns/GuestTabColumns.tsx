@@ -5,6 +5,7 @@ import {DisplayGuestTabItem, GuestTabStatus} from "@/model/Interfaces";
 import {ChevronDown, ChevronRight} from "lucide-react";
 import {DataTableColumnHeader} from "@/components/ui/data-table";
 import {formatDateDisplay} from "@/utils/operations/date-convertion";
+import {GuestTabActions} from "@/components/actions/GuestTabActions";
 
 export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     // DrillDown
@@ -45,7 +46,7 @@ export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     {
         accessorKey: 'timeOpened',
         header: 'Hora',
-        cell: ({ row }) => formatDateDisplay(row.original.timeOpened)
+        cell: ({row}) => formatDateDisplay(row.original.timeOpened)
     },
     {
         accessorKey: "totalPrice",
@@ -61,5 +62,17 @@ export const guestTabColumns: ColumnDef<DisplayGuestTabItem>[] = [
     {
         header: "Qtd. Pedidos",
         cell: ({row}) => row.original.orderGroups.length,
+    },
+    {
+        id: 'actions',
+        header: () => <div className="text-center">Ações</div>,
+        cell: ({row}) => {
+            const guestTab = row.original;
+            return (
+                <div className="flex justify-center">
+                    <GuestTabActions guestTab={guestTab}/>
+                </div>
+            )
+        },
     },
 ]
