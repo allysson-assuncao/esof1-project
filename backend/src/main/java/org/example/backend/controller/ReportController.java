@@ -32,5 +32,4 @@ public class ReportController {
         return ResponseEntity.ok(new FilteredPageDTO<>(paymentsPage.getContent(), paymentsPage.getTotalPages()));
     }
 
-
 }

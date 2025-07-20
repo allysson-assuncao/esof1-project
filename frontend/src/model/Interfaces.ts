@@ -74,23 +74,6 @@ export interface FetchGuestTabParams {
     direction?: 'ASC' | 'DESC';
 }
 
-export interface PaymentFilters {
-    minPrice?: number;
-    maxPrice?: number;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
-    categoryNames?: string[];
-    productNames?: string[];
-}
-
-export interface FetchPaymentParams {
-    filter: PaymentFilters;
-    page?: number;
-    size?: number;
-    orderBy?: string;
-    direction?: 'ASC' | 'DESC';
-}
-
 export interface DisplayOrderItem {
     id: number;
     amount: number;
@@ -225,4 +208,43 @@ export interface RegisterIndividualPaymentDTO {
 
 export interface RegisterPaymentRequest {
     individualPayments: RegisterIndividualPaymentDTO[];
+}
+
+export interface PaymentFilters {
+    startDate?: Date;
+    endDate?: Date;
+    businessDayStartTime?: string; // ex: "18:00"
+    businessDayEndTime?: string;   // ex: "02:00"
+    paymentMethodIds?: number[];
+}
+
+export interface FetchPaymentParams {
+    filter: PaymentFilters;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    direction?: 'ASC' | 'DESC';
+}
+
+export interface IndividualPayment {
+    id: number;
+    amount: number;
+    paymentMethodName: string;
+}
+
+export interface ReportPayment {
+    id: number;
+    totalAmount: number;
+    numberOfPayers: number;
+    status: PaymentStatus;
+    createdAt: string;
+    guestTabId: string;
+    individualPayments: IndividualPayment[];
+}
+
+export interface PaymentGroup {
+    date: string
+    totalAmount: number;
+    paymentCount: number;
+    payments: ReportPayment[];
 }

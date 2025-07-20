@@ -1,21 +1,21 @@
 import {SalesReportDataTable} from "@/components/report/data-table/SalesReportDataTable";
 import {salesReportColumns} from "@/components/report/columns/SalesReportColumns";
 
-import React, { useState } from "react";
-import { PaymentFilters } from "@/model/Interfaces";
-import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/ui/date-picker";
-import { MultiSelect } from "@/components/ui/multi-select";
+import React, {useState} from "react";
+import {PaymentFilters} from "@/model/Interfaces";
+import {Input} from "@/components/ui/input";
+import {DatePicker} from "@/components/ui/date-picker";
+import {MultiSelect} from "@/components/ui/multi-select";
 
 const categoryOptions = [ //placeholder
-    { label: "Bebidas", value: "Bebidas" },
-    { label: "Comidas", value: "Comidas" },
-    { label: "Sobremesas", value: "Sobremesas" },
+    {label: "Bebidas", value: "Bebidas"},
+    {label: "Comidas", value: "Comidas"},
+    {label: "Sobremesas", value: "Sobremesas"},
 ];
 const productOptions = [ //placeholder
-    { label: "Coca-Cola", value: "Coca-Cola" },
-    { label: "Água", value: "Água" },
-    { label: "Hambúrguer", value: "Hambúrguer" },
+    {label: "Coca-Cola", value: "Coca-Cola"},
+    {label: "Água", value: "Água"},
+    {label: "Hambúrguer", value: "Hambúrguer"},
 ];
 
 const SalesReportTable = () => {
@@ -78,20 +78,20 @@ const SalesReportTable = () => {
                     />
                 </div>
                 <DatePicker
-                    onDateSelected={date => setFilters(f => ({ ...f, startDate: date }))}
+                    onDateSelected={date => setFilters(f => ({...f, startDate: date}))}
                 />
                 <DatePicker
-                    onDateSelected={date => setFilters(f => ({ ...f, endDate: date }))}
+                    onDateSelected={date => setFilters(f => ({...f, endDate: date}))}
                 />
                 <MultiSelect
                     options={categoryOptions}
-                    onValueChange={values => setFilters(f => ({ ...f, categoryNames: values }))}
+                    onValueChange={values => setFilters(f => ({...f, categoryNames: values}))}
                     defaultValue={filters.categoryNames || []}
                     placeholder="Categorias"
                 />
                 <MultiSelect
                     options={productOptions}
-                    onValueChange={values => setFilters(f => ({ ...f, productNames: values }))}
+                    onValueChange={values => setFilters(f => ({...f, productNames: values}))}
                     defaultValue={filters.productNames || []}
                     placeholder="Produtos"
                 />

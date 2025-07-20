@@ -1,4 +1,4 @@
-import {guestTab, payment} from "@/services/index";
+import {payment} from "@/services/index";
 import {FetchPaymentParams, RegisterPaymentRequest} from "@/model/Interfaces";
 
 export const registerPaymentRequest = async ({ paymentId, data }: { paymentId: number, data: RegisterPaymentRequest }) => {
@@ -11,7 +11,7 @@ export const registerPaymentRequest = async ({ paymentId, data }: { paymentId: n
 };
 
 export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
-    /*const response = await payment.post(`/filter`, params.filter, {
+    const response = await payment.post(`/reports/filter-payments`, params.filter, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -24,5 +24,5 @@ export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
     });
     console.log(response);
     console.log(response.data);
-    return response.data;*/
+    return response.data;
 }
