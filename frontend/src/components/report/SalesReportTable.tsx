@@ -83,7 +83,7 @@ const SalesReportTable = () => {
                 <DatePicker
                     onDateSelected={date => setFilters(f => ({...f, endDate: date}))}
                 />
-                <MultiSelect
+                {/*<MultiSelect
                     options={categoryOptions}
                     onValueChange={values => setFilters(f => ({...f, categoryNames: values}))}
                     defaultValue={filters.categoryNames || []}
@@ -94,7 +94,7 @@ const SalesReportTable = () => {
                     onValueChange={values => setFilters(f => ({...f, productNames: values}))}
                     defaultValue={filters.productNames || []}
                     placeholder="Produtos"
-                />
+                />*/}
             </div>
             <SalesReportDataTable
                 columns={salesReportColumns}
