@@ -112,8 +112,8 @@ export function SalesDataTable<TValue>({
 
     const paymentMethodOptions =
         simplePaymentMethods?.map((method) => ({
-            label: String(method.id),
-            value: method.name,
+            label: method.name,
+            value: String(method.id),
         })) ?? [];
 
     const handlePreviousPage = () => {

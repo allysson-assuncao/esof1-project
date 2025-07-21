@@ -97,13 +97,9 @@ public class GuestTabService {
             output.append("         R$");
             output.append(it.getProduct().getPrice());
             output.append("\n");
-            accum += it.getProduct().getPrice()*it.getAmount();
+            accum += it.getProduct().getPrice();
         }
-        output.append("\n" + "Subtotal: R$ " + accum + "\n");
-        double ten_percent = accum*0.1;
-        output.append("\n" + "Taxa de serviço: R$ " + ten_percent + "\n");
-        double total = accum + ten_percent;
-        output.append("\n" + "Valor final: R$ " + total + "\n");
+        output.append("\n" + "Preço total: R$ " + accum);
         tab.setStatus(GuestTabStatus.CLOSED);
         return output.toString();
     }
@@ -153,7 +149,7 @@ public class GuestTabService {
         return result;
     }
 
-    private GuestTabGetDTO convertGuestTabToGetDTO(GuestTab guestTab) {
+    public GuestTabGetDTO convertGuestTabToGetDTO(GuestTab guestTab) {
         return GuestTabGetDTO.builder()
                 .id(guestTab.getId())
                 .tableNumber(guestTab.getLocalTable().getNumber())
