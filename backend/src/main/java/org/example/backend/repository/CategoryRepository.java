@@ -18,4 +18,13 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     Optional<Category> findByName(String subCategory);
 
     List<Category> findByParentCategoryIsNull();
+
+    @Query("""
+        SELECT c FROM Category c WHERE c.isAdditional = true OR
+        (c.isAdditional = false AND NOT EXISTS
+            (SELECT s FROM Category s WHERE s.parentCategory = c AND s.isAdditional = false)
+        )
+    """)
+    List<Category> findProductEligibleCategories();
+
 }

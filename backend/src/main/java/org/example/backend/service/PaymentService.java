@@ -1,6 +1,6 @@
 package org.example.backend.service;
 
-import org.example.backend.dto.IndividualPayment.IndividualPaymentDTO;
+import org.example.backend.dto.IndividualPayment.SimpleIndividualPaymentDTO;
 import org.example.backend.dto.Payment.RegisterPaymentRequestDTO;
 import org.example.backend.model.GuestTab;
 import org.example.backend.model.IndividualPayment;
@@ -64,7 +64,7 @@ public class PaymentService {
             throw new IllegalStateException("Este pagamento já foi totalmente quitado.");
         }
 
-        for (IndividualPaymentDTO dto : request.individualPayments()) {
+        for (SimpleIndividualPaymentDTO dto : request.individualPayments()) {
             PaymentMethod method = this.paymentMethodRepository.findById(dto.paymentMethodId())
                     .orElseThrow(() -> new RuntimeException("Método de pagamento não encontrado."));
 

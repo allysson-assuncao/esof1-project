@@ -5,7 +5,6 @@ import {formatDateDisplay} from "@/utils/operations/date-convertion";
 import React, {useEffect} from "react";
 import {getExpandedRowModel} from "@tanstack/table-core";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {AddOrderDialog} from "@/components/dialog/AddOrderDialog";
 import {AdditionalOrdersContainer} from "@/components/container/AdditionalOrdersContainer";
 
 const getOrderColumns = (parentOrderId: number | null): ColumnDef<DisplayOrderItem>[] => [
@@ -13,8 +12,6 @@ const getOrderColumns = (parentOrderId: number | null): ColumnDef<DisplayOrderIt
         id: "expander",
         header: () => null,
         cell: ({row}) => {
-            // Um item principal (onde a tabela pai tem parentOrderId nulo) SEMPRE pode ser expandido
-            // para mostrar o contêiner de adicionais.
             const isMainOrderItem = parentOrderId === null;
             if (isMainOrderItem) {
                 return (
@@ -24,7 +21,6 @@ const getOrderColumns = (parentOrderId: number | null): ColumnDef<DisplayOrderIt
                 );
             }
 
-            // Um item adicional só pode ser expandido se ele mesmo tiver filhos.
             const canExpandAdditional = row.original.additionalOrders && row.original.additionalOrders.length > 0;
             return canExpandAdditional ? (
                 <button {...{onClick: () => row.toggleExpanded(!row.getIsExpanded())}}>

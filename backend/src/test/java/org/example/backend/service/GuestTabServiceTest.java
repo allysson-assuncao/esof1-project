@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+
 import org.example.backend.dto.GuestTab.GuestTabGetDTO;
 import org.example.backend.dto.GuestTab.GuestTabRequestDTO;
 import org.example.backend.model.GuestTab;
@@ -101,6 +102,8 @@ public class GuestTabServiceTest {
         assertEquals(GuestTabGetDTO.class, result.getFirst().getClass(), "");
 
     }
+
+
 
 
 }

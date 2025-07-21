@@ -95,6 +95,13 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
+    public List<SimpleCategoryDTO> getProductEligibleCategories() {
+        return categoryRepository.findProductEligibleCategories()
+                .stream()
+                .map(this::toSimpleCategoryDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public Category updateCategoryById(UUID id, CategoryDTO dto) {
         Category category = findCategoryById(id);

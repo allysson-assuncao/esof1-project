@@ -3,7 +3,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useMutation, useQuery} from "react-query";
 import {SimpleCategory} from "@/model/Interfaces";
-import {fetchSimpleCategories} from "@/services/categoryService";
+import {fetchSimpleCategories, fetchSimpleProductEligibleCategories} from "@/services/categoryService";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {productRegisterSchema} from "@/utils/authValidation";
@@ -43,7 +43,7 @@ export function AddProductForm({className, onSubmit}: { className?: string; onSu
     })
 
     const {data: simpleCategories, isLoading, error} = useQuery<SimpleCategory[]>(
-        ["simpleCategories"], fetchSimpleCategories
+        ["simpleCategories"], fetchSimpleProductEligibleCategories
     );
 
     const mutation = useMutation((data: any) => {

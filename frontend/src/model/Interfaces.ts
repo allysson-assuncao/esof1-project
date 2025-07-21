@@ -22,7 +22,7 @@ export const GuestTabStatus = {
     OPEN: {value: 'OPEN', label: 'Aberta'},
     CLOSED: {value: 'CLOSED', label: 'Fechada'},
     CANCELED: {value: 'CANCELED', label: 'Cancelada'},
-    PAYED: {value: 'PAYED', label: 'Paga'},
+    PAID: {value: 'PAID', label: 'Paga'},
 } as const
 
 export const LocalTableStatus = {
@@ -108,6 +108,7 @@ export interface DisplayGuestTabItem {
 export interface PaymentItem {
     id: number;
     totalAmount: number;
+    updatedAt: Date | undefined;
     status: PaymentStatus;
 }
 
@@ -208,4 +209,49 @@ export interface RegisterIndividualPaymentDTO {
 
 export interface RegisterPaymentRequest {
     individualPayments: RegisterIndividualPaymentDTO[];
+}
+
+export interface PaymentMetrics {
+    totalRevenue: number;
+    totalPayments: number;
+    averageTicket: number;
+}
+
+export interface PaymentFilters {
+    startDate?: Date;
+    endDate?: Date;
+    businessDayStartTime?: string; // ex: "18:00"
+    businessDayEndTime?: string;   // ex: "02:00"
+    paymentMethodIds?: number[];
+}
+
+export interface FetchPaymentParams {
+    filter: PaymentFilters;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    direction?: 'ASC' | 'DESC';
+}
+
+export interface IndividualPayment {
+    id: number;
+    amount: number;
+    paymentMethodName: string;
+}
+
+export interface ReportPayment {
+    id: number;
+    totalAmount: number;
+    numberOfPayers: number;
+    status: PaymentStatus;
+    createdAt: string;
+    guestTabId: string;
+    individualPayments: IndividualPayment[];
+}
+
+export interface PaymentGroup {
+    date: string
+    totalAmount: number;
+    paymentCount: number;
+    payments: ReportPayment[];
 }

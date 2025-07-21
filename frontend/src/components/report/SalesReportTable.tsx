@@ -1,0 +1,70 @@
+import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
+import {useQuery} from "react-query";
+import {useState} from "react";
+import {GuestTabFilters, PaymentFilters, PaymentMetrics} from "@/model/Interfaces";
+import {SalesDataTable} from "@/components/report/data-table/SalesDataTable";
+import {paymentGroupColumns} from "@/components/report/columns/SalesColumns";
+import {fetchFilteredPayments, fetchPaymentMethods} from "@/services/reportService";
+
+const SalesReportTable = () => {
+    const [selectedFilters, setSelectedFilters] = useState<PaymentFilters>({
+        startDate: undefined,
+        endDate: undefined,
+        businessDayStartTime: '18:00',
+        businessDayEndTime: '02:00',
+        paymentMethodIds: [],
+    });
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [cachedPages, setCachedPages] = useState<{ [key: number]: GuestTabFilters[] }>({});
+
+    const {data: tableData, error: tableError, isLoading: isTableLoading} = useQuery(
+        ['paymentGroups', selectedFilters, page, pageSize],
+        async () => {
+            const res = await fetchFilteredPayments({
+                filter: selectedFilters,
+                page: page,
+                size: pageSize,
+                orderBy: 'timeOpened',
+                direction: 'ASC',
+            });
+            setTotalPages(res.totalPages)
+            setCachedPages((prev) => ({...prev, [page]: res.content}))
+            return res.content
+        },
+        {
+            keepPreviousData: true,
+            initialData: cachedPages[page] || undefined,
+        },
+    );
+
+    const {data: metricsData, isLoading: isMetricsLoading} = useQuery<PaymentMetrics>(
+        ['paymentMetrics', selectedFilters],
+        () => fetchPaymentMethods(selectedFilters),
+        {keepPreviousData: true}
+    );
+
+    if (isTableLoading) return <DataTableSkeleton/>;
+    if (tableError) return <div>Erro ao carregar os pagamentos.</div>;
+
+    return (
+        <div className="container mx-auto py-10">
+            <h1 className="text-2xl font-bold">Relatório de Pagamentos</h1>
+            <SalesDataTable
+                columns={paymentGroupColumns()}
+                data={tableData || []}
+                setPage={setPage}
+                selectedFilters={selectedFilters}
+                setSelectedFilters={setSelectedFilters}
+                page={page}
+                totalPages={totalPages}
+                setPageSize={setPageSize}
+                metrics={metricsData}
+                isMetricsLoading={isMetricsLoading}
+            />
+        </div>
+    );
+};
+
+export default SalesReportTable;
