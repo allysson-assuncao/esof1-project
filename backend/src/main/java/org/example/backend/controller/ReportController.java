@@ -28,7 +28,9 @@ public class ReportController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
+        System.out.println(filterDto);
         Page<PaymentGroupDTO> paymentsPage = this.reportService.getGroupedPaymentsByFilters(filterDto, page, size, "date", Sort.Direction.DESC);
+        System.out.println(paymentsPage);
         return ResponseEntity.ok(new FilteredPageDTO<>(paymentsPage.getContent(), paymentsPage.getTotalPages()));
     }
 

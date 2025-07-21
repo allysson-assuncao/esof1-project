@@ -3,8 +3,7 @@
 import {ColumnDef} from '@tanstack/react-table'
 import {PaymentItem} from "@/model/Interfaces";
 
-
-export const salesReportColumns: ColumnDef<PaymentItem>[] = [
+export const performanceReportColumns: ColumnDef<PaymentItem>[] = [
     {
         accessorKey: "id",
         header: "ID",

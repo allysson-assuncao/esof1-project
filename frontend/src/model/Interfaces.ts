@@ -210,6 +210,12 @@ export interface RegisterPaymentRequest {
     individualPayments: RegisterIndividualPaymentDTO[];
 }
 
+export interface PaymentMetrics {
+    totalRevenue: number;
+    totalPayments: number;
+    averageTicket: number;
+}
+
 export interface PaymentFilters {
     startDate?: Date;
     endDate?: Date;

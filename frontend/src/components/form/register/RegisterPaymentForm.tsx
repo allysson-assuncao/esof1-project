@@ -1,7 +1,7 @@
 import {DisplayGuestTabItem, SimplePaymentMethod} from "@/model/Interfaces";
 import {useMutation, useQuery, useQueryClient} from "react-query";
 import {useMemo, useState} from "react";
-import {fetchAllPaymentMethods} from "@/services/paymentMethodService";
+import {fetchSimplePaymentMethods} from "@/services/paymentMethodService";
 import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {registerPaymentFormSchema} from "@/utils/paymentValidation";
@@ -35,7 +35,7 @@ export function RegisterPaymentForm({guestTab, onSuccess}: RegisterPaymentFormPr
 
     const {data: paymentMethods, isLoading: isLoadingMethods} = useQuery<SimplePaymentMethod[]>(
         'paymentMethods',
-        fetchAllPaymentMethods
+        fetchSimplePaymentMethods
     );
 
     const form = useForm<RegisterPaymentFormData>({

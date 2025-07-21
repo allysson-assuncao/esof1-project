@@ -1,17 +1,13 @@
 "use client";
 
-import GuestTabTable from "@/components/table/GuestTabTable";
+import PerformanceReportTable from "@/components/report/PerformanceReportTable";
 
-function OrdersTablePage({
-                             params,
-                         }: {
-    params: { id: string };
-}) {
+function OrdersTablePage() {
     return (
         <div className="h-full">
-            <GuestTabTable localTableId={params.id} />
+            <PerformanceReportTable/>
         </div>
     );
-};
+}
 
 export default OrdersTablePage;

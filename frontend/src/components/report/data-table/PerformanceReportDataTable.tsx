@@ -13,7 +13,7 @@ interface SalesReportDataTableProps {
     columns: ColumnDef<PaymentItem>[];
 }
 
-export function SalesReportDataTable({data, columns}: SalesReportDataTableProps) {
+export function PerformanceReportDataTable({data, columns}: SalesReportDataTableProps) {
     const table = useReactTable({
         data,
         columns,

@@ -43,3 +43,7 @@ export const paymentMethod = axios.create({
 export const payment = axios.create({
     baseURL: `http://localhost:${port}/app/payment`,
 });
+
+export const report = axios.create({
+    baseURL: `http://localhost:${port}/app/report`,
+});
