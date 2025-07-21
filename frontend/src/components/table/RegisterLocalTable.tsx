@@ -1,5 +1,6 @@
 import React from "react";
 import {AddLocalTableForm} from "@/components/form/add/AddLocalTableForm";
+import {AddBulkLocalTableForm} from "@/components/form/add/AddBulkLocalTableForm";
 
 export function RegisterLocalTable (){
 
@@ -7,6 +8,9 @@ export function RegisterLocalTable (){
         <h1 className="text-3xl font-bold mb-6 text-center">Nova Mesa</h1>
         <div>
             <AddLocalTableForm/>
+        </div>
+        <div>
+            <AddBulkLocalTableForm/>
         </div>
     </div>)
 }
