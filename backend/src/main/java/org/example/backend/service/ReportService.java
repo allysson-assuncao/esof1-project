@@ -36,6 +36,7 @@ public class ReportService {
     public Page<PaymentGroupDTO> getGroupedPaymentsByFilters(GeneralReportFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
         Specification<Payment> specification = this.paymentSpecificationService.getAPIProcessSpecification(filterDto);
         List<Payment> allPayments = this.paymentRepository.findAll(specification);
+        System.out.println(allPayments);
 
         LocalTime businessDayStart = Optional.ofNullable(filterDto.businessDayStartTime()).orElse(LocalTime.of(18, 0)); // Default 18:00
 
