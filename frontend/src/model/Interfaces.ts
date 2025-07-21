@@ -150,6 +150,7 @@ export interface SimpleWorkstation {
 export interface HierarchicalCategoryDTO {
     id: string;
     name: string;
+    isAdditional: boolean;
     subCategories: HierarchicalCategoryDTO[];
 }
 
