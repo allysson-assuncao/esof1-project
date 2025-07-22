@@ -27,6 +27,11 @@ export interface LocalTableRegisterFormData {
     number: number;
 }
 
+export interface BulkRegisterLocalTableFormData {
+    start: number;
+    end: number;
+}
+
 export interface GuestTabRegisterFormData {
     localTableId: string;
     guestName: string;
