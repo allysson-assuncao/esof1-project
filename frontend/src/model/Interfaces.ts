@@ -254,3 +254,43 @@ export interface PaymentGroup {
     paymentCount: number;
     payments: ReportPayment[];
 }
+
+export interface MenuPerformanceFilter {
+    startDate?: Date;
+    endDate?: Date;
+    businessDayStartTime?: string;
+    categoryIds?: string[];
+    productIds?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+}
+
+export interface ProductSales {
+    productId: string;
+    name: string;
+    unitPrice: number;
+    quantitySold: number;
+    totalValue: number;
+}
+
+export interface CategorySales {
+    categoryId: string;
+    name: string;
+    quantitySold: number;
+    totalValue: number;
+    subCategorySales: CategorySales[];
+    productSales: ProductSales[];
+    subRows?: (CategorySales | ProductSales)[];
+}
+
+export interface MenuPerformanceMetrics {
+    totalItemsSold: number;
+    topSellingProduct: { name: string; quantity: number } | null;
+    topSellingCategory: { name: string; value: number } | null;
+    averageItemsPerOrder: number;
+}
+
+export interface SimpleOption {
+    value: string;
+    label: string;
+}
