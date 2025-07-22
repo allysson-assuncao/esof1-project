@@ -59,9 +59,9 @@ public class LocalTableController {
         if (created == 0) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("All numbers requested are taken");
+                    .body("All the requested numbers are taken");
         }else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(created + " Tables were created");
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
         }
     }
 

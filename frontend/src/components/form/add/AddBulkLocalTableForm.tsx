@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
-import {BulkRegisterLocalTableFormData, LocalTableRegisterFormData} from "@/model/FormData";
+import {BulkRegisterLocalTableFormData} from "@/model/FormData";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {bulkRegisterLocalTableSchema, localTableRegisterSchema} from "@/utils/authValidation";
+import {bulkRegisterLocalTableSchema} from "@/utils/authValidation";
 import {useMutation} from "react-query";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
-import {bulkRegisterLocalTable, registerLocalTable} from "@/services/localTableService";
+import {bulkRegisterLocalTable} from "@/services/localTableService";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
@@ -30,6 +30,7 @@ export function AddBulkLocalTableForm({className, onSubmit}: {className?: string
     const mutation = useMutation(bulkRegisterLocalTable, {
         onSuccess: (data) => {
             setCreatedCount(data);
+            router.push(`/dashboard/table/grid`)
             toast.success(`Foram criadas ${data} mesas!`, {});
         },
         onError: (error: unknown) => {
@@ -63,11 +64,6 @@ export function AddBulkLocalTableForm({className, onSubmit}: {className?: string
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
-                    {createdCount !== null && (
-                        <div className="text-green-600 font-semibold text-center">
-                            Foram criadas {createdCount} mesas!
-                        </div>
-                    )}
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleFormSubmit)}>
                             <div className="grid gap-4 sm:gap-6">
