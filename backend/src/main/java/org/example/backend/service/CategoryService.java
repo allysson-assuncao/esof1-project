@@ -197,26 +197,28 @@ public class CategoryService {
     }
 
     public List<HierarchicalCategoryDTO> getCategoryTree() {
-        // 1. Busca todas as categorias que não têm pai (as categorias principais)
+        // 1. Busca todas as categorias que não têm pai (as categorias raiz)
         List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
 
-        // 2. Mapeia cada categoria raiz para o DTO hierárquico
+        // 2. Filtra as categorias raiz que SÃO de adicionais e depois mapeia para o DTO
         return rootCategories.stream()
-                .map(this::toHierarchicalCategoryDTO)
+                .filter(category -> !category.isAdditional())
+                .map(this::toHierarchicalDTO)
                 .collect(Collectors.toList());
     }
 
-    private HierarchicalCategoryDTO toHierarchicalCategoryDTO(Category category) {
-        // Mapeia recursivamente as subcategorias
-        Set<HierarchicalCategoryDTO> subDtos = (category.getSubCategories() == null) ? Collections.emptySet() :
-                category.getSubCategories().stream()
-                        .map(this::toHierarchicalCategoryDTO)
-                        .collect(Collectors.toSet());
+    private HierarchicalCategoryDTO toHierarchicalDTO(Category category) {
+        // Filtra as subcategorias para remover as que são de "adicionais"
+        Set<HierarchicalCategoryDTO> visibleSubCategories = category.getSubCategories().stream()
+                .filter(subCat -> !subCat.isAdditional()) // Aqui a lógica está correta
+                .map(this::toHierarchicalDTO)
+                .collect(Collectors.toSet());
 
         return new HierarchicalCategoryDTO(
                 category.getId(),
                 category.getName(),
-                subDtos
+                category.isAdditional(),
+                visibleSubCategories
         );
     }
 

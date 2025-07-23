@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import org.example.backend.dto.LocalTable.LocalTableBulkRegisterDTO;
 import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
@@ -55,6 +56,19 @@ public class LocalTableService {
         // persiste via JPA
         localTableRepository.save(table);
         return true;
+    }
+
+    public int bulkRegisterLocalTable(LocalTableBulkRegisterDTO request) {
+        LocalTableRequestDTO iterator;
+        int created=0;
+        for (int current_number= request.start(); current_number<=request.end(); current_number++) {
+            iterator = new LocalTableRequestDTO(current_number);
+            if(registerLocalTable(iterator)){
+                created++;
+            }
+        }
+
+        return created;
     }
 
     public List<LocalTableDTO> getGridTables() {

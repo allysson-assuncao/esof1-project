@@ -42,6 +42,27 @@ export const localTableRegisterSchema = z.object({
         .max(999, {message: 'O número da mesa deve ser menor que 1000'})
 })
 
+export const bulkRegisterLocalTableSchema = z.object({
+    start: z.number()
+        .min(1, {message: 'O início do intervalo deve ser maior que 0'})
+        .max(999, {message: 'O início do intervalo deve ser menor que 1000'}),
+    end: z.number()
+        .min(1, {message: 'O fim do intervalo deve ser maior que 0'})
+        .max(999, {message: 'O fim do intervalo deve ser inferior a 1000'})
+}).refine(
+    (data) => data.start <= data.end,
+    {
+        message: 'O início do intervalo deve ser menor ou igual ao fim',
+        path: ['start'],
+    }
+).refine(
+    (data) => data.end >= data.start,
+    {
+        message: 'O fim do intervalo deve ser maior ou igual ao início',
+        path: ['end'],
+    }
+);
+
 export const guestTabRegisterSchema = z.object({
     guestName: z.string()
         .min(1, {message: 'Nome do cliente é obrigatório'})

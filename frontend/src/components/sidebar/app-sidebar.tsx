@@ -138,26 +138,6 @@ const data = {
                 },
             ],
         },
-        {
-            title: 'Administrador',
-            /*url: "#",*/
-            icon: ShieldPlusIcon,
-            isActive: false,
-            items: [
-                {
-                    title: 'Relatório de Vendas',
-                    url: '/dashboard/table/sales',
-                },
-                {
-                    title: 'Relatório de Operação',
-                    url: '/dashboard/table/operation',
-                },
-                {
-                    title: 'Relatório de Funcionários',
-                    url: '/dashboard/table/workers',
-                },
-            ],
-        },
     ],
     projects: [
         {
