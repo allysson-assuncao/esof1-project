@@ -1,4 +1,4 @@
-import {FetchPaymentParams, MenuPerformanceFilter, PaymentFilters} from "@/model/Interfaces";
+import {CategorySales, FetchPaymentParams, MenuPerformanceFilter, PaymentFilters} from "@/model/Interfaces";
 import {report} from "@/services/index";
 
 export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
@@ -27,6 +27,18 @@ export const fetchPaymentMetrics = async (filters: PaymentFilters) => {
     return response.data;
 };
 
+function transformDataForTable(nodes: CategorySales[]): CategorySales[] {
+    return nodes.map(node => {
+        const productSubRows = node.productSales.map(p => ({ ...p, subRows: undefined }));
+        const categorySubRows = transformDataForTable(node.subCategorySales);
+
+        return {
+            ...node,
+            subRows: [...categorySubRows, ...productSubRows],
+        };
+    });
+}
+
 export const fetchMenuPerformanceReport = async (filter: MenuPerformanceFilter) => {
     const response = await report.post(`/filter-menu`, filter, {
         headers: {
@@ -34,8 +46,8 @@ export const fetchMenuPerformanceReport = async (filter: MenuPerformanceFilter) 
         },
     });
     console.log(filter);
-    console.log(response.data);
-    return response.data;
+    console.log(transformDataForTable(response.data));
+    return transformDataForTable(response.data);
 }
 
 export const fetchMenuPerformanceMetrics = async (filters: MenuPerformanceFilter) => {

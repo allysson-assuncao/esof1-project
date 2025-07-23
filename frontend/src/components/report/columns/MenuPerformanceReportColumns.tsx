@@ -46,7 +46,7 @@ export const menuPerformanceReportColumns: ColumnDef<MenuRowData>[] = [
             const isProduct = 'productId' in row.original;
             return (
                 <div className="text-right">
-                    {isProduct ? formatCurrency(row.original.unitPrice) : '-'}
+                    {isProduct ? formatCurrency("unitPrice" in row.original ? row.original.unitPrice : 0) : '-'}
                 </div>
             );
         },

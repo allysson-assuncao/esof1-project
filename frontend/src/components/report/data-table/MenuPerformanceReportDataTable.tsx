@@ -2,16 +2,13 @@ import React, {SetStateAction} from "react";
 import {
     useReactTable,
     getCoreRowModel,
-    ColumnDef,
     flexRender,
 } from "@tanstack/react-table";
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from "@/components/ui/table";
 import {
-    CategorySales, GuestTabStatus,
+    CategorySales,
     MenuPerformanceFilter,
-    MenuPerformanceMetrics, PaymentFilters,
-    PaymentGroup,
-    PaymentItem
+    MenuPerformanceMetrics
 } from "@/model/Interfaces";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -22,8 +19,6 @@ import {fetchSimpleProducts} from "@/services/productService";
 import {DatePicker} from "@/components/ui/date-picker";
 import {Input} from "@/components/ui/input";
 import {MultiSelect} from "@/components/ui/multi-select";
-import {PaymentsSubTable} from "@/components/report/sub-table/PaymentsSubTable";
-import {Button} from "@/components/ui/button";
 import {Slider} from "@/components/ui/slider";
 import {menuPerformanceReportColumns} from "@/components/report/columns/MenuPerformanceReportColumns";
 
