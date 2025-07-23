@@ -271,6 +271,7 @@ export interface ProductSales {
     unitPrice: number;
     quantitySold: number;
     totalValue: number;
+    subRows?: never[];
 }
 
 export interface CategorySales {

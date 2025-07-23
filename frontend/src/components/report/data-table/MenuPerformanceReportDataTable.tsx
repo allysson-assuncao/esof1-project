@@ -181,27 +181,31 @@ export function MenuPerformanceReportDataTable({
             {/* Table */}
             <div className="rounded-md border overflow-x-auto">
                 <Table>
-                    <TableHeader>{table.getHeaderGroups().map(hg =>
-                        <TableRow key={hg.id}>{hg.headers.map(h =>
-                            <TableHead
-                                key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}
-                            </TableHead>)}
-                        </TableRow>)}
+                    <TableHeader>
+                        {table.getHeaderGroups().map(hg => (
+                            <TableRow key={hg.id}>
+                                {hg.headers.map(h => (
+                                    <TableHead key={h.id}>
+                                        {flexRender(h.column.columnDef.header, h.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map(row => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map(cell => (
-                                        <TableCell
-                                            key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
                                     Nenhum resultado.
                                 </TableCell>
                             </TableRow>

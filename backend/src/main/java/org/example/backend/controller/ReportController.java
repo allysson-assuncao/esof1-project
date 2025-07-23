@@ -41,7 +41,7 @@ public class ReportController {
         return ResponseEntity.ok(new FilteredPageDTO<>(paymentsPage.getContent(), paymentsPage.getTotalPages()));
     }
 
-    @PostMapping("/menu-sales")
+    @PostMapping("/filter-menu")
     public ResponseEntity<List<CategorySalesDTO>> getMenuSalesReport(@RequestBody MenuReportFilterDTO filter) {
         List<CategorySalesDTO> report = this.menuReportService.getMenuSalesReport(filter);
         return ResponseEntity.ok(report);

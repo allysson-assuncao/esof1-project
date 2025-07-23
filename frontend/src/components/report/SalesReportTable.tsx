@@ -49,8 +49,10 @@ const SalesReportTable = () => {
     if (tableError) return <div>Erro ao carregar os pagamentos.</div>;
 
     return (
-        <div className="container mx-auto py-10">
-            <h1 className="text-2xl font-bold">Relatório de Pagamentos</h1>
+        <div className="container mx-auto py-10 w-full max-w-[1920px] 5xl:mx-auto 5xl:px-32">
+            <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-8 items-start md:items-center">
+                <h1 className="text-2xl font-bold">Relatório de Pagamentos</h1>
+            </div>
             <SalesDataTable
                 columns={paymentGroupColumns()}
                 data={tableData || []}
