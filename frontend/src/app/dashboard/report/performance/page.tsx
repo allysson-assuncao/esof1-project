@@ -1,11 +1,11 @@
 "use client";
 
-import PerformanceReportTable from "@/components/report/PerformanceReportTable";
+import MenuPerformanceReportTable from "@/components/report/MenuPerformanceReportTable";
 
 function OrdersTablePage() {
     return (
         <div className="h-full">
-            <PerformanceReportTable/>
+            <MenuPerformanceReportTable/>
         </div>
     );
 }

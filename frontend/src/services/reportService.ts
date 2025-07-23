@@ -1,4 +1,4 @@
-import {FetchPaymentParams, PaymentFilters} from "@/model/Interfaces";
+import {FetchPaymentParams, MenuPerformanceFilter, PaymentFilters} from "@/model/Interfaces";
 import {report} from "@/services/index";
 
 export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
@@ -18,8 +18,28 @@ export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
     return response.data;
 }
 
-export const fetchPaymentMethods = async (filters: PaymentFilters) => {
+export const fetchPaymentMetrics = async (filters: PaymentFilters) => {
     const response = await report.post('/payment-metrics', filters, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    });
+    return response.data;
+};
+
+export const fetchMenuPerformanceReport = async (filter: MenuPerformanceFilter) => {
+    const response = await report.post(`/filter-menu`, filter, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    });
+    console.log(filter);
+    console.log(response.data);
+    return response.data;
+}
+
+export const fetchMenuPerformanceMetrics = async (filters: MenuPerformanceFilter) => {
+    const response = await report.post('/menu-metrics', filters, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },

@@ -4,7 +4,7 @@ import {useState} from "react";
 import {GuestTabFilters, PaymentFilters, PaymentMetrics} from "@/model/Interfaces";
 import {SalesDataTable} from "@/components/report/data-table/SalesDataTable";
 import {paymentGroupColumns} from "@/components/report/columns/SalesColumns";
-import {fetchFilteredPayments, fetchPaymentMethods} from "@/services/reportService";
+import {fetchFilteredPayments, fetchPaymentMetrics} from "@/services/reportService";
 
 const SalesReportTable = () => {
     const [selectedFilters, setSelectedFilters] = useState<PaymentFilters>({
@@ -41,7 +41,7 @@ const SalesReportTable = () => {
 
     const {data: metricsData, isLoading: isMetricsLoading} = useQuery<PaymentMetrics>(
         ['paymentMetrics', selectedFilters],
-        () => fetchPaymentMethods(selectedFilters),
+        () => fetchPaymentMetrics(selectedFilters),
         {keepPreviousData: true}
     );
 
