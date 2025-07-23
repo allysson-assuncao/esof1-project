@@ -1,6 +1,7 @@
 package org.example.backend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.dto.Category.CategorySalesDTO;
 import org.example.backend.dto.Category.ProductSalesDTO;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
@@ -13,14 +14,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j // enables logging
 public class MenuReportService {
 
     private final OrderRepository orderRepository;
@@ -28,7 +27,25 @@ public class MenuReportService {
     private final MenuReportSpecificationService specificationService;
 
     public List<CategorySalesDTO> getMenuSalesReport(MenuReportFilterDTO filter) {
-        Specification<Order> spec = specificationService.getSpecification(filter);
+        MenuReportFilterDTO effectiveFilter = filter;
+
+        if (filter.categoryIds() != null && !filter.categoryIds().isEmpty()) {
+            log.info("Finding all descendant categories for IDs: {}", filter.categoryIds());
+            Set<UUID> allCategoryIds = findAllCategoryAndDescendantIds(filter.categoryIds());
+            log.info("Total categories to filter (including descendants): {}", allCategoryIds.size());
+
+            effectiveFilter = new MenuReportFilterDTO(
+                filter.startDate(),
+                filter.endDate(),
+                filter.businessDayStartTime(),
+                allCategoryIds,
+                filter.productIds(),
+                filter.minPrice(),
+                filter.maxPrice()
+            );
+        }
+
+        Specification<Order> spec = specificationService.getSpecification(effectiveFilter);
         List<Order> filteredOrders = orderRepository.findAll(spec);
 
         Map<UUID, ProductSalesDTO> salesByProduct = aggregateSalesData(filteredOrders);
@@ -39,6 +56,29 @@ public class MenuReportService {
                 .map(category -> buildRecursiveCategorySales(category, salesByProduct))
                 .filter(dto -> dto.getQuantitySold() > 0)
                 .collect(Collectors.toList());
+    }
+
+    private Set<UUID> findAllCategoryAndDescendantIds(Set<UUID> initialCategoryIds) {
+        Set<UUID> allIds = new HashSet<>(initialCategoryIds);
+        Queue<UUID> queue = new LinkedList<>(initialCategoryIds);
+
+        while(!queue.isEmpty()) {
+            Set<UUID> currentBatch = new HashSet<>();
+            while(!queue.isEmpty()) {
+                currentBatch.add(queue.poll());
+            }
+
+            if (currentBatch.isEmpty()) continue;
+
+            Set<Category> children = categoryRepository.findByParentCategoryIds(currentBatch);
+
+            for (Category child : children) {
+                if (allIds.add(child.getId())) {
+                    queue.add(child.getId());
+                }
+            }
+        }
+        return allIds;
     }
 
     private Map<UUID, ProductSalesDTO> aggregateSalesData(List<Order> orders) {
@@ -54,6 +94,7 @@ public class MenuReportService {
                     .productId(product.getId())
                     .name(product.getName())
                     .unitPrice(product.getPrice())
+                    .active(product.isActive())
                     .quantitySold(newQuantity)
                     .totalValue(newTotal)
                     .build();

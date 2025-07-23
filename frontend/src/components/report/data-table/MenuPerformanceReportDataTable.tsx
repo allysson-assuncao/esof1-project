@@ -8,7 +8,7 @@ import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from "@/c
 import {
     CategorySales,
     MenuPerformanceFilter,
-    MenuPerformanceMetrics
+    MenuPerformanceMetrics, SimpleCategory, SimpleProduct
 } from "@/model/Interfaces";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -81,18 +81,6 @@ export function MenuPerformanceReportDataTable({
                                                    metrics,
                                                    isMetricsLoading
                                                }: DataTableProps) {
-    const {data: simpleCategories, isLoading: isLoadingCategoryOptions} = useQuery(
-        'simpleCategories', fetchSimpleCategories
-    );
-    const {data: productOptions, isLoading: isLoadingProductOptions} = useQuery(
-        'simpleProducts', fetchSimpleProducts
-    );
-
-    const categoryOptions =
-        simpleCategories?.map((category) => ({
-            value: category.id,
-            label: category.name,
-        })) ?? [];
 
     const table = useReactTable({
         data,
@@ -104,6 +92,25 @@ export function MenuPerformanceReportDataTable({
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
     });
+
+    const {data: simpleCategories, isLoading: isLoadingCategoryOptions} = useQuery<SimpleCategory[]>(
+        'simpleCategories', fetchSimpleCategories
+    );
+    const {data: simpleProducts, isLoading: isLoadingSimpleProducts} = useQuery<SimpleProduct[]>(
+        'simpleProducts', fetchSimpleProducts
+    );
+
+    const categoryOptions =
+        simpleCategories?.map((category) => ({
+            value: category.id,
+            label: category.name,
+        })) ?? [];
+
+    const productOptions =
+        simpleProducts?.map((category) => ({
+            value: category.id,
+            label: category.name,
+        })) ?? [];
 
     return (
         <div>
@@ -149,7 +156,7 @@ export function MenuPerformanceReportDataTable({
                             : []
                     }
                     placeholder="Produtos"
-                    disabled={isLoadingProductOptions}
+                    disabled={isLoadingSimpleProducts}
                     animation={2}
                     maxCount={2}
                 />

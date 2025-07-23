@@ -269,6 +269,7 @@ export interface ProductSales {
     productId: string;
     name: string;
     unitPrice: number;
+    active: boolean;
     quantitySold: number;
     totalValue: number;
     subRows?: never[];

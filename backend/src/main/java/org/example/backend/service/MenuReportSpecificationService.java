@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
@@ -29,10 +30,15 @@ public class MenuReportSpecificationService {
             Optional.ofNullable(filter.endDate())
                     .ifPresent(end -> predicates.add(cb.lessThanOrEqualTo(root.get("orderedTime"), end)));
 
-            Optional.ofNullable(filter.minPrice())
-                    .ifPresent(min -> predicates.add(cb.greaterThanOrEqualTo(productJoin.get("price"), min)));
-            Optional.ofNullable(filter.maxPrice())
-                    .ifPresent(max -> predicates.add(cb.lessThanOrEqualTo(productJoin.get("price"), max)));
+            if (filter.minPrice() != null || filter.maxPrice() != null) {
+                Expression<Double> totalOrderItemValue = cb.prod(root.get("amount"), productJoin.get("price"));
+                System.out.println("totalOrderItemValue: " + totalOrderItemValue.toString());
+
+                Optional.ofNullable(filter.minPrice())
+                        .ifPresent(min -> predicates.add(cb.greaterThanOrEqualTo(totalOrderItemValue, min)));
+                Optional.ofNullable(filter.maxPrice())
+                        .ifPresent(max -> predicates.add(cb.lessThanOrEqualTo(totalOrderItemValue, max)));
+            }
 
             if (filter.productIds() != null && !filter.productIds().isEmpty()) {
                 predicates.add(productJoin.get("id").in(filter.productIds()));
