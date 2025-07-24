@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.dto.Category.CategorySalesDTO;
 import org.example.backend.dto.Category.ProductSalesDTO;
+import org.example.backend.dto.Report.MenuPerformanceMetricsDTO;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
 import org.example.backend.model.Category;
 import org.example.backend.model.Order;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j // enables logging
+@Slf4j
 public class MenuReportService {
 
     private final OrderRepository orderRepository;
@@ -77,6 +78,51 @@ public class MenuReportService {
                 .map(category -> buildRecursiveCategorySales(category, filteredSalesByProduct))
                 .filter(dto -> dto.getQuantitySold() > 0)
                 .collect(Collectors.toList());
+    }
+
+    public MenuPerformanceMetricsDTO getMenuPerformanceMetrics(MenuReportFilterDTO filter) {
+        MenuReportFilterDTO effectiveFilter = applyDescendantCategoryFilter(filter);
+
+        Specification<Order> spec = specificationService.getSpecification(effectiveFilter);
+        List<Order> ordersFromDb = orderRepository.findAll(spec);
+
+        if (ordersFromDb.isEmpty()) {
+            return MenuPerformanceMetricsDTO.builder()
+                    .totalRevenue(BigDecimal.ZERO)
+                    .totalItemsSold(0L)
+                    .uniqueProductsSold(0L)
+                    .build();
+        }
+
+        BigDecimal totalRevenue = ordersFromDb.stream()
+                .map(order -> BigDecimal.valueOf(order.getProduct().getPrice()).multiply(BigDecimal.valueOf(order.getAmount())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        long totalItemsSold = ordersFromDb.stream()
+                .mapToLong(Order::getAmount)
+                .sum();
+
+        long uniqueProductsSold = ordersFromDb.stream()
+                .map(order -> order.getProduct().getId())
+                .distinct()
+                .count();
+
+        return MenuPerformanceMetricsDTO.builder()
+                .totalRevenue(totalRevenue)
+                .totalItemsSold(totalItemsSold)
+                .uniqueProductsSold(uniqueProductsSold)
+                .build();
+    }
+
+    private MenuReportFilterDTO applyDescendantCategoryFilter(MenuReportFilterDTO filter) {
+        if (filter.categoryIds() != null && !filter.categoryIds().isEmpty()) {
+            Set<UUID> allCategoryIds = findAllCategoryAndDescendantIds(filter.categoryIds());
+            return new MenuReportFilterDTO(
+                    filter.startDate(), filter.endDate(), filter.businessDayStartTime(),
+                    allCategoryIds, filter.productIds(), filter.minPrice(), filter.maxPrice()
+            );
+        }
+        return filter;
     }
 
     private Set<UUID> findAllCategoryAndDescendantIds(Set<UUID> initialCategoryIds) {
