@@ -36,7 +36,7 @@ public class OrderSpecificationService {
 
             Optional.ofNullable(filterDto.endTime())
                     .ifPresent(endTime -> predicates.add(
-                            criteriaBuilder.lessThanOrEqualTo(root.get("closedTime"), endTime)
+                            criteriaBuilder.lessThanOrEqualTo(root.get("orderedTime"), endTime)
                     ));
 
             assert query != null;
