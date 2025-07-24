@@ -3,7 +3,6 @@ package org.example.backend.service;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
-import org.example.backend.dto.GuestTab.GuestTabFilterDTO;
 import org.example.backend.dto.Order.OrderKanbanFilterDTO;
 import org.example.backend.model.*;
 import org.example.backend.model.enums.OrderStatus;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderSpecificationService {
@@ -28,6 +28,16 @@ public class OrderSpecificationService {
                 Join<Order, Workstation> workstationJoin = root.join("workstation", JoinType.LEFT);
                 predicates.add(workstationJoin.get("id").in(filterDto.workstationIds()));
             }
+
+            Optional.ofNullable(filterDto.startTime())
+                    .ifPresent(startTime -> predicates.add(
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("orderedTime"), startTime)
+                    ));
+
+            Optional.ofNullable(filterDto.endTime())
+                    .ifPresent(endTime -> predicates.add(
+                            criteriaBuilder.lessThanOrEqualTo(root.get("closedTime"), endTime)
+                    ));
 
             assert query != null;
             query.distinct(true);
