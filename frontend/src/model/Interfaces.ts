@@ -266,6 +266,12 @@ export interface MenuPerformanceFilter {
     maxPrice?: number;
 }
 
+export interface MenuPerformanceMetrics {
+    totalRevenue: number;
+    totalItemsSold: number;
+    uniqueProductsSold: number;
+}
+
 export interface ProductSales {
     productId: string;
     name: string;
@@ -273,7 +279,6 @@ export interface ProductSales {
     active: boolean;
     quantitySold: number;
     totalValue: number;
-    subRows?: never[];
 }
 
 export interface CategorySales {
@@ -281,9 +286,19 @@ export interface CategorySales {
     name: string;
     quantitySold: number;
     totalValue: number;
-    subCategorySales: CategorySales[];
     productSales: ProductSales[];
-    subRows?: (CategorySales | ProductSales)[];
+    subCategorySales: CategorySales[];
+}
+
+export interface ReportRow {
+    id: string;
+    name: string;
+    quantitySold: number;
+    totalValue: number;
+    unitPrice?: number;
+    active?: boolean;
+    type: 'CATEGORY' | 'PRODUCT';
+    subRows?: ReportRow[];
 }
 
 export interface MenuPerformanceMetrics {
