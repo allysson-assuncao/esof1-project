@@ -6,4 +6,4 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-public record ProductSalesDTO(UUID productId, String name, double unitPrice, long quantitySold, BigDecimal totalValue) { }
+public record ProductSalesDTO(UUID productId, String name, double unitPrice, boolean active, long quantitySold, BigDecimal totalValue) { }

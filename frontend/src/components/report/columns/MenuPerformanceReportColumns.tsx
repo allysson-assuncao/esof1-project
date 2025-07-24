@@ -2,7 +2,7 @@
 
 import {ColumnDef} from '@tanstack/react-table'
 import {CategorySales, ProductSales} from "@/model/Interfaces";
-import {ChevronDown, ChevronRight, Dot} from "lucide-react";
+import {CheckCircle2, ChevronDown, ChevronRight, Dot, XCircle} from "lucide-react";
 
 type MenuRowData = CategorySales | ProductSales;
 
@@ -38,6 +38,26 @@ export const menuPerformanceReportColumns: ColumnDef<MenuRowData>[] = [
         accessorKey: 'quantitySold',
         header: () => <div className="text-right">Qtd. Vendida</div>,
         cell: ({ getValue }) => <div className="text-right">{getValue<number>()}</div>,
+    },
+    {
+        id: 'active',
+        header: () => <div className="text-center">Ativo</div>,
+        cell: ({ row }) => {
+            const isProduct = 'productId' in row.original;
+            if (!isProduct) return <div className="text-center">-</div>;
+            const active = (row.original as ProductSales).active;
+            return (
+                <div className="flex justify-center items-center">
+                    {active ? (
+                        <CheckCircle2 size={20} className="text-green-600" />
+                    ) : (
+                        <XCircle size={20} className="text-red-600" />
+                    )}
+                </div>
+            );
+        },
+        enableSorting: false,
+        enableColumnFilter: false,
     },
     {
         accessorKey: 'unitPrice',

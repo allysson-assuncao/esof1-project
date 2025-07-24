@@ -29,11 +29,6 @@ public class MenuReportSpecificationService {
             Optional.ofNullable(filter.endDate())
                     .ifPresent(end -> predicates.add(cb.lessThanOrEqualTo(root.get("orderedTime"), end)));
 
-            Optional.ofNullable(filter.minPrice())
-                    .ifPresent(min -> predicates.add(cb.greaterThanOrEqualTo(productJoin.get("price"), min)));
-            Optional.ofNullable(filter.maxPrice())
-                    .ifPresent(max -> predicates.add(cb.lessThanOrEqualTo(productJoin.get("price"), max)));
-
             if (filter.productIds() != null && !filter.productIds().isEmpty()) {
                 predicates.add(productJoin.get("id").in(filter.productIds()));
             }
