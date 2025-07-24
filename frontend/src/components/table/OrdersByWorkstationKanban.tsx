@@ -15,13 +15,17 @@ import {OrdersByWorkstationDataTable} from "@/components/table/data-table/Orders
 import {makeOrderKanbanColumns} from "@/components/table/columns/OrdersByWorkstationColumns";
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
 import {DatePicker} from "@/components/ui/date-picker";
+import {Search} from "lucide-react";
+import {Button} from "@/components/ui/button";
 
 export const OrdersByWorkstationKanban = () => {
-    const [selectedFilters, setSelectedFilters] = useState<KanbanOrderResultsFilter>({
+    const [filterInputs, setFilterInputs] = useState<KanbanOrderResultsFilter>({
         workstationIds: [],
         startTime: undefined,
         endTime: undefined,
-    })
+    });
+
+    const [appliedFilters, setAppliedFilters] = useState<KanbanOrderResultsFilter>(filterInputs);
 
     const {data: workstationOptions, isLoading: isLoadingWorkstations} = useQuery<SimpleWorkstation[]>({
         queryKey: ['workstations'],
@@ -40,9 +44,9 @@ export const OrdersByWorkstationKanban = () => {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery({
-        queryKey: ['kanbanOrders', selectedFilters],
+        queryKey: ['kanbanOrders', appliedFilters],
         queryFn: ({pageParam = 0}) => fetchFilteredOrderKanbanResults({
-            filter: selectedFilters,
+            filter: appliedFilters,
             page: pageParam,
             size: 20,
         }),
@@ -136,6 +140,10 @@ export const OrdersByWorkstationKanban = () => {
     const inPrepareOrders = useMemo(() => data?.pages.flatMap(page => page.inPrepareOrders.content) ?? [], [data]);
     const readyOrders = useMemo(() => data?.pages.flatMap(page => page.readyOrders.content) ?? [], [data]);
 
+    const handleApplyFilters = () => {
+        setAppliedFilters(filterInputs);
+    };
+
     if (isLoadingOrders) return <DataTableSkeleton/>
     if (error) return <div>Erro carregando os dados</div>
 
@@ -150,25 +158,30 @@ export const OrdersByWorkstationKanban = () => {
             <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-8 items-start md:items-center">
                 Filas de Pedidos
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
+            <div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
                 <MultiSelect
                     options={optionsForFilter}
-                    onValueChange={(selectedValues) => setSelectedFilters({
-                        ...selectedFilters,
+                    onValueChange={(selectedValues) => setFilterInputs({
+                        ...filterInputs,
                         workstationIds: selectedValues,
                     })}
-                    defaultValue={selectedFilters.workstationIds || []}
+                    defaultValue={filterInputs.workstationIds || []}
                     placeholder="Selecione a área de Trabalho..."
                     disabled={isLoadingWorkstations}
                     animation={2}
                     maxCount={3}
                 />
                 <DatePicker
-                    onDateSelected={(startTime) => setSelectedFilters({...selectedFilters, startTime})}
+                    onDateSelected={(startTime) => setFilterInputs({...filterInputs, startTime})}
                 />
                 <DatePicker
-                    onDateSelected={(endTime) => setSelectedFilters({...selectedFilters, endTime})}
+                    onDateSelected={(endTime) => setFilterInputs({...filterInputs, endTime})}
                 />
+                <Button onClick={handleApplyFilters}>
+                    <Search className="mr-2 h-4 w-4"/>
+                    Aplicar Filtros
+                </Button>
             </div>
 
             <main className="flex gap-6 p-2">
