@@ -35,25 +35,46 @@ public class MenuReportService {
             log.info("Total categories to filter (including descendants): {}", allCategoryIds.size());
 
             effectiveFilter = new MenuReportFilterDTO(
-                filter.startDate(),
-                filter.endDate(),
-                filter.businessDayStartTime(),
-                allCategoryIds,
-                filter.productIds(),
-                filter.minPrice(),
-                filter.maxPrice()
+                    filter.startDate(),
+                    filter.endDate(),
+                    filter.businessDayStartTime(),
+                    allCategoryIds,
+                    filter.productIds(),
+                    null,
+                    null
             );
         }
 
         Specification<Order> spec = specificationService.getSpecification(effectiveFilter);
-        List<Order> filteredOrders = orderRepository.findAll(spec);
+        List<Order> ordersFromDb = orderRepository.findAll(spec);
 
-        Map<UUID, ProductSalesDTO> salesByProduct = aggregateSalesData(filteredOrders);
+        Map<UUID, ProductSalesDTO> salesByProduct = aggregateSalesData(ordersFromDb);
+
+        Map<UUID, ProductSalesDTO> filteredSalesByProduct;
+
+        if (filter.minPrice() != null || filter.maxPrice() != null) {
+            filteredSalesByProduct = salesByProduct.entrySet().stream()
+                    .filter(entry -> {
+                        ProductSalesDTO productSales = entry.getValue();
+                        BigDecimal totalSalesValue = productSales.totalValue();
+
+                        boolean minPriceOk = (filter.minPrice() == null) ||
+                                (totalSalesValue.compareTo(BigDecimal.valueOf(filter.minPrice())) >= 0);
+
+                        boolean maxPriceOk = (filter.maxPrice() == null) ||
+                                (totalSalesValue.compareTo(BigDecimal.valueOf(filter.maxPrice())) <= 0);
+
+                        return minPriceOk && maxPriceOk;
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        } else {
+            filteredSalesByProduct = salesByProduct;
+        }
 
         List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
 
         return rootCategories.stream()
-                .map(category -> buildRecursiveCategorySales(category, salesByProduct))
+                .map(category -> buildRecursiveCategorySales(category, filteredSalesByProduct))
                 .filter(dto -> dto.getQuantitySold() > 0)
                 .collect(Collectors.toList());
     }
@@ -62,9 +83,9 @@ public class MenuReportService {
         Set<UUID> allIds = new HashSet<>(initialCategoryIds);
         Queue<UUID> queue = new LinkedList<>(initialCategoryIds);
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Set<UUID> currentBatch = new HashSet<>();
-            while(!queue.isEmpty()) {
+            while (!queue.isEmpty()) {
                 currentBatch.add(queue.poll());
             }
 
