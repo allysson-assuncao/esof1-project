@@ -6,7 +6,7 @@ import {
     KanbanOrderResultsFilter,
     SimpleWorkstation
 } from "@/model/Interfaces";
-import {useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {MultiSelect} from "@/components/ui/multi-select";
 import {fetchFilteredOrderKanbanResults, advanceOrderStatus, regressOrderStatus} from "@/services/orderService";
 import {toast} from "sonner";
@@ -14,10 +14,13 @@ import {AxiosError} from "axios";
 import {OrdersByWorkstationDataTable} from "@/components/table/data-table/OrdersByWorkstationDataTable";
 import {makeOrderKanbanColumns} from "@/components/table/columns/OrdersByWorkstationColumns";
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
+import {DatePicker} from "@/components/ui/date-picker";
 
 export const OrdersByWorkstationKanban = () => {
     const [selectedFilters, setSelectedFilters] = useState<KanbanOrderResultsFilter>({
         workstationIds: [],
+        startTime: undefined,
+        endTime: undefined,
     })
 
     const {data: workstationOptions, isLoading: isLoadingWorkstations} = useQuery<SimpleWorkstation[]>({
@@ -45,27 +48,27 @@ export const OrdersByWorkstationKanban = () => {
         }),
         getNextPageParam: (lastPage, allPages) => {
             const hasMoreInSent = (lastPage?.sentOrders?.totalPages ?? 0) > allPages.length;
-        const hasMoreInPrepare = (lastPage?.inPrepareOrders?.totalPages ?? 0) > allPages.length;
-        const hasMoreInReady = (lastPage?.readyOrders?.totalPages ?? 0) > allPages.length;
+            const hasMoreInPrepare = (lastPage?.inPrepareOrders?.totalPages ?? 0) > allPages.length;
+            const hasMoreInReady = (lastPage?.readyOrders?.totalPages ?? 0) > allPages.length;
 
-        const hasMore = hasMoreInSent || hasMoreInPrepare || hasMoreInReady;
-        return hasMore ? allPages.length : undefined;
+            const hasMore = hasMoreInSent || hasMoreInPrepare || hasMoreInReady;
+            return hasMore ? allPages.length : undefined;
         },
         enabled: !isLoadingWorkstations,
     });
 
     const advanceStatusMutation = useMutation({
-        mutationFn: ({ orderId }: { orderId: number }) =>
-            advanceOrderStatus({ orderId }),
+        mutationFn: ({orderId}: { orderId: number }) =>
+            advanceOrderStatus({orderId}),
         onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
+            queryClient.invalidateQueries({queryKey: ['kanbanOrders']});
             toast.success("Status do Pedido Avançado!", {
                 description: "O pedido foi movido para a próxima fila.",
                 duration: 5000,
                 action: {
                     label: "Desfazer",
                     onClick: () => {
-                        revertStatusMutation.mutate({ orderId: variables.orderId });
+                        revertStatusMutation.mutate({orderId: variables.orderId});
                     }
                 }
             });
@@ -84,17 +87,17 @@ export const OrdersByWorkstationKanban = () => {
     });
 
     const revertStatusMutation = useMutation({
-        mutationFn: ({ orderId }: { orderId: number }) =>
-            regressOrderStatus({ orderId }),
+        mutationFn: ({orderId}: { orderId: number }) =>
+            regressOrderStatus({orderId}),
         onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['kanbanOrders'] });
+            queryClient.invalidateQueries({queryKey: ['kanbanOrders']});
             toast.success("Status do Pedido Revertido!", {
                 description: "O pedido foi movido para a fila anterior.",
                 duration: 5000,
                 action: {
                     label: "Desfazer",
                     onClick: () => {
-                        advanceStatusMutation.mutate({ orderId: variables.orderId });
+                        advanceStatusMutation.mutate({orderId: variables.orderId});
                     }
                 }
             });
@@ -113,11 +116,11 @@ export const OrdersByWorkstationKanban = () => {
     });
 
     const handleAdvanceStatus = (orderId: number) => {
-        advanceStatusMutation.mutate({ orderId });
+        advanceStatusMutation.mutate({orderId});
     };
 
     const handleRevertStatus = (orderId: number) => {
-        revertStatusMutation.mutate({ orderId });
+        revertStatusMutation.mutate({orderId});
     };
 
     const columns = useMemo(
@@ -133,7 +136,7 @@ export const OrdersByWorkstationKanban = () => {
     const inPrepareOrders = useMemo(() => data?.pages.flatMap(page => page.inPrepareOrders.content) ?? [], [data]);
     const readyOrders = useMemo(() => data?.pages.flatMap(page => page.readyOrders.content) ?? [], [data]);
 
-    if (isLoadingOrders) return <DataTableSkeleton />
+    if (isLoadingOrders) return <DataTableSkeleton/>
     if (error) return <div>Erro carregando os dados</div>
 
     const kanbanQueues = [
@@ -147,7 +150,7 @@ export const OrdersByWorkstationKanban = () => {
             <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-8 items-start md:items-center">
                 Filas de Pedidos
             </div>
-            <div className="max-w-md p-2 rounded-lg shadow">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
                 <MultiSelect
                     options={optionsForFilter}
                     onValueChange={(selectedValues) => setSelectedFilters({
@@ -160,9 +163,15 @@ export const OrdersByWorkstationKanban = () => {
                     animation={2}
                     maxCount={3}
                 />
+                <DatePicker
+                    onDateSelected={(startTime) => setSelectedFilters({...selectedFilters, startTime})}
+                />
+                <DatePicker
+                    onDateSelected={(endTime) => setSelectedFilters({...selectedFilters, endTime})}
+                />
             </div>
 
-            <main className="flex gap-6 overflow-x-auto p-2">
+            <main className="flex gap-6 p-2">
                 {kanbanQueues.map(queue => (
                     <OrdersByWorkstationDataTable
                         key={queue.title}

@@ -34,6 +34,7 @@ public class PaymentSpecificationService {
             predicates.add(individualPaymentJoin.get("paymentMethod").get("id").in(filterDto.paymentMethodIds()));
         }
 
+        assert query != null;
         query.distinct(true);
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     };

@@ -10,6 +10,10 @@ body {
     color: #cc3300;
 }
 
+/*::-webkit-scrollbar-track {
+    background: transparent;
+}*/
+
 @layer utilities {
     .text-balance {
         text-wrap: balance;

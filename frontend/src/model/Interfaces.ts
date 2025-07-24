@@ -175,6 +175,8 @@ export interface OrderKanban {
 
 export interface KanbanOrderResultsFilter {
     workstationIds: string[],
+    startTime?: Date | undefined;
+    endTime?: Date | undefined;
 }
 
 export interface FetchKanbanOrderResultsParams {

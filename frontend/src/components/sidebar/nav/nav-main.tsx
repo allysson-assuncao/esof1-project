@@ -51,7 +51,7 @@ export function NavMain({
             <SidebarMenu>
                 {items.map((item) => (
                     (item.title !== 'Gestão' || hasManagePermission()) && (
-                        (item.title !== 'Administrador' || role === UserRoles.ADMIN.value) && (
+                        (item.title !== 'Relatório' || role === UserRoles.ADMIN.value) && (
                             <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild tooltip={item.title}>
@@ -71,7 +71,7 @@ export function NavMain({
                                             <CollapsibleContent>
                                                 <SidebarMenuSub>
                                                     {item.items?.map((subItem) => (
-                                                        /*(subItem.title !== 'Administrador' || role === UserRoles.ADMIN.value) && (*/
+                                                        /*(subItem.title !== 'Relatório' || role === UserRoles.ADMIN.value) && (*/
                                                         <SidebarMenuSubItem key={subItem.title}>
                                                             <SidebarMenuSubButton asChild>
                                                                 <a href={subItem.url}>

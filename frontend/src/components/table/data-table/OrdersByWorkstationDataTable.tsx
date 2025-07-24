@@ -80,7 +80,7 @@ export function OrdersByWorkstationDataTable<TData extends OrderKanban, TValue>(
                     <div className="px-4 py-2 border-b">
                         <span className="text-lg font-semibold">Pedidos Adicionais</span>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div>
                         <Table className="min-w-full divide-y divide-muted">
                             <TableHeader className="bg-muted/30">
                                 <TableRow>
