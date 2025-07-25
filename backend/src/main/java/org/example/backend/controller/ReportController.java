@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import org.example.backend.dto.Category.CategorySalesDTO;
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Payment.PaymentGroupDTO;
+import org.example.backend.dto.Report.FinancialMetricsDTO;
 import org.example.backend.dto.Report.GeneralReportFilterDTO;
 import org.example.backend.dto.Report.MenuPerformanceMetricsDTO;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
@@ -51,6 +52,12 @@ public class ReportController {
     @PostMapping("/menu-metrics")
     public ResponseEntity<MenuPerformanceMetricsDTO> getMenuPerformanceMetrics(@RequestBody MenuReportFilterDTO filter) {
         MenuPerformanceMetricsDTO metrics = this.menuReportService.getMenuPerformanceMetrics(filter);
+        return ResponseEntity.ok(metrics);
+    }
+
+    @PostMapping("/payment-metrics")
+    public ResponseEntity<FinancialMetricsDTO> getPaymentMetrics(@RequestBody GeneralReportFilterDTO filter) {
+        FinancialMetricsDTO metrics = this.reportService.getFinancialMetrics(filter);
         return ResponseEntity.ok(metrics);
     }
 
