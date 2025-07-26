@@ -8,7 +8,7 @@ export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
         },
         params: {
             page: params.page || 0,
-            size: params.size || 350,
+            size: params.size || 5,
             orderBy: params.orderBy || 'updatedAt',
             direction: params.direction || 'ASC',
         },

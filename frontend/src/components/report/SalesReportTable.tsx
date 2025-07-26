@@ -15,7 +15,7 @@ const SalesReportTable = () => {
         paymentMethodIds: [],
     });
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(5);
     const [totalPages, setTotalPages] = useState(0);
     const [cachedPages, setCachedPages] = useState<{ [key: number]: GuestTabFilters[] }>({});
 
@@ -26,7 +26,7 @@ const SalesReportTable = () => {
                 filter: selectedFilters,
                 page: page,
                 size: pageSize,
-                orderBy: 'timeOpened',
+                orderBy: 'createdAt',
                 direction: 'ASC',
             });
             setTotalPages(res.totalPages)

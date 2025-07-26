@@ -5,7 +5,14 @@ import {ColumnDef} from "@tanstack/react-table";
 export const paymentGroupColumns = (): ColumnDef<PaymentGroup>[] => [
     {
         id: "expander",
-        header: () => null,
+        header: ({table}) => (
+            <button
+                onClick={() => table.toggleAllRowsExpanded(!table.getIsAllRowsExpanded())}
+                aria-label={table.getIsAllRowsExpanded() ? "Recolher todos" : "Expandir todos"}
+            >
+                {table.getIsAllRowsExpanded() ? <ChevronDown/> : <ChevronRight/>}
+            </button>
+        ),
         cell: ({row}) => (
             <button onClick={() => row.toggleExpanded(!row.getIsExpanded())}>
                 {row.getIsExpanded() ? <ChevronDown/> : <ChevronRight/>}
