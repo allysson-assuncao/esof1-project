@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface PaymentGroupProjection {
-    LocalDate getBusinessDate();
+    LocalDate getBusinessDay();
     BigDecimal getTotalAmount();
-    long getPaymentCount();
+    Integer getPaymentCount();
 }

@@ -2,6 +2,7 @@ package org.example.backend.service;
 
 import org.example.backend.dto.IndividualPayment.IndividualPaymentDTO;
 import org.example.backend.dto.Payment.PaymentGroupDTO;
+import org.example.backend.dto.Payment.PaymentGroupProjection;
 import org.example.backend.dto.Payment.ReportPaymentDTO;
 import org.example.backend.dto.Report.GeneralReportFilterDTO;
 import org.example.backend.model.Payment;
@@ -22,21 +23,56 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentSpecificationService paymentSpecificationService;
 
     @Autowired
-    public ReportService(PaymentRepository paymentRepository, PaymentSpecificationService paymentSpecificationService) {
+    public ReportService(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
-        this.paymentSpecificationService = paymentSpecificationService;
     }
 
     public Page<PaymentGroupDTO> getGroupedPaymentsByFilters(GeneralReportFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
-        Specification<Payment> specification = this.paymentSpecificationService.getAPIProcessSpecification(filterDto);
-        List<Payment> allPayments = this.paymentRepository.findAll(specification);
-
         LocalTime businessDayStart = Optional.ofNullable(filterDto.businessDayStartTime()).orElse(LocalTime.of(18, 0));
+        LocalTime businessDayEnd = Optional.ofNullable(filterDto.businessDayEndTime()).orElse(LocalTime.of(2, 0));
 
-        Map<LocalDate, List<Payment>> groupedByBusinessDay = allPayments.stream()
+        LocalDateTime queryStartDate = null;
+        if (filterDto.startDate() != null) {
+            queryStartDate = filterDto.startDate().toLocalDate().atTime(businessDayStart);
+        }
+
+        LocalDateTime queryEndDate = null;
+        if (filterDto.endDate() != null) {
+            queryEndDate = filterDto.endDate().toLocalDate().atTime(businessDayEnd);
+            if (businessDayEnd.isBefore(businessDayStart)) {
+                queryEndDate = queryEndDate.plusDays(1);
+            }
+        }
+
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(direction, "businessDay"));
+
+        Page<PaymentGroupProjection> groupedPage = this.paymentRepository.findGroupedPayments(
+                queryStartDate,
+                queryEndDate,
+                businessDayStart.toString(),
+                pageable
+        );
+
+        List<PaymentGroupProjection> projections = groupedPage.getContent();
+
+        if (projections.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        List<LocalDate> businessDaysOnPage = projections.stream()
+                .map(PaymentGroupProjection::getBusinessDay)
+                .collect(Collectors.toList());
+
+        List<Payment> paymentsForPage = this.paymentRepository.findPaymentsByBusinessDays(
+                businessDaysOnPage,
+                queryStartDate,
+                queryEndDate,
+                businessDayStart
+        );
+
+        Map<LocalDate, List<Payment>> paymentsByDateMap = paymentsForPage.stream()
                 .collect(Collectors.groupingBy(payment -> {
                     LocalDateTime createdAt = payment.getCreatedAt();
                     if (createdAt.toLocalTime().isBefore(businessDayStart)) {
@@ -45,39 +81,25 @@ public class ReportService {
                     return createdAt.toLocalDate();
                 }));
 
-        List<PaymentGroupDTO> paymentGroups = groupedByBusinessDay.entrySet().stream()
-                .map(entry -> {
-                    LocalDate date = entry.getKey();
-                    List<Payment> paymentsInGroup = entry.getValue();
-
-                    BigDecimal totalAmount = paymentsInGroup.stream()
-                            .map(Payment::getTotalAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<PaymentGroupDTO> finalResult = projections.stream()
+                .map(projection -> {
+                    LocalDate businessDay = projection.getBusinessDay();
+                    List<Payment> paymentsInGroup = paymentsByDateMap.getOrDefault(businessDay, Collections.emptyList());
 
                     List<ReportPaymentDTO> reportPaymentDTOs = paymentsInGroup.stream()
                             .map(this::mapPaymentToReportDTO)
                             .collect(Collectors.toList());
 
-                    return PaymentGroupDTO.builder()
-                            .date(date)
-                            .payments(reportPaymentDTOs)
-                            .paymentCount(paymentsInGroup.size())
-                            .totalAmount(totalAmount)
-                            .build();
+                    return new PaymentGroupDTO(
+                            businessDay,
+                            projection.getTotalAmount(),
+                            projection.getPaymentCount(),
+                            reportPaymentDTOs
+                    );
                 })
-                .sorted(Comparator.comparing(PaymentGroupDTO::date).reversed())
                 .collect(Collectors.toList());
 
-        int start = (int) PageRequest.of(page, size).getOffset();
-        int end = Math.min((start + size), paymentGroups.size());
-
-        if (start > paymentGroups.size()) {
-            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), paymentGroups.size());
-        }
-
-        List<PaymentGroupDTO> paginatedContent = paymentGroups.subList(start, end);
-
-        return new PageImpl<>(paginatedContent, PageRequest.of(page, size), paymentGroups.size());
+        return new PageImpl<>(finalResult, groupedPage.getPageable(), groupedPage.getTotalElements());
     }
 
     private ReportPaymentDTO mapPaymentToReportDTO(Payment payment) {
