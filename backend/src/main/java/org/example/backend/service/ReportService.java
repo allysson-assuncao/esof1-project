@@ -15,10 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,9 +33,8 @@ public class ReportService {
     public Page<PaymentGroupDTO> getGroupedPaymentsByFilters(GeneralReportFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
         Specification<Payment> specification = this.paymentSpecificationService.getAPIProcessSpecification(filterDto);
         List<Payment> allPayments = this.paymentRepository.findAll(specification);
-        System.out.println(allPayments);
 
-        LocalTime businessDayStart = Optional.ofNullable(filterDto.businessDayStartTime()).orElse(LocalTime.of(18, 0)); // Default 18:00
+        LocalTime businessDayStart = Optional.ofNullable(filterDto.businessDayStartTime()).orElse(LocalTime.of(18, 0));
 
         Map<LocalDate, List<Payment>> groupedByBusinessDay = allPayments.stream()
                 .collect(Collectors.groupingBy(payment -> {
@@ -74,6 +70,11 @@ public class ReportService {
 
         int start = (int) PageRequest.of(page, size).getOffset();
         int end = Math.min((start + size), paymentGroups.size());
+
+        if (start > paymentGroups.size()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), paymentGroups.size());
+        }
+
         List<PaymentGroupDTO> paginatedContent = paymentGroups.subList(start, end);
 
         return new PageImpl<>(paginatedContent, PageRequest.of(page, size), paymentGroups.size());
