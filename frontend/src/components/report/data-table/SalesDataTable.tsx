@@ -128,6 +128,10 @@ export function SalesDataTable<TValue>({
 
     return (
         <div>
+            <div className="mb-4">
+                <MetricsDisplay metrics={metrics} isLoading={isMetricsLoading}/>
+            </div>
+
             {/* Filters */}
             <div
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">

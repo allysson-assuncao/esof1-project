@@ -1,6 +1,7 @@
 package org.example.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.example.backend.dto.LocalTable.LocalTableBulkRegisterDTO;
 import org.example.backend.dto.LocalTable.LocalTableDTO;
 import org.example.backend.dto.LocalTable.LocalTableGetDTO;
 import org.example.backend.dto.LocalTable.LocalTableRequestDTO;
@@ -49,6 +50,18 @@ public class LocalTableController {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Table number " + request.number() + " already exists");
+        }
+    }
+
+    @PostMapping("/bulk-register")
+    public ResponseEntity<?> bulkRegisterLocalTable(@RequestBody LocalTableBulkRegisterDTO request) {
+        int created = localTableService.bulkRegisterLocalTable(request);
+        if (created == 0) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("All the requested numbers are taken");
+        }else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
         }
     }
 

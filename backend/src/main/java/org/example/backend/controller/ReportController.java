@@ -3,7 +3,9 @@ package org.example.backend.controller;
 import org.example.backend.dto.Category.CategorySalesDTO;
 import org.example.backend.dto.FilteredPageDTO;
 import org.example.backend.dto.Payment.PaymentGroupDTO;
+import org.example.backend.dto.Report.FinancialMetricsDTO;
 import org.example.backend.dto.Report.GeneralReportFilterDTO;
+import org.example.backend.dto.Report.MenuPerformanceMetricsDTO;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
 import org.example.backend.service.MenuReportService;
 import org.example.backend.service.ReportService;
@@ -45,6 +47,18 @@ public class ReportController {
     public ResponseEntity<List<CategorySalesDTO>> getMenuSalesReport(@RequestBody MenuReportFilterDTO filter) {
         List<CategorySalesDTO> report = this.menuReportService.getMenuSalesReport(filter);
         return ResponseEntity.ok(report);
+    }
+
+    @PostMapping("/menu-metrics")
+    public ResponseEntity<MenuPerformanceMetricsDTO> getMenuPerformanceMetrics(@RequestBody MenuReportFilterDTO filter) {
+        MenuPerformanceMetricsDTO metrics = this.menuReportService.getMenuPerformanceMetrics(filter);
+        return ResponseEntity.ok(metrics);
+    }
+
+    @PostMapping("/payment-metrics")
+    public ResponseEntity<FinancialMetricsDTO> getPaymentMetrics(@RequestBody GeneralReportFilterDTO filter) {
+        FinancialMetricsDTO metrics = this.reportService.getFinancialMetrics(filter);
+        return ResponseEntity.ok(metrics);
     }
 
 }

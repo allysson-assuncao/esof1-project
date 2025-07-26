@@ -1,18 +1,23 @@
+"use client";
+
 import React, {SetStateAction} from "react";
 import {
     useReactTable,
     getCoreRowModel,
     flexRender,
+    getExpandedRowModel,
+    ExpandedState,
 } from "@tanstack/react-table";
 import {Table, TableHeader, TableBody, TableRow, TableCell, TableHead} from "@/components/ui/table";
 import {
-    CategorySales,
     MenuPerformanceFilter,
-    MenuPerformanceMetrics, SimpleCategory, SimpleProduct
+    MenuPerformanceMetrics,
+    ReportRow,
+    SimpleCategory,
+    SimpleProduct
 } from "@/model/Interfaces";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {getExpandedRowModel} from "@tanstack/table-core";
 import {useQuery} from "react-query";
 import {fetchSimpleCategories} from "@/services/categoryService";
 import {fetchSimpleProducts} from "@/services/productService";
@@ -25,41 +30,36 @@ import {menuPerformanceReportColumns} from "@/components/report/columns/MenuPerf
 const MetricsDisplay = ({metrics, isLoading}: { metrics?: MenuPerformanceMetrics; isLoading: boolean }) => {
     if (isLoading) {
         return (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{[...Array(4)].map((_, i) =>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{[...Array(4)].map((_, i) =>
                 <Skeleton key={i} className="h-28"/>
             )}
             </div>
         );
     }
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <Card>
-                <CardHeader>
-                    <CardTitle>Itens Vendidos</CardTitle>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
                 </CardHeader>
-                <CardContent><p className="text-2xl font-bold">{metrics?.totalItemsSold ?? '...'}</p>
+                <CardContent>
+                    <p className="text-2xl font-bold">R$ {metrics?.totalRevenue?.toFixed(2) ?? '0.00'}</p>
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader>
-                    <CardTitle>Produto Top 1</CardTitle>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Itens Vendidos</CardTitle>
                 </CardHeader>
-                <CardContent><p className="text-2xl font-bold">{metrics?.topSellingProduct?.name ?? 'N/A'}</p>
+                <CardContent>
+                    <p className="text-2xl font-bold">{metrics?.totalItemsSold ?? 0}</p>
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader>
-                    <CardTitle>Categoria Top 1</CardTitle>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Produtos Únicos</CardTitle>
                 </CardHeader>
-                <CardContent><p className="text-2xl font-bold">{metrics?.topSellingCategory?.name ?? 'N/A'}</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Itens/Pedido</CardTitle>
-                </CardHeader>
-                <CardContent><p
-                    className="text-2xl font-bold">{metrics?.averageItemsPerOrder?.toFixed(1) ?? '...'}</p>
+                <CardContent>
+                    <p className="text-2xl font-bold">{metrics?.uniqueProductsSold ?? 0}</p>
                 </CardContent>
             </Card>
         </div>
@@ -67,15 +67,19 @@ const MetricsDisplay = ({metrics, isLoading}: { metrics?: MenuPerformanceMetrics
 };
 
 interface DataTableProps {
-    data: CategorySales[];
+    data: ReportRow[];
     selectedFilters: MenuPerformanceFilter;
-    setSelectedFilters: (filters: SetStateAction<MenuPerformanceFilter>) => void;
+    setSelectedFilters: (action: SetStateAction<MenuPerformanceFilter>) => void;
     metrics?: MenuPerformanceMetrics;
     isMetricsLoading: boolean;
+    expanded: ExpandedState;
+    setExpanded: React.Dispatch<SetStateAction<ExpandedState>>;
 }
 
 export function MenuPerformanceReportDataTable({
                                                    data,
+                                                   expanded,
+                                                   setExpanded,
                                                    selectedFilters,
                                                    setSelectedFilters,
                                                    metrics,
@@ -86,8 +90,9 @@ export function MenuPerformanceReportDataTable({
         data,
         columns: menuPerformanceReportColumns,
         state: {
-            expanded: true,
+            expanded,
         },
+        onExpandedChange: setExpanded,
         getSubRows: (row) => row.subRows,
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
@@ -107,17 +112,21 @@ export function MenuPerformanceReportDataTable({
         })) ?? [];
 
     const productOptions =
-        simpleProducts?.map((category) => ({
-            value: category.id,
-            label: category.name,
+        simpleProducts?.map((product) => ({
+            value: product.id,
+            label: product.name,
         })) ?? [];
 
     return (
         <div>
-            {/* Filters */}
+            {}
+            <div className="mb-4">
+                <MetricsDisplay metrics={metrics} isLoading={isMetricsLoading}/>
+            </div>
+
+            {}
             <div
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 5xl:grid-cols-4 gap-4 md:gap-6 py-4">
-                {/*<MetricsDisplay metrics={metrics} isLoading={isMetricsLoading}/>*/}
                 <DatePicker
                     onDateSelected={(startDate) => setSelectedFilters({...selectedFilters, startDate})}
                 />
@@ -125,36 +134,28 @@ export function MenuPerformanceReportDataTable({
                     onDateSelected={(endDate) => setSelectedFilters({...selectedFilters, endDate})}
                 />
                 <MultiSelect
-                    options={categoryOptions || []}
+                    options={categoryOptions}
                     onValueChange={(selectedValues) =>
                         setSelectedFilters({
                             ...selectedFilters,
-                            categoryIds: selectedValues.map((id) => id),
+                            categoryIds: selectedValues,
                         })
                     }
-                    defaultValue={
-                        selectedFilters.categoryIds ?? []
-                            ? selectedFilters.categoryIds?.map(String)
-                            : []
-                    }
+                    defaultValue={selectedFilters.categoryIds ?? []}
                     placeholder="Categorias"
                     disabled={isLoadingCategoryOptions}
                     animation={2}
                     maxCount={2}
                 />
                 <MultiSelect
-                    options={productOptions || []}
+                    options={productOptions}
                     onValueChange={(selectedValues) =>
                         setSelectedFilters({
                             ...selectedFilters,
-                            productIds: selectedValues.map((id) => id),
+                            productIds: selectedValues,
                         })
                     }
-                    defaultValue={
-                        selectedFilters.productIds ?? []
-                            ? selectedFilters.productIds?.map(String)
-                            : []
-                    }
+                    defaultValue={selectedFilters.productIds ?? []}
                     placeholder="Produtos"
                     disabled={isLoadingSimpleProducts}
                     animation={2}
@@ -168,7 +169,7 @@ export function MenuPerformanceReportDataTable({
                                className="w-24"
                         />
                         <Slider
-                            defaultValue={[0, 9999]}
+                            defaultValue={[selectedFilters.minPrice ?? 0, selectedFilters.maxPrice ?? 9999]}
                             max={9999}
                             step={1}
                             onValueCommit={([min, max]) => setSelectedFilters(f => ({
@@ -185,7 +186,7 @@ export function MenuPerformanceReportDataTable({
                 </div>
             </div>
 
-            {/* Table */}
+            {}
             <div className="rounded-md border overflow-x-auto">
                 <Table>
                     <TableHeader>
@@ -202,7 +203,7 @@ export function MenuPerformanceReportDataTable({
                     <TableBody>
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map(row => (
-                                <TableRow key={row.id}>
+                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                     {row.getVisibleCells().map(cell => (
                                         <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
