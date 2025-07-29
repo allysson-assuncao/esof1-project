@@ -26,10 +26,12 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentSpecificationService paymentSpecificationService;
 
     @Autowired
-    public ReportService(PaymentRepository paymentRepository) {
+    public ReportService(PaymentRepository paymentRepository, PaymentSpecificationService paymentSpecificationService) {
         this.paymentRepository = paymentRepository;
+        this.paymentSpecificationService = paymentSpecificationService;
     }
 
     public Page<PaymentGroupDTO> getGroupedPaymentsByFilters(GeneralReportFilterDTO filterDto, int page, int size, String orderBy, Sort.Direction direction) {
