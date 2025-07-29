@@ -13,8 +13,6 @@ export const fetchFilteredPayments = async (params: FetchPaymentParams) => {
             direction: params.direction || 'ASC',
         },
     });
-    console.log(params);
-    console.log(response.data);
     return response.data;
 }
 
