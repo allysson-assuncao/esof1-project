@@ -6,16 +6,19 @@ import org.example.backend.dto.Category.CategorySalesDTO;
 import org.example.backend.dto.Category.ProductSalesDTO;
 import org.example.backend.dto.Report.MenuPerformanceMetricsDTO;
 import org.example.backend.dto.Report.MenuReportFilterDTO;
+import org.example.backend.dto.Report.ProductSalesProjection;
 import org.example.backend.model.Category;
 import org.example.backend.model.Order;
-import org.example.backend.model.Product;
 import org.example.backend.repository.CategoryRepository;
 import org.example.backend.repository.OrderRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,54 +31,49 @@ public class MenuReportService {
     private final MenuReportSpecificationService specificationService;
 
     public List<CategorySalesDTO> getMenuSalesReport(MenuReportFilterDTO filter) {
-        MenuReportFilterDTO effectiveFilter = filter;
+        LocalTime businessDayStart = Optional.ofNullable(filter.businessDayStartTime())
+                .orElse(LocalTime.of(18, 0));
+        LocalTime businessDayEnd = LocalTime.of(2, 0);
 
-        if (filter.categoryIds() != null && !filter.categoryIds().isEmpty()) {
-            log.info("Finding all descendant categories for IDs: {}", filter.categoryIds());
-            Set<UUID> allCategoryIds = findAllCategoryAndDescendantIds(filter.categoryIds());
-            log.info("Total categories to filter (including descendants): {}", allCategoryIds.size());
-
-            effectiveFilter = new MenuReportFilterDTO(
-                    filter.startDate(),
-                    filter.endDate(),
-                    filter.businessDayStartTime(),
-                    allCategoryIds,
-                    filter.productIds(),
-                    null,
-                    null
-            );
+        LocalDateTime queryStartDate = null;
+        if (filter.startDate() != null) {
+            queryStartDate = filter.startDate().toLocalDate().atTime(businessDayStart);
+        }
+        LocalDateTime queryEndDate = null;
+        if (filter.endDate() != null) {
+            queryEndDate = filter.endDate().toLocalDate().atTime(businessDayEnd);
+            if (businessDayEnd.isBefore(businessDayStart)) {
+                queryEndDate = queryEndDate.plusDays(1);
+            }
         }
 
-        Specification<Order> spec = specificationService.getSpecification(effectiveFilter);
-        List<Order> ordersFromDb = orderRepository.findAll(spec);
+        Set<UUID> productUuids = (filter.productIds() == null || filter.productIds().isEmpty())
+                ? Collections.emptySet()
+                : filter.productIds();
 
-        Map<UUID, ProductSalesDTO> salesByProduct = aggregateSalesData(ordersFromDb);
+        List<UUID> allCategoryUuids = (filter.categoryIds() == null || filter.categoryIds().isEmpty())
+                ? Collections.emptyList()
+                : new ArrayList<>(findAllCategoryAndDescendantIds(filter.categoryIds()));
 
-        Map<UUID, ProductSalesDTO> filteredSalesByProduct;
+        List<ProductSalesProjection> salesProjections = orderRepository.getAggregatedMenuSales(
+                queryStartDate,
+                queryEndDate,
+                productUuids,
+                allCategoryUuids,
+                filter.minPrice() == null ? null : BigDecimal.valueOf(filter.minPrice()),
+                filter.maxPrice() == null ? null : BigDecimal.valueOf(filter.maxPrice())
+        );
 
-        if (filter.minPrice() != null || filter.maxPrice() != null) {
-            filteredSalesByProduct = salesByProduct.entrySet().stream()
-                    .filter(entry -> {
-                        ProductSalesDTO productSales = entry.getValue();
-                        BigDecimal totalSalesValue = productSales.totalValue();
-
-                        boolean minPriceOk = (filter.minPrice() == null) ||
-                                (totalSalesValue.compareTo(BigDecimal.valueOf(filter.minPrice())) >= 0);
-
-                        boolean maxPriceOk = (filter.maxPrice() == null) ||
-                                (totalSalesValue.compareTo(BigDecimal.valueOf(filter.maxPrice())) <= 0);
-
-                        return minPriceOk && maxPriceOk;
-                    })
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        } else {
-            filteredSalesByProduct = salesByProduct;
-        }
+        Map<UUID, ProductSalesDTO> salesByProduct = salesProjections.stream()
+                .map(p -> new ProductSalesDTO(
+                        p.getProductId(), p.getName(), p.getUnitPrice(), p.getActive(),
+                        p.getQuantitySold(), p.getTotalValue()
+                ))
+                .collect(Collectors.toMap(ProductSalesDTO::productId, Function.identity()));
 
         List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
-
         return rootCategories.stream()
-                .map(category -> buildRecursiveCategorySales(category, filteredSalesByProduct))
+                .map(category -> buildRecursiveCategorySales(category, salesByProduct))
                 .filter(dto -> dto.getQuantitySold() > 0)
                 .collect(Collectors.toList());
     }
@@ -148,7 +146,7 @@ public class MenuReportService {
         return allIds;
     }
 
-    private Map<UUID, ProductSalesDTO> aggregateSalesData(List<Order> orders) {
+    /*private Map<UUID, ProductSalesDTO> aggregateSalesData(List<Order> orders) {
         Map<UUID, ProductSalesDTO> salesMap = new HashMap<>();
         for (Order order : orders) {
             Product product = order.getProduct();
@@ -169,7 +167,7 @@ public class MenuReportService {
             salesMap.put(product.getId(), updated);
         }
         return salesMap;
-    }
+    }*/
 
     private CategorySalesDTO buildRecursiveCategorySales(Category category, Map<UUID, ProductSalesDTO> salesByProduct) {
         List<ProductSalesDTO> productSales = category.getProducts().stream()

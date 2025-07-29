@@ -12,6 +12,7 @@ import {fetchMenuPerformanceReport, fetchMenuPerformanceMetrics} from "@/service
 import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
 import {MenuPerformanceReportDataTable} from "@/components/report/data-table/MenuPerformanceReportDataTable";
 import {ExpandedState} from "@tanstack/react-table";
+import {Loader2} from "lucide-react";
 
 const transformDataToReportRows = (data: CategorySales[]): ReportRow[] => {
     return data.map((category) => {
@@ -45,7 +46,12 @@ const MenuPerformanceReportTable = () => {
 
     const hasValidPeriod = !!selectedFilters.startDate && !!selectedFilters.endDate;
 
-    const {data: reportData, error, isLoading: isReportLoading} = useQuery<CategorySales[]>(
+    const {
+        data: reportData,
+        error,
+        isLoading: isReportLoading,
+        isFetching: isReportFetching
+    } = useQuery<CategorySales[]>(
         ['menuPerformanceReport', selectedFilters],
         () => fetchMenuPerformanceReport(selectedFilters),
         {
@@ -54,7 +60,11 @@ const MenuPerformanceReportTable = () => {
         }
     );
 
-    const {data: metricsData, isLoading: isMetricsLoading} = useQuery<MenuPerformanceMetrics>(
+    const {
+        data: metricsData,
+        isLoading: isMetricsLoading,
+        isFetching: isMetricsFetching
+    } = useQuery<MenuPerformanceMetrics>(
         ['menuPerformanceMetrics', selectedFilters],
         () => fetchMenuPerformanceMetrics(selectedFilters),
         {
@@ -72,7 +82,10 @@ const MenuPerformanceReportTable = () => {
 
     return (
         <div className="container mx-auto py-10">
-            <h1 className="text-2xl font-bold mb-4">Relatório de Performance do Cardápio</h1>
+            <div className="flex items-center gap-4 mb-4">
+                <h1 className="text-2xl font-bold">Relatório de Performance do Cardápio</h1>
+                {isReportFetching && <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>}
+            </div>
 
             <MenuPerformanceReportDataTable
                 data={tableData}
@@ -81,7 +94,7 @@ const MenuPerformanceReportTable = () => {
                 selectedFilters={selectedFilters}
                 setSelectedFilters={setSelectedFilters}
                 metrics={metricsData}
-                isMetricsLoading={isMetricsLoading}
+                isMetricsLoading={isMetricsLoading || isMetricsFetching}
                 hasValidPeriod={hasValidPeriod}
             />
         </div>
