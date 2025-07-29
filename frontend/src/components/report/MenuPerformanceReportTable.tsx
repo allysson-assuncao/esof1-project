@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useQuery } from "react-query";
+import React, {useMemo, useState} from "react";
+import {useQuery} from "react-query";
 import {
     CategorySales,
     MenuPerformanceFilter,
     MenuPerformanceMetrics,
     ReportRow,
 } from "@/model/Interfaces";
-import { fetchMenuPerformanceReport, fetchMenuPerformanceMetrics } from "@/services/reportService";
-import { DataTableSkeleton } from "@/components/skeleton/DataTableSkeleton";
-import { MenuPerformanceReportDataTable } from "@/components/report/data-table/MenuPerformanceReportDataTable";
-import { ExpandedState } from "@tanstack/react-table";
+import {fetchMenuPerformanceReport, fetchMenuPerformanceMetrics} from "@/services/reportService";
+import {DataTableSkeleton} from "@/components/skeleton/DataTableSkeleton";
+import {MenuPerformanceReportDataTable} from "@/components/report/data-table/MenuPerformanceReportDataTable";
+import {ExpandedState} from "@tanstack/react-table";
 
 const transformDataToReportRows = (data: CategorySales[]): ReportRow[] => {
     return data.map((category) => {
@@ -39,28 +39,35 @@ const transformDataToReportRows = (data: CategorySales[]): ReportRow[] => {
 };
 
 const MenuPerformanceReportTable = () => {
-    const [selectedFilters, setSelectedFilters] = useState<MenuPerformanceFilter>({
-    });
+    const [selectedFilters, setSelectedFilters] = useState<MenuPerformanceFilter>({});
 
     const [expanded, setExpanded] = useState<ExpandedState>({});
 
-    const { data: reportData, error, isLoading: isReportLoading } = useQuery<CategorySales[]>(
+    const hasValidPeriod = !!selectedFilters.startDate && !!selectedFilters.endDate;
+
+    const {data: reportData, error, isLoading: isReportLoading} = useQuery<CategorySales[]>(
         ['menuPerformanceReport', selectedFilters],
         () => fetchMenuPerformanceReport(selectedFilters),
-        { keepPreviousData: true }
+        {
+            keepPreviousData: true,
+            enabled: hasValidPeriod
+        }
     );
 
-    const { data: metricsData, isLoading: isMetricsLoading } = useQuery<MenuPerformanceMetrics>(
+    const {data: metricsData, isLoading: isMetricsLoading} = useQuery<MenuPerformanceMetrics>(
         ['menuPerformanceMetrics', selectedFilters],
         () => fetchMenuPerformanceMetrics(selectedFilters),
-        { keepPreviousData: true }
+        {
+            keepPreviousData: true,
+            enabled: hasValidPeriod
+        }
     );
 
     const tableData = useMemo(() => {
         return reportData ? transformDataToReportRows(reportData) : [];
     }, [reportData]);
 
-    if (isReportLoading && !reportData) return <DataTableSkeleton />;
+    if (isReportLoading && !reportData) return <DataTableSkeleton/>;
     if (error) return <div>Ocorreu um erro ao carregar o relatório.</div>;
 
     return (
@@ -75,6 +82,7 @@ const MenuPerformanceReportTable = () => {
                 setSelectedFilters={setSelectedFilters}
                 metrics={metricsData}
                 isMetricsLoading={isMetricsLoading}
+                hasValidPeriod={hasValidPeriod}
             />
         </div>
     );

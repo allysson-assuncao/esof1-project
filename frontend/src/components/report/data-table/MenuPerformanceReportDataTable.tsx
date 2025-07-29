@@ -1,5 +1,3 @@
-"use client";
-
 import React, {SetStateAction} from "react";
 import {
     useReactTable,
@@ -74,6 +72,7 @@ interface DataTableProps {
     isMetricsLoading: boolean;
     expanded: ExpandedState;
     setExpanded: React.Dispatch<SetStateAction<ExpandedState>>;
+    hasValidPeriod: boolean;
 }
 
 export function MenuPerformanceReportDataTable({
@@ -83,7 +82,8 @@ export function MenuPerformanceReportDataTable({
                                                    selectedFilters,
                                                    setSelectedFilters,
                                                    metrics,
-                                                   isMetricsLoading
+                                                   isMetricsLoading,
+                                                   hasValidPeriod
                                                }: DataTableProps) {
 
     const table = useReactTable({
@@ -188,38 +188,44 @@ export function MenuPerformanceReportDataTable({
 
             {}
             <div className="rounded-md border overflow-x-auto">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map(hg => (
-                            <TableRow key={hg.id}>
-                                {hg.headers.map(h => (
-                                    <TableHead key={h.id}>
-                                        {flexRender(h.column.columnDef.header, h.getContext())}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map(row => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                    {row.getVisibleCells().map(cell => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
+                {!hasValidPeriod ? (
+                    <div className="text-center text-lg py-20">
+                        Escolha o período para análise
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map(hg => (
+                                <TableRow key={hg.id}>
+                                    {hg.headers.map(h => (
+                                        <TableHead key={h.id}>
+                                            {flexRender(h.column.columnDef.header, h.getContext())}
+                                        </TableHead>
                                     ))}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
-                                    Nenhum resultado.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map(row => (
+                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
+                                        Nenhum resultado.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
             </div>
         </div>
     );
